@@ -1,0 +1,46 @@
+php artisan serve
+
+php artisan migrate
+php artisan db:seed
+
+php artisan migrate --seed
+
+php artisan migrate:reset
+
+
+php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan clear-compiled
+php artisan event:clear
+php artisan optimize
+
+npm cache clean --force
+npm install
+
+rm -rf node_modules
+rm package-lock.json
+
+
+composer install
+npm install
+
+
+npm run dev
+
+
+php artisan temp:clear
+php artisan notifications:table
+
+
+User and role need to change permissions and also restrcit in list view
+
+Need to provide option to upload service worker
+Need to make PWA image genration Dyunamic
+
+Changes Made in satna but not in Boilerplate
+
+default password remvoed from login view
+User table class
+User moved script to new scritp section
