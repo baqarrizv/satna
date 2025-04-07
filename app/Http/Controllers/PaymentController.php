@@ -5,30 +5,60 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\PaymentService;
 use App\Models\Patient;
-use App\Models\Service;    
+use App\Models\Service;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use DataTables;
+use Yajra\DataTables\Facades\DataTables;
+use App\Models\Department;
+use App\Models\Doctor;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $payments = Payment::with('patient');
-            
-            return Datatables::of($payments)
+            $query = Payment::with('patient');
+
+            // Apply filters
+            if ($request->filled('payment_mode')) {
+                $query->where('payment_mode', $request->payment_mode);
+            }
+
+            if ($request->filled('doctor_id')) {
+                $doctor = Doctor::find($request->doctor_id);
+                if ($doctor) {
+                    $query->where('doctor_name', $doctor->name);
+                }
+            }
+
+            if ($request->filled('service_id')) {
+                $service = Service::find($request->service_id);
+                if ($service) {
+                    $query->whereHas('services', function ($q) use ($service) {
+                        $q->where('service_name', $service->name);
+                    });
+                }
+            }
+
+            if ($request->filled('payment_date')) {
+                $query->whereDate('created_at', $request->payment_date);
+            }
+
+            return Datatables::of($query)
                 ->addIndexColumn()
-                ->addColumn('fc_file', function($payment) {
+                ->addColumn('fc_file', function ($payment) {
                     return $payment->fc_number . ' ' . $payment->file_number;
                 })
-                ->addColumn('invoice', function($payment) {
+                ->addColumn('invoice', function ($payment) {
                     return '<a href="' . route('payments.invoice', $payment->id) . '" class="btn btn-sm">
                         <span class="badge rounded-pill bg-warning-subtle text-info font-size-12">Download</span>
                     </a>';
                 })
-                ->addColumn('action', function($payment) {
-                    if(!$payment->closed && !$payment->refunded && auth()->user()->can('Refund Payments')) {
+                ->addColumn('action', function ($payment) {
+                    if (!$payment->closed && !$payment->refunded && Auth::check() && Auth::user()->can('Refund Payments')) {
                         return '<form action="' . route('payments.refund', $payment->id) . '" method="POST" style="display:inline-block;">
                             ' . csrf_field() . '
                             ' . method_field('PUT') . '
@@ -36,28 +66,43 @@ class PaymentController extends Controller
                                 <span class="badge rounded-pill bg-warning-subtle text-warning font-size-12">Refund</span>
                             </button>
                         </form>';
-                    } elseif($payment->refunded) {
+                    } elseif ($payment->refunded) {
                         return '<span class="badge rounded-pill bg-success-subtle text-success font-size-12">Refunded</span>';
                     } else {
                         return '<span class="badge rounded-pill bg-danger-subtle text-danger font-size-12">Closed</span>';
                     }
                 })
-                ->editColumn('total', function($payment) {
+                ->editColumn('total', function ($payment) {
                     return number_format($payment->total, 2);
+                })
+                ->editColumn('created_at', function ($payment) {
+                    return $payment->created_at->format('d-M-Y');
                 })
                 ->rawColumns(['invoice', 'action'])
                 ->make(true);
         }
 
-        return view('payments.index');
+        // Get data for filters
+        $doctors = Doctor::select('id', 'name')->get();
+        $services = Service::select('id', 'name')->get();
+
+        return view('payments.index', compact('doctors', 'services'));
     }
 
     // Show the form for Adding Charges
     public function addCharges(Request $request)
     {
         if ($request->isMethod('get')) {
+            // Check if patient ID was passed in the URL
+            $patientId = $request->query('patient');
+            $patient = null;
+
+            if ($patientId) {
+                $patient = Patient::find($patientId);
+            }
+
             // Handle GET request: Show the form
-            return view('payments.addCharges');
+            return view('payments.addCharges', compact('patient'));
         }
 
         if ($request->isMethod('post')) {
@@ -80,23 +125,49 @@ class PaymentController extends Controller
                 // Search by id
                 $patient = Patient::where('id', $input)->first();
             }
-        
+
             // Check if patient exists
             if (!$patient) {
                 return redirect()->route('payments.addCharges')
                     ->withErrors(['patient' => 'Patient not found. Please check the ID or contact number.']);
             }
 
-            $type = $validatedData['type'];  
-            
+            $type = $validatedData['type'];
+
             if ($type === 'Appointment Charges' && empty($patient->doctor->doctor_charges)) {
                 return redirect()->route('payments.addCharges')
                     ->withErrors(['patient' => 'Assign a doctor to this patient before adding Appointment Charges']);
             }
-            
-            $services = Service::all();      
-            
-            return view('payments.viewChargeDetails', compact('patient', 'type', 'services'));
+
+            // Get all departments and services with a direct approach
+            $departments = Department::all()->keyBy('id');
+            $services = Service::all();
+
+            // Manually prepare grouped structure
+            $groupedServices = [];
+
+            foreach ($services as $service) {
+                $deptName = 'Uncategorized';
+
+                if ($service->department_id && isset($departments[$service->department_id])) {
+                    $deptName = $departments[$service->department_id]->name;
+                }
+
+                if (!isset($groupedServices[$deptName])) {
+                    $groupedServices[$deptName] = [];
+                }
+
+                $groupedServices[$deptName][] = $service;
+            }
+
+            // Sort departments alphabetically but keep 'Uncategorized' at the end
+            uksort($groupedServices, function ($a, $b) {
+                if ($a === 'Uncategorized') return 1;
+                if ($b === 'Uncategorized') return -1;
+                return $a <=> $b;
+            });
+
+            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices'));
         }
     }
 
@@ -109,9 +180,10 @@ class PaymentController extends Controller
             'discount' => 'required|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'payment_mode' => 'required|string',
+            'receiver_name' => 'nullable|string|max:255',
             'remarks' => 'nullable|string'
         ]);
-        
+
         if (!empty($request->services)) {
             $validatedServices = $request->validate([
                 'services.*' => 'required|exists:services,id',
@@ -120,20 +192,21 @@ class PaymentController extends Controller
         }
 
         $patient = Patient::findOrFail($request->patient_id);
-                
+
         $paymentData = [
             'patient_id' => $patient->id,
             'fc_number' => $patient->fc_number,
             'file_number' => $patient->file_number,
             'payment_mode' => $request->payment_mode,
+            'receiver_name' => $request->receiver_name,
             'remarks' => $request->remarks,
             'patient_type' => $patient->type,
         ];
 
         if ($request->type === 'Service Charges' && !empty($request->services)) {
             $sub_total = 0;
-                
-            foreach ($request->services as $i => $service_id) {                
+
+            foreach ($request->services as $i => $service_id) {
                 $service = Service::findOrFail($service_id);
                 $paymentServiceData[$i] = [
                     'service_name' => $service->name,
@@ -141,39 +214,49 @@ class PaymentController extends Controller
                     'charges' => $service->charges,
                 ];
                 $sub_total += $service->charges;
-            } 
-            
+            }
+
             $paymentData['sub_total'] = $sub_total;
             $paymentData['discount'] = min($request->discount, $sub_total);
             $paymentData['total'] = $sub_total - $request->discount;
+            
+            // Add doctor's name for service charges
+            if ($patient->doctor) {
+                $paymentData['doctor_name'] = $patient->doctor->name;
+                $paymentData['doctor_department_name'] = $patient->doctor->department->name;
+            }
         }
 
         if ($request->type === 'Appointment Charges') {
             $discount = min($request->discount, $patient->doctor->doctor_charges);
-            $total = $patient->doctor->doctor_charges - $discount;            
-       
+            $total = $patient->doctor->doctor_charges - $discount;
+
             $paymentData['doctor_name'] = $patient->doctor->name;
             $paymentData['doctor_department_name'] = $patient->doctor->department->name;
             $paymentData['sub_total'] = $patient->doctor->doctor_charges;
             $paymentData['discount'] = $discount;
             $paymentData['total'] = $total;
 
-            $paymentData['doctor_charges'] = $patient->doctor->doctor_charges;            
+            $paymentData['doctor_charges'] = $patient->doctor->doctor_charges;
             $paymentData['doctor_portion'] = $patient->doctor->doctor_portion;
             $paymentData['clinic_portion'] = $patient->doctor->clinic_portion;
-        } 
-        
-        $payment = Payment::create($paymentData);
-      
-        if (!empty($paymentServiceData)) {         
-            $payment->services()->createMany($paymentServiceData);   
         }
 
-        session()->flash('invoice_url', route('payments.invoice', $payment->id));
+        $payment = Payment::create($paymentData);
 
-        // Redirect to payments list with a success message
-        return redirect()->route('payments.index')->with('success', 'Payment created successfully!');
-    }    
+        if (!empty($paymentServiceData)) {
+            $payment->services()->createMany($paymentServiceData);
+        }
+
+        $invoice_url = route('payments.invoice', $payment->id);
+        
+        // Return a view that will handle both redirects
+        return view('payments.redirect', [
+            'redirect_url' => route('payments.index'),
+            'invoice_url' => $invoice_url,
+            'message' => 'Payment created successfully!'
+        ]);
+    }
 
     public function dailyClosing(Request $request)
     {
@@ -181,7 +264,7 @@ class PaymentController extends Controller
             // Handle GET request: Show the form
             return view('payments.dailyClosing');
         }
-    
+
         if ($request->isMethod('post')) {
             // Validate the input
             $validatedData = $request->validate([
@@ -195,23 +278,23 @@ class PaymentController extends Controller
                     },
                 ],
             ]);
-    
+
             $date = $validatedData['date'];
-    
+
             // Check if the date exists in payments
             $paymentsOnDate = Payment::whereDate('created_at', $date)->get();
-    
+
             if ($paymentsOnDate->isEmpty()) {
                 return redirect()->back()->withErrors(['date' => 'No payments found for the selected date.']);
             }
-    
+
             // Set `closed` to true for all payments on the selected date
             Payment::whereDate('created_at', $date)->update(['closed' => true]);
-    
+
             return redirect()->route('payments.dailyClosing')->with('success', 'Daily closing completed successfully!');
         }
     }
-    
+
     // Display a specific payment
     public function show(Payment $payment)
     {
@@ -238,14 +321,60 @@ class PaymentController extends Controller
 
     public function generateInvoice(Payment $payment)
     {
-        $payment->load('patient', 'services'); 
-        
+        $payment->load('patient', 'services');
+
         session(['redirect_back_url' => route('payments.index')]);
-        
+
         // return view('invoices.payment_invoice', compact('payment'));
 
         $pdf = Pdf::loadView('invoices.payment_invoice', compact('payment'));
         return $pdf->stream('invoice-' . $payment->id . '.pdf');
     }
 
+    public function getServicesByDepartment(Department $department)
+    {
+        try {
+            $services = $department->services()
+                ->select('id', 'name', 'charges')
+                ->get();
+
+            return response()->json($services);
+        } catch (\Exception $e) {
+            Log::error('Error fetching services for department: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch services'], 500);
+        }
+    }
+
+    public function viewChargeDetails(Request $request, Patient $patient, $type)
+    {
+        // Get all departments and services with a direct approach
+        $departments = Department::all()->keyBy('id');
+        $services = Service::all();
+
+        // Manually prepare grouped structure
+        $groupedServices = [];
+
+        foreach ($services as $service) {
+            $deptName = 'Uncategorized';
+
+            if ($service->department_id && isset($departments[$service->department_id])) {
+                $deptName = $departments[$service->department_id]->name;
+            }
+
+            if (!isset($groupedServices[$deptName])) {
+                $groupedServices[$deptName] = [];
+            }
+
+            $groupedServices[$deptName][] = $service;
+        }
+
+        // Sort departments alphabetically but keep 'Uncategorized' at the end
+        uksort($groupedServices, function ($a, $b) {
+            if ($a === 'Uncategorized') return 1;
+            if ($b === 'Uncategorized') return -1;
+            return $a <=> $b;
+        });
+
+        return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices'));
+    }
 }

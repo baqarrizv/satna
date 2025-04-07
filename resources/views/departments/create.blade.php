@@ -24,21 +24,11 @@
                     <form action="{{ route('departments.store') }}" method="POST">
                         @csrf
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Department Name</label>
                                     <input type="text" name="name" required class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}">
                                     @error('name')
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="sequence" class="form-label">Sequence</label>
-                                    <input type="number" name="sequence" required class="form-control @error('sequence') is-invalid @enderror" value="{{ old('sequence') }}">
-                                    @error('sequence')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>

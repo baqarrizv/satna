@@ -178,21 +178,31 @@ File: Main Js File
 
     // Initialize settings on page load
     function initSettings() {
-        if (window.sessionStorage) {            
-            // Get the stored theme from sessionStorage
-            var theme = sessionStorage.getItem("theme");
+        // Clear any theme from sessionStorage to avoid conflicts
+        if (window.sessionStorage) {
+            sessionStorage.removeItem("theme");
+        }
+        
+        if (window.localStorage) {            
+            // Get the stored theme from localStorage
+            var theme = localStorage.getItem("theme");
             
-            // If no theme is stored, set default to light
-            if (!theme) {
-                sessionStorage.setItem("theme", "light");
+            // If no theme is stored or not valid, set default to light
+            if (!theme || (theme !== "light" && theme !== "dark")) {
+                localStorage.setItem("theme", "light");
                 applyTheme("light");  // Apply the light theme initially
             } else {
+                // Fix for "darkbut" value - normalize to "dark"
+                if (theme.startsWith("dark")) {
+                    theme = "dark";
+                    localStorage.setItem("theme", "dark");
+                }
                 applyTheme(theme);  // Apply the stored theme
             }
         }
     }
 
-    // Apply the theme based on sessionStorage value
+    // Apply the theme based on localStorage value
     function applyTheme(theme) {
         var body = document.getElementsByTagName("body")[0];
         
@@ -209,24 +219,63 @@ File: Main Js File
         }
     }
 
+    // Immediately apply theme on page load before DOM is ready
+    (function() {
+        // Clear any theme from sessionStorage to avoid conflicts
+        if (window.sessionStorage) {
+            sessionStorage.removeItem("theme");
+        }
+
+        // Apply theme as early as possible to prevent flickering
+        if (window.localStorage) {
+            var storedTheme = localStorage.getItem("theme");
+            if (storedTheme === "dark" || storedTheme === "darkbut") {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                document.documentElement.setAttribute('data-topbar', 'dark');
+                document.documentElement.setAttribute('data-sidebar', 'dark');
+            }
+        }
+    })();
+
     // Handle the theme toggle button
     function layoutSetting() {
         var body = document.getElementsByTagName("body")[0];
 
         $('#mode-setting-btn').on('click', function (e) {
+            // Clear any theme from sessionStorage to avoid conflicts
+            if (window.sessionStorage) {
+                sessionStorage.removeItem("theme");
+            }
+            
             // Toggle between light and dark mode
             if (body.hasAttribute("data-bs-theme") && body.getAttribute("data-bs-theme") == "dark") {
+                localStorage.setItem("theme", "light");
                 sessionStorage.setItem("theme", "light");
                 applyTheme("light");
             } else {
+                localStorage.setItem("theme", "dark");
                 sessionStorage.setItem("theme", "dark");
                 applyTheme("dark");
             }
         });
+
+        // Ensure toggle button state matches current theme
+        var currentTheme = localStorage.getItem("theme");
+
+        if (currentTheme === "dark" || currentTheme === "darkbut") {
+            // If we're in dark mode, make sure checkbox is checked
+            $('#mode-setting-btn').prop('checked', true);
+        } else {
+            // If we're in light mode, make sure checkbox is unchecked
+            $('#mode-setting-btn').prop('checked', false);
+        }
     }
 
     function init() {
+        // Priority: load theme settings first to prevent flickering
         initSettings();
+        
+        // Then initialize other components
         initMetisMenu();
         initLeftMenuCollapse();
         initActiveMenu();
@@ -240,6 +289,9 @@ File: Main Js File
         Waves.init();
     }
 
-    init();
+    // Execute initialization as soon as DOM is ready
+    $(document).ready(function() {
+        init();
+    });
 
-})(jQuery)
+})(jQuery)  

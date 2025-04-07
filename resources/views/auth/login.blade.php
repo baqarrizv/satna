@@ -8,10 +8,11 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="text-center">
+                        <br>
                         <a href="{{ url('/') }}" class="mb-2 d-block auth-logo">
-                            <img src="{{ config('settings.logo_dark') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="100"
                                  class="logo logo-dark">
-                            <img src="{{ config('settings.logo_light') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="100"
                                  class="logo logo-light">
                         </a>
                     </div>
@@ -59,7 +60,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-check">
+                                    <div class="">
                                         <input type="checkbox" class="form-check-input" id="auth-remember-check"
                                             name="remember" {{ old('remember') ? 'checked' : '' }}>
                                         <label class="form-check-label" for="auth-remember-check">Remember me</label>
@@ -78,8 +79,7 @@
                     <div class="mt-2 text-center">
                         <p>© <script>
                                 document.write(new Date().getFullYear())
-
-                            </script> {{ config('settings.title') }}. Crafted with <i class="mdi mdi-heart text-danger"></i> by Arwaj</p>
+                            </script> {{config('settings.title')}} By <a href="https://arwaj.com.pk" target="_blank" class="text-reset">Arwaj</a></p>
                     </div>
 
                 </div>

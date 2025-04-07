@@ -3,7 +3,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-6 col-xl-3">
+    <!-- <div class="col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
                 <div class="float-end mt-2">
@@ -17,7 +17,7 @@
                 </p>
             </div>
         </div>
-    </div> <!-- end col-->
+    </div> 
 
     <div class="col-md-6 col-xl-3">
         <div class="card">
@@ -33,7 +33,7 @@
                 </p>
             </div>
         </div>
-    </div> <!-- end col-->
+    </div> 
     
     <div class="col-md-6 col-xl-3">
         <div class="card">
@@ -49,7 +49,7 @@
                 </p>   
             </div>
         </div>
-    </div> <!-- end col-->
+    </div> 
     <div class="col-md-6 col-xl-3">
         <div class="card">
             <div class="card-body">
@@ -64,8 +64,8 @@
                 </p>
             </div>
         </div>
-    </div> <!-- end col-->
-</div> <!-- end row-->
+    </div> 
+</div> -->
 
 @endsection
 @section('script')

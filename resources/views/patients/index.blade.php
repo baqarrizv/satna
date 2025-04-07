@@ -27,6 +27,52 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Filter Patients</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="typeFilter" class="form-label">Patient Type</label>
+                                <select id="typeFilter" class="form-control">
+                                    <option value="">All Types</option>
+                                    <option value="Free Consultancy">Free Consultancy</option>
+                                    <option value="Regular Patient">Regular Patient</option>
+                                    <option value="Gyne">Gyne</option>
+                                    <option value="Ultrasound">Ultrasound</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="doctorFilter" class="form-label">Doctor</label>
+                                <select id="doctorFilter" class="form-control">
+                                    <option value="">All Doctors</option>
+                                    @foreach(\App\Models\Doctor::where('is_active', true)->get() as $doctor)
+                                        <option value="{{ $doctor->name }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="coordinatorFilter" class="form-label">Doctor's Coordinator</label>
+                                <select id="coordinatorFilter" class="form-control">
+                                    <option value="">All Coordinators</option>
+                                    @foreach(\App\Models\Doctor::where('is_active', true)->get() as $doctor)
+                                        <option value="{{ $doctor->name }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -59,14 +105,22 @@
 
     <script type="text/javascript">
         $(function () {
+            // Initialize DataTable
             var table = $('#patients-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('patients.index') }}",
+                ajax: {
+                    url: "{{ route('patients.index') }}",
+                    data: function(d) {
+                        d.patient_type = $('#typeFilter').val();
+                        d.doctor_name = $('#doctorFilter').val();
+                        d.coordinator_name = $('#coordinatorFilter').val();
+                    }
+                },
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                     {data: 'id', name: 'id'},
-                    {data: 'fc_file', name: 'fc_file'},
+                    {data: 'fc_file', name: 'fc_file', defaultContent: 'N/A'},
                     {data: 'patient_name', name: 'patient_name'},
                     {data: 'patient_contact', name: 'patient_contact'},
                     {data: 'type', name: 'type'},
@@ -77,6 +131,11 @@
                 responsive: true,
                 pageLength: 25,
                 order: [[1, 'desc']]
+            });
+            
+            // Apply filters when dropdown values change
+            $('#typeFilter, #doctorFilter, #coordinatorFilter').change(function() {
+                table.draw();
             });
         });
     </script>

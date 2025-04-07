@@ -63,7 +63,7 @@
                                         <label for="logo_light" class="form-label">Logo Light</label>
                                         @component('common-components.dropzone', [
                                             'inputName' => 'logo_light',
-                                            'existingFiles' => $setting->logo_light ? [Storage::url($setting->logo_light)] : [],
+                                            'existingFiles' => $setting->logo_light ? [asset($setting->logo_light)] : [],
                                             'acceptedFiles' => 'image/*',
                                             'maxFiles' => 1,
                                             'maxFileSize' => 2
@@ -80,7 +80,7 @@
                                         <label for="logo_dark" class="form-label">Logo Dark</label>
                                         @component('common-components.dropzone', [
                                             'inputName' => 'logo_dark',
-                                            'existingFiles' => $setting->logo_dark ? [Storage::url($setting->logo_dark)] : [],
+                                            'existingFiles' => $setting->logo_dark ? [asset($setting->logo_dark)] : [],
                                             'acceptedFiles' => 'image/*',
                                             'maxFiles' => 1,
                                             'maxFileSize' => 2
@@ -97,7 +97,7 @@
                                         <label for="fav_icon" class="form-label">Fav Icon</label>
                                         @component('common-components.dropzone', [
                                             'inputName' => 'fav_icon',
-                                            'existingFiles' => $setting->fav_icon ? [Storage::url($setting->fav_icon)] : [],
+                                            'existingFiles' => $setting->fav_icon ? [asset($setting->fav_icon)] : [],
                                             'acceptedFiles' => 'image/*',
                                             'maxFiles' => 1,
                                             'maxFileSize' => 2

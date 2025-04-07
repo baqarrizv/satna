@@ -31,10 +31,10 @@ class SettingServiceProvider extends ServiceProvider
             // Make each setting available in the global configuration
             $settingsArray = $settings->toArray();
 
-            // Check if logo_light, logo_dark, fav_icon exist and prepend the storage URL
-            $settingsArray['logo_light'] = isset($settingsArray['logo_light']) ? Storage::url($settingsArray['logo_light']) : null;
-            $settingsArray['logo_dark'] = isset($settingsArray['logo_dark']) ? Storage::url($settingsArray['logo_dark']) : null;
-            $settingsArray['fav_icon'] = isset($settingsArray['fav_icon']) ? Storage::url($settingsArray['fav_icon']) : null;
+            // Check if logo_light, logo_dark, fav_icon exist and use the new path format
+            $settingsArray['logo_light'] = isset($settingsArray['logo_light']) ? asset($settingsArray['logo_light']) : null;
+            $settingsArray['logo_dark'] = isset($settingsArray['logo_dark']) ? asset($settingsArray['logo_dark']) : null;
+            $settingsArray['fav_icon'] = isset($settingsArray['fav_icon']) ? asset($settingsArray['fav_icon']) : null;
 
             // Now set the config
             Config::set('settings', $settingsArray);
@@ -42,7 +42,14 @@ class SettingServiceProvider extends ServiceProvider
             Config::set('mail.mailers.smtp.port', $settings->smtp_port);
             Config::set('mail.mailers.smtp.encryption', $settings->encryption);
             Config::set('mail.mailers.smtp.username', $settings->smtp_email);
-            Config::set('mail.mailers.smtp.password', Crypt::decryptString($settings->smtp_password));
+            
+            try {
+                Config::set('mail.mailers.smtp.password', Crypt::decryptString($settings->smtp_password));
+            } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                // If decryption fails, set a default or empty password
+                Config::set('mail.mailers.smtp.password', '');
+            }
+            
             Config::set('mail.from.address', $settings->smtp_email);
             Config::set('mail.from.name', $settings->smtp_name);  
             

@@ -9,6 +9,7 @@
 
                 <div class="col-md-8 col-lg-6 col-xl-5">
                     <div>
+                        <br>
                         <a href="{{ url('/') }}" class="mb-2 d-block auth-logo">
                             <img src="{{ config('settings.logo_dark') }}" alt="" height="100"
                                  class="logo logo-dark">
@@ -52,7 +53,7 @@
 
                                         <div class="mt-4 text-center">
                                             <p class="mb-0">Remember It ? <a href="{{ url('login') }}"
-                                                    class="fw-medium text-primary"> Signin </a></p>
+                                                    class="fw-medium text-primary"> Sign in </a></p>
                                         </div>
                                     </form>
                                 </div>
@@ -63,7 +64,7 @@
                             <p>© <script>
                                     document.write(new Date().getFullYear())
 
-                                </script> {{ config('settings.title') }}. Crafted with <i class="mdi mdi-heart text-danger"></i> by Arwaj</p>
+                                </script> {{config('settings.title')}}  By <a href="https://arwaj.com.pk" target="_blank" class="text-reset">Arwaj</a></p>
                         </div>
                     </div>
                 </div>

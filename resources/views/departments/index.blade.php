@@ -33,8 +33,9 @@
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
+                                <th>Sequence</th>
                                 <th>Actions</th>
-                            </tr>
+                            </tr    >
                         </thead>
                     </table>
                 </div>
@@ -57,11 +58,12 @@
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
                     {data: 'name', name: 'name'},
+                    {data: 'sequence', name: 'sequence'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 responsive: true,
                 pageLength: 25,
-                order: [[1, 'asc']]
+                order: [[2, 'ASC']] // Order by created_at column descending
             });
         });
     </script>

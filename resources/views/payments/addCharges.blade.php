@@ -21,40 +21,37 @@
         <div class="col-4">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('payments.addCharges') }}" method="POST">
+                    <form method="POST" action="{{ route('payments.addCharges') }}">
                         @csrf
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="mb-3">
-                                    <label for="type" class="form-label">Charges Type</label>
-                                    <select name="type" class="form-control @error('type') is-invalid @enderror" required>
-                                        <option value="Appointment Charges" {{ old('type') == 'Appointment Charges' ? 'selected' : '' }}>Appointment Charges</option>
-                                        <option value="Service Charges" {{ old('type') == 'Service Charges' ? 'selected' : '' }}>Service Charges</option>
-                                    </select>
-                                    @error('type')
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                        <div class="row mb-4">
+                            <div class="col-12 mb-3">
+                                <label for="type" class="form-label">Charge Type</label>
+                                <select class="form-control @error('type') is-invalid @enderror" id="type" name="type" required>
+                                    <option value="">Select Type</option>
+                                    <option value="Appointment Charges" {{ old('type') == 'Appointment Charges' ? 'selected' : '' }}>Appointment Charges</option>
+                                    <option value="Service Charges" {{ old('type') == 'Service Charges' ? 'selected' : '' }}>Service Charges</option>
+                                </select>
+                                @error('type')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
                             </div>
-                        </div>
-                        <div class="row">                        
-                            <div class="col-md-12">
-                                <div class="mb-3">                                
-                                    <label for="patient" class="form-label">Patient ID/Contact #</label>
-                                    <div class="d-flex align-items-center">
-                                        <i id="toggle-mask-icon" class="uil-phone-alt" style="cursor: pointer; font-size: 1.3rem; margin-right: 10px; color: gray;"></i>
-                                        <input type="text" id="patient" name="patient" required class="form-control @error('patient') is-invalid @enderror" value="{{ old('patient') }}" style="flex-grow: 1;">
-                                    </div>
-                                </div>
+                            <div class="col-12">
+                                <label for="patient" class="form-label">Patient ID or Contact Number</label>
+                                <input type="text" class="form-control @error('patient') is-invalid @enderror" id="patient" name="patient" 
+                                       value="{{ isset($patient) ? $patient->id : old('patient') }}" 
+                                       {{ isset($patient) ? 'readonly' : '' }} required>
+                                <div class="form-text">Enter patient ID or contact number (format: (0399) 999-9999)</div>
                                 @error('patient')
-                                    <div class="text-danger">{{ $message }}</div>
+                                    <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-primary">Add Charges</button>
+                            <div class="col-12">
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Continue</button>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -65,25 +62,23 @@
 </div>
 @endsection
 
-
 @section('scripts')
 <script src="{{ URL::asset('/assets/libs/inputmask/inputmask.min.js') }}"></script>
 <script>
- $(document).ready(function() {
-    let isMasked = false; // Tracks masking state
+$(document).ready(function() {
+    let isMasked = false;
 
+    // Toggle mask for patient input
     $('#toggle-mask-icon').on('click', function() {
         const inputField = $('#patient');
 
         if (!isMasked) {
-            // Apply mask and set icon color to primary
             inputField.inputmask('(0399) 999-9999');
-            $(this).css('color', 'blue'); // Change icon color
+            $(this).css('color', 'blue');
             isMasked = true;
         } else {
-            // Remove mask and reset icon color
             inputField.inputmask('remove');
-            $(this).css('color', 'gray'); // Reset icon color
+            $(this).css('color', 'gray');
             isMasked = false;
         }
     });

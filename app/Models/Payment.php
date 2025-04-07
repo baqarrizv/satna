@@ -10,7 +10,7 @@ class Payment extends Model
         'patient_id', 'fc_number', 'file_number', 'patient_type', 'doctor_name',
         'doctor_department_name', 'doctor_charges', 'doctor_portion',
         'clinic_portion', 'sub_total', 'discount', 'total', 'payment_mode',
-        'remarks', 'refunded', 'closed'
+        'receiver_name', 'remarks', 'refunded', 'closed'
     ];
 
     public function patient()

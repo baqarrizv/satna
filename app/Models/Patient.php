@@ -32,6 +32,7 @@ class Patient extends Model
         'emergency_contact_relation',
         'emergency_contact_number',
         'type',
+        'filetype',
         'fc_number',
         'doctor_coordinator_id',
         'file_number',

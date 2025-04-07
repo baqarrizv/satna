@@ -1,0 +1,161 @@
+/* Custom styles for better visibility in both dark and light themes */
+
+/* Form elements */
+.form-control {
+    border: 1px solid rgba(120, 130, 140, 0.5) !important;
+    background-color: transparent !important;
+    color: #333 !important;
+}
+
+[data-bs-theme="dark"] .form-control {
+    background-color: transparent !important;
+    color: #fff !important;
+    border-color: rgba(160, 160, 160, 0.6) !important;
+}
+[data-bs-theme="dark"] .form-check-input[type="radio"]{
+      border-color: #FFF;
+}
+[data-bs-theme="light"] .form-check-input[type="radio"]{
+      border-color: #333;
+}
+[data-bs-theme="dark"] .form-check-input[type=checkbox]{
+      border-color: #FFF;
+}
+[data-bs-theme="light"] .form-check-input[type=checkbox]{
+      border-color: #333;
+}
+/* Radio buttons - keeping borders */
+.form-check-input[type="radio"] {
+    width: 1.2em !important;
+    height: 1.2em !important;
+    margin-top: 0.25em !important;
+    background-color: transparent !important;
+}
+
+/* Checkboxes - no borders */
+.form-check-input[type="checkbox"] {
+    width: 1.2em !important;
+    height: 1.2em !important;
+    margin-top: 0.25em !important;
+}
+
+.form-check-input:checked {
+    background-color: #2563eb !important;
+}
+/* 
+[data-bs-theme="dark"] .form-check-input[type="radio"] {
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .form-check-input[type="checkbox"] {
+    border: none !important;
+    background-color: transparent !important;
+} */
+
+/* Labels */
+.form-label {
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin-bottom: 0.5rem !important;
+}
+
+[data-bs-theme="dark"] .form-label {
+    color: #e6e6e6 !important;
+}
+
+/* Radio button labels */
+.form-check-label {
+    color: #333 !important;
+    font-weight: 500 !important;
+    padding-left: 0.25rem !important;
+}
+
+[data-bs-theme="dark"] .form-check-label {
+    color: #e6e6e6 !important;
+}
+
+/* Patient type selection - highlight */
+.form-check {
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.25rem !important;
+    margin-right: 0.5rem !important;
+    background-color: transparent !important;
+}
+
+.form-check:hover {
+    border-color: rgba(120, 130, 140, 0.7) !important;
+}
+
+[data-bs-theme="dark"] .form-check {
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .form-check:hover {
+    border-color: rgba(200, 200, 200, 0.6) !important;
+}
+
+/* Selected radio option highlight */
+.form-check-input:checked + .form-check-label {
+    color: #2563eb !important;
+    font-weight: 600 !important;
+}
+
+[data-bs-theme="dark"] .form-check-input:checked + .form-check-label {
+    color: #3b82f6 !important;
+}
+
+/* Select boxes */
+select.form-control, select.form-select {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    background-color: transparent !important;
+    color: #333 !important;
+    border: 1px solid rgba(120, 130, 140, 0.5) !important;
+}
+
+[data-bs-theme="dark"] select.form-control, [data-bs-theme="dark"] select.form-select {
+    background-color: transparent !important;
+    color: #fff !important;
+    border-color: rgba(160, 160, 160, 0.6) !important;
+}
+
+/* Better focus states */
+.form-control:focus, .form-check-input:focus, select.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.25) !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Required field indicator */
+.text-danger {
+    color: #dc2626 !important;
+    font-weight: bold !important;
+}
+
+/* Placeholder text color */
+::placeholder {
+    color: #6b7280 !important;
+    opacity: 0.7 !important;
+}
+
+[data-bs-theme="dark"] ::placeholder {
+    color: #9ca3af !important;
+    opacity: 0.7 !important;
+}
+
+/* Better visibility for select dropdowns in dark mode */
+[data-bs-theme="dark"] select.form-control option, 
+[data-bs-theme="dark"] select.form-select option {
+    background-color: rgba(40, 40, 40, 0.95) !important;
+    color: #fff !important;
+}
+
+/* Card styles */
+.card-body {
+    border: 1px solid rgba(120, 130, 140, 0.2) !important;
+}
+
+[data-bs-theme="dark"] .card-body {
+    border: 1px solid rgba(160, 160, 160, 0.3) !important;
+    background-color: transparent !important;
+} 

@@ -192,7 +192,7 @@ class UserController extends Controller
     {
         // Optionally, you can pass user data to the view
         $user = auth()->user();
-        $user->image = isset($user->image) ? Storage::url($user->image) : null;
+        $user->image = isset($user->image) ? $user->image : null;
         
         $notificationsList = $user->notifications()->get();
         $activities = Activity::where('causer_id', $user->id)->latest()->paginate(10);

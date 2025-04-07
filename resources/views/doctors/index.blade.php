@@ -34,10 +34,12 @@
                     <table class="table table-bordered dt-responsive nowrap w-100" id="doctors-table">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>Doctor ID</th>
                                 <th>Name</th>
                                 <th>Department</th>
                                 <th>Specialization</th>
+                                <th>Appointment Date</th>
+                                <th>Charges</th>
                                 <th>Contact Number</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -62,17 +64,19 @@
                 serverSide: true,
                 ajax: "{{ route('doctors.index') }}",
                 columns: [
-                    {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
+                    {data: 'doctor_id', name: 'doctor_id'},
                     {data: 'name', name: 'name'},
                     {data: 'department.name', name: 'department.name', defaultContent: 'N/A'},
                     {data: 'specialist', name: 'specialist'},
-                    {data: 'contact_number', name: 'contact_number'},
+                    {data: 'date_of_appointment', name: 'date_of_appointment'},
+                    {data: 'doctor_charges', name: 'doctor_charges'},
+                    {data: 'contact_number', name: 'contact_number', defaultContent: 'N/A'},
                     {data: 'status', name: 'status', orderable: false, searchable: false},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 responsive: true,
                 pageLength: 25,
-                order: [[1, 'asc']]
+                order: [[0, 'asc']]
             });
         });
 

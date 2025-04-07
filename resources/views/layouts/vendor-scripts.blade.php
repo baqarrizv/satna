@@ -199,7 +199,7 @@
                     keyboard: false
                 });
 
-                installModal.show();
+                installModal.hide();
 
                 // Add an event listener to the Install button in the modal
                 document.getElementById('confirmInstallBtn').addEventListener('click', () => {

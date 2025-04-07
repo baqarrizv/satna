@@ -15,7 +15,7 @@
                     </div>
                     <div class="clearfix"></div>
                     <div>
-                        <img src="{{ $user->image }}" alt="" class="avatar-lg rounded-circle img-thumbnail">
+                        <img src="{{ $user->image ? asset($user->image) : asset('/assets/images/users/avatar-4.jpg') }}" alt="" class="avatar-lg rounded-circle img-thumbnail">
                     </div>
                     <h5 class="mt-3 mb-1">{{ $user->name }}</h5>
                     <p class="text-muted">{{ $user->roles->pluck('name')->first() }}</p>
@@ -46,7 +46,7 @@
                                 <label for="name" class="form-label">Profile Picture</label>
                                 @component('common-components.dropzone', [
                                     'inputName' => 'image',
-                                    'existingFiles' => $user->image ? [Storage::url($user->image)] : [],
+                                    'existingFiles' => $user->image ? [asset($user->image)] : [],
                                     'acceptedFiles' => 'image/*',
                                     'maxFiles' => 1,
                                     'maxFileSize' => 2

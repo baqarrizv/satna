@@ -46,14 +46,16 @@
 
         .logo-section {
             flex: 1;
+            text-align: center;
         }
 
-        .logo-section img {
-            max-height: 60px;
-            object-fit: contain;
+        .logo {
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 1rem;
         }
 
-        .company-info {
+        .invoice-info {
             flex: 1;
             text-align: right;
         }
@@ -61,7 +63,8 @@
         .invoice-title {
             color: var(--primary-color);
             font-size: 1.5rem;
-            margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
+            text-align: center;
         }
 
         .details-grid {
@@ -137,6 +140,13 @@
             font-size: 0.75rem;
         }
 
+        .logo-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
         @media print {
             body {
                 padding: 0;
@@ -152,6 +162,8 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            
+        
         }
     </style>
 </head>
@@ -160,9 +172,9 @@
         <!-- Header Section -->
         <table style="width: 100%; margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb;">
             <tr>
-                <td style="width: 50%;">
-                    <img src="{{ config('settings.logo_light') }}" alt="{{ config('settings.title') }}" style="max-height: 60px; object-fit: contain;">
-                    <h1 style="color: #2563eb; font-size: 1.5rem; text-align: center; margin-bottom: 0.5rem;">Payment Slip</h1>
+                <td style="text-align: center; padding: 10px 0;">   
+                    <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'assets/images/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
+                    <h1 style="color: #2563eb; font-size: 1.5rem; text-align: center; margin-top: 0.5rem;">Payment Slip</h1>
                 </td>                
             </tr>
         </table>
@@ -183,7 +195,7 @@
                         </tr>
                         <tr>
                             <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Doctor Name</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->doctor_name }}</td>
+                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->doctor_name ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </td>
@@ -197,11 +209,15 @@
                         </tr>                        
                         <tr>
                             <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">FC-File #</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->fc_number }} {{ $payment->file_number }}</td>
+                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->fc_number ?? '' }} {{ $payment->file_number ?? '' }}</td>
                         </tr>
                         <tr>
                             <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Payment Method</th>
                             <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->payment_mode }}</td>
+                        </tr>
+                        <tr>
+                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receiver's Name</th>
+                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->receiver_name ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </td>
@@ -231,6 +247,26 @@
                     <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">{{ number_format($payment->total, 2) }}</td>
                 </tr>
             </tfoot>
+        </table>
+        
+        <!-- Footer -->
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #6b7280;">
+            <p>Thank you for choosing Setna Medical Center</p>
+        </div>
+        
+        <!-- Divider line -->
+        <hr style="border: 0; border-top: 1px solid black; margin: 1.5rem 0;">
+        
+        <!-- Print info -->
+        <table style="width: 100%; font-size: 0.7rem; color: #6b7280;">
+            <tr>
+                <td style="text-align: left;">
+                    User: {{ Auth::user()->name ?? 'System' }}
+                </td>
+                <td style="text-align: right;">
+                    Created At: {{ $payment->created_at }}
+                </td>
+            </tr>
         </table>
     </div>
 </body>

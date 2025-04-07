@@ -53,10 +53,12 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:departments,name',
-            'sequence' => 'required|integer',
         ]);
 
-        Department::create($request->all());
+        // Create department (sequence will be auto-incremented by the database)
+        Department::create([
+            'name' => $request->name,
+        ]);
 
         EventNotificationService::notifyEventByName('Department Created');
 
@@ -72,10 +74,11 @@ class DepartmentController extends Controller
     {
         $request->validate([
             'name' => 'required|unique:departments,name,' . $department->id,
-            'sequence' => 'required|integer',
         ]);
 
-        $department->update($request->all());
+        $department->update([
+            'name' => $request->name,
+        ]);
         
         EventNotificationService::notifyEventByName('Department Modified');
 

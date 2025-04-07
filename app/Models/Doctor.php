@@ -14,7 +14,7 @@ class Doctor extends Model
         'name', 'dob', 'sex', 'religion', 'doctor_id', 'cnic', 'contact_number', 'address', 'date_of_appointment',
         'marital_status', 'specialist', 'department_id', 'emergency_contact_name', 'emergency_contact_relation',
         'emergency_contact_number', 'payment_mode', 'account_title', 'account_number', 'bank_name',
-        'doctor_charges', 'doctor_portion', 'clinic_portion', 'image', 'is_active'
+        'doctor_charges', 'doctor_portion', 'clinic_portion', 'image', 'is_active', 'is_coordinator'
     ];
 
     // Relationships

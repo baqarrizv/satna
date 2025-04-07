@@ -18,6 +18,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReportController;
+use App\Services\FileUploadService;
 
 /*
 |--------------------------------------------------------------------------
@@ -207,6 +208,10 @@ Route::group(['middleware' => ['auth', 'enforce2fa']], function () {
     Route::get('payments/{payment}/invoice', [PaymentController::class, 'generateInvoice'])
         ->name('payments.invoice')
         ->middleware('can:View Payments');
+
+    Route::get('/services/by-department/{department}', [PaymentController::class, 'getServicesByDepartment'])
+        ->name('services.byDepartment')
+        ->middleware('can:View Service');
     
     Route::get('reports/daily-collection', [ReportController::class, 'generateDailyCollectionReport'])
         ->name('reports.dailyCollection')
@@ -240,3 +245,17 @@ Route::middleware('auth')->group(function () {
      Route::get('/2fa/challenge', [TwoFactorController::class, 'showChallengeForm'])->name('2fa.challenge');
      Route::post('/2fa/verify', [TwoFactorController::class, 'verify2FA'])->name('2fa.verify');
 });
+// Test route for file upload service - REMOVE AFTER TESTING
+Route::get('/test-file-upload-service', function (FileUploadService $fileUploadService) {
+    // Test with null and empty values
+    $result1 = $fileUploadService->handleFileUpdate(null, 'assets/uploads/test/test.jpg', 'test');
+    $result2 = $fileUploadService->handleFileUpdate('', 'assets/uploads/test/test2.jpg', 'test');
+    $result3 = $fileUploadService->handleFileUpdate('null', 'assets/uploads/test/test3.jpg', 'test');
+    
+    return [
+        'result1' => $result1,
+        'result2' => $result2,
+        'result3' => $result3,
+    ];
+});
+

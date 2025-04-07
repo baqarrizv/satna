@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Services\EventNotificationService;
 use DataTables;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
 {
@@ -76,65 +77,63 @@ class DoctorController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'dob' => 'required|date',
-            'sex' => 'required|in:Male,Female',
-            'religion' => 'nullable|string|max:255',
-            'doctor_id' => 'required|string|unique:doctors',
-            'cnic' => 'required|string|unique:doctors',
-            'contact_number' => 'required|string|max:15',
-            'image' => 'nullable|string|max:255',
-            'address' => 'required|string',
+            'dob' => 'nullable|date',
+            'sex' => 'nullable|string',
+            'religion' => 'nullable|string',
+            'cnic' => 'nullable|string',
+            'contact_number' => 'nullable|string',
+            'address' => 'nullable|string',
             'date_of_appointment' => 'required|date',
-            'marital_status' => 'required|in:Single,Married,Divorced',
             'specialist' => 'required|string',
             'department_id' => 'required|exists:departments,id',
-
-            // Emergency contact validation
-            'emergency_contact_name' => 'required|string|max:255',
-            'emergency_contact_relation' => 'required|string|max:255',
-            'emergency_contact_number' => 'required|string|max:15',
-
-            // Payment information validation
-            'payment_mode' => 'required|in:Bank Transfer,Cash',
-            'account_title' => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
-            'bank_name' => 'nullable|string|max:255',
-            'doctor_charges' => 'required|numeric|min:0',
-            'doctor_portion' => 'required|numeric|min:0|max:100',
-            'clinic_portion' => 'required|numeric|min:0|max:100',
+            'doctor_charges' => 'required|numeric',
+            'doctor_portion' => 'nullable|numeric',
+            'clinic_portion' => 'nullable|numeric',
+            'payment_mode' => 'nullable|string',
+            'account_title' => 'nullable|string',
+            'account_number' => 'nullable|string',
+            'bank_name' => 'nullable|string',
+            'emergency_contact_name' => 'nullable|string',
+            'emergency_contact_relation' => 'nullable|string',
+            'emergency_contact_number' => 'nullable|string',
+            'doctor_id' => 'nullable|string|unique:doctors,doctor_id',
+            'is_coordinator' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ]);
-                
-        // Handle Image
-        if ($request->image) {
-            $validated['image'] = $this->fileUploadService->handleFileUpdate($request->image, '', 'doctors');
+
+        // Generate a unique doctor_id if not provided
+        if (empty($validatedData['doctor_id'])) {
+            $lastDoctor = Doctor::orderBy('id', 'desc')->first();
+            $lastId = $lastDoctor ? intval(substr($lastDoctor->doctor_id ?? 'DR0000', 2)) : 0;
+            $validatedData['doctor_id'] = 'DR' . str_pad($lastId + 1, 4, '0', STR_PAD_LEFT);
         }
 
-        $doctor = Doctor::create($validated);
-
-        // Store qualifications
-        foreach ($request->degrees as $key => $degree) {
-            $doctor->qualifications()->create([
-                'degree' => $degree,
-                'majors' => $request->majors[$key],
-                'institution' => $request->institutions[$key],
-            ]);
+        // Set default values for portions if not provided
+        if (empty($validatedData['doctor_portion'])) {
+            $validatedData['doctor_portion'] = 0;
         }
 
-        // Store experiences
-        foreach ($request->last_employers as $key => $employer) {
-            $doctor->experiences()->create([
-                'last_employer' => $employer,
-                'designation' => $request->designations[$key],
-                'start_date' => $request->start_dates[$key],
-                'end_date' => $request->end_dates[$key],
-            ]);
+        if (empty($validatedData['clinic_portion'])) {
+            $validatedData['clinic_portion'] = 0;
         }
-                
-        EventNotificationService::notifyEventByName('Doctor Created');
 
-        return redirect()->route('doctors.index')->with('success', 'Doctor created successfully');
+        // Set boolean fields
+        $validatedData['is_coordinator'] = $request->has('is_coordinator') ? 1 : 0;
+        $validatedData['is_active'] = $request->has('is_active') ? 1 : 0;
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/doctors'), $imageName);
+            $validatedData['image'] = 'images/doctors/' . $imageName;
+        }
+
+        Doctor::create($validatedData);
+
+        return redirect()->route('doctors.index')->with('success', 'Doctor created successfully!');
     }
 
     public function edit(Doctor $doctor)
@@ -146,70 +145,60 @@ class DoctorController extends Controller
 
     public function update(Request $request, Doctor $doctor)
     {
-        $validated = $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
-            'dob' => 'required|date',
-            'sex' => 'required|in:Male,Female',
-            'religion' => 'nullable|string|max:255',
-            'doctor_id' => 'required|string|unique:doctors,doctor_id,'.$doctor->id,
-            'cnic' => 'required|string|unique:doctors,cnic,'.$doctor->id,
-            'contact_number' => 'required|string|max:15',
-            'image' => 'nullable|string|max:255',
-            'address' => 'required|string',
+            'dob' => 'nullable|date',
+            'sex' => 'nullable|string',
+            'religion' => 'nullable|string',
+            'cnic' => 'nullable|string',
+            'contact_number' => 'nullable|string',
+            'address' => 'nullable|string',
             'date_of_appointment' => 'required|date',
-            'marital_status' => 'required|in:Single,Married,Divorced',
             'specialist' => 'required|string',
             'department_id' => 'required|exists:departments,id',
-
-            // Emergency contact validation
-            'emergency_contact_name' => 'required|string|max:255',
-            'emergency_contact_relation' => 'required|string|max:255',
-            'emergency_contact_number' => 'required|string|max:15',
-
-            // Payment information validation
-            'payment_mode' => 'required|in:Bank Transfer,Cash',
-            'account_title' => 'nullable|string|max:255',
-            'account_number' => 'nullable|string|max:255',
-            'bank_name' => 'nullable|string|max:255',
-            'doctor_charges' => 'required|numeric|min:0',
-            'doctor_portion' => 'required|numeric|min:0|max:100',
-            'clinic_portion' => 'required|numeric|min:0|max:100',
+            'doctor_charges' => 'required|numeric',
+            'doctor_portion' => 'nullable|numeric',
+            'clinic_portion' => 'nullable|numeric',
+            'payment_mode' => 'nullable|string',
+            'account_title' => 'nullable|string',
+            'account_number' => 'nullable|string',
+            'bank_name' => 'nullable|string',
+            'emergency_contact_name' => 'nullable|string',
+            'emergency_contact_relation' => 'nullable|string',
+            'emergency_contact_number' => 'nullable|string',
+            'doctor_id' => 'nullable|string|unique:doctors,doctor_id,' . $doctor->id,
+            'is_coordinator' => 'nullable|boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
-        // Handle Image
-        if ($request->image) {
-            $validated['image'] = $this->fileUploadService->handleFileUpdate($request->image, $doctor->image, 'doctors');
-        }
-        
-        // Update doctor information
-        $doctor->update($validated);
-
-        // Delete old qualifications and experiences
-        $doctor->qualifications()->delete();
-        $doctor->experiences()->delete();
-
-        // Store updated qualifications
-        foreach ($request->degrees as $key => $degree) {
-            $doctor->qualifications()->create([
-                'degree' => $degree,
-                'majors' => $request->majors[$key],
-                'institution' => $request->institutions[$key],
-            ]);
+        // Set default values for portions if not provided
+        if (!isset($validatedData['doctor_portion'])) {
+            $validatedData['doctor_portion'] = 0;
         }
 
-        // Store updated experiences
-        foreach ($request->last_employers as $key => $employer) {
-            $doctor->experiences()->create([
-                'last_employer' => $employer,
-                'designation' => $request->designations[$key],
-                'start_date' => $request->start_dates[$key],
-                'end_date' => $request->end_dates[$key],
-            ]);
+        if (!isset($validatedData['clinic_portion'])) {
+            $validatedData['clinic_portion'] = 0;
         }
 
-        EventNotificationService::notifyEventByName('Doctor Updated');
+        // Set boolean fields
+        $validatedData['is_coordinator'] = $request->has('is_coordinator') ? 1 : 0;
+        $validatedData['is_active'] = $request->has('is_active') ? 1 : 0;
 
-        return redirect()->route('doctors.index')->with('success', 'Doctor updated successfully');
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete previous image if exists
+            if ($doctor->image && file_exists(public_path($doctor->image))) {
+                unlink(public_path($doctor->image));
+            }
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('images/doctors'), $imageName);
+            $validatedData['image'] = 'images/doctors/' . $imageName;
+        }
+
+        $doctor->update($validatedData);
+
+        return redirect()->route('doctors.index')->with('success', 'Doctor updated successfully!');
     }
 
     public function destroy(Doctor $doctor)

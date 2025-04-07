@@ -9,6 +9,8 @@
 <link href="{{ URL::asset('/assets/libs/dropzone/dropzone.min.css') }}" rel="stylesheet" type="text/css" />
 <!-- DataTables -->
 <link href="{{ URL::asset('/assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+<!-- Custom Theme Compatibility CSS -->
+<link href="{{ URL::asset('/assets/css/custom/theme-compatibility.css') }}" rel="stylesheet" type="text/css" />
 
 <style>
 .simplebar-mask { 

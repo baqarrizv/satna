@@ -6,6 +6,7 @@ use App\Models\Patient;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
 use DataTables;
+use Illuminate\Support\Facades\DB;
 
 class PatientController extends Controller
 {
@@ -14,10 +15,33 @@ class PatientController extends Controller
         if ($request->ajax()) {
             $patients = Patient::with(['doctorCoordinator', 'doctor']);
             
+            // Apply filters
+            if ($request->has('patient_type') && !empty($request->patient_type)) {
+                $patients->where('type', $request->patient_type);
+            }
+            
+            if ($request->has('doctor_name') && !empty($request->doctor_name)) {
+                $patients->whereHas('doctor', function($query) use ($request) {
+                    $query->where('name', $request->doctor_name);
+                });
+            }
+            
+            if ($request->has('coordinator_name') && !empty($request->coordinator_name)) {
+                $patients->whereHas('doctorCoordinator', function($query) use ($request) {
+                    $query->where('name', $request->coordinator_name);
+                });
+            }
+            
             return Datatables::of($patients)
                 ->addIndexColumn()
                 ->addColumn('fc_file', function($patient) {
-                    return ($patient->fc_number ?? 'N/A') . ' ' . ($patient->file_number ?? 'N/A');
+                    // If fc_number exists, show it, otherwise show N/A
+                    $fcDisplay = $patient->fc_number ? $patient->fc_number : 'N/A';
+                    // If file_number exists, show it, otherwise show N/A
+                    $fileDisplay = $patient->file_number ? $patient->file_number : 'N/A';
+                    
+                    // Always display both values separated by a dash
+                    return $fcDisplay . ' - ' . $fileDisplay;
                 })
                 ->addColumn('action', function($patient) {
                     $actions = '';
@@ -38,6 +62,11 @@ class PatientController extends Controller
                         </form>';
                     }
                     
+                    // Add Charges Button
+                    $actions .= '<a href="' . route('payments.addCharges') . '?patient=' . $patient->id . '" class="btn btn-outline-primary btn-sm ml-1" title="Add Charges">
+                        <i class="uil-money-bill"></i>
+                    </a>';
+                    
                     return $actions;
                 })
                 ->rawColumns(['action'])
@@ -49,40 +78,80 @@ class PatientController extends Controller
 
     public function create()
     {
-        $doctors = Doctor::all();     
-        return view('patients.create', compact('doctors'));
+        $doctors = Doctor::where('is_active', true)->get();
+        $coordinators = Doctor::where('is_active', true)
+                             ->where('is_coordinator', true)
+                             ->get();
+        return view('patients.create', compact('doctors', 'coordinators'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'type' => 'required|in:Free Consultancy,Regular Patient',
-            'patient_name' => 'required|string|max:255',
-            'patient_dob' => 'required|date',
-            'patient_cnic' => 'required|unique:patients,patient_cnic|regex:/^[0-9]{5}-[0-9]{7}-[0-9]$/',
-            'patient_contact' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'spouse_cnic' => 'nullable|regex:/^[0-9]{5}-[0-9]{7}-[0-9]$/',
-            'spouse_contact' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'emergency_contact_number' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'doctor_coordinator_id' => 'required|exists:doctors,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'patient_name' => 'required',
+            'patient_contact' => 'required',
+            'type' => 'required'
         ]);
 
-        // Auto-increment `file_number` starting from 1001
-        $lastFileNumber = Patient::withTrashed()->max('file_number');
-        $file_number = $lastFileNumber ? $lastFileNumber + 1 : 1001;
+        // Additional validation for Gyne/Ultrasound
+        if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
+            $request->validate([
+                'filetype' => 'required'
+            ]);
+        }
 
-        // Auto-increment `fc_number` starting from 1001
-        $lastFcNumber = Patient::withTrashed()->max('fc_number');
-        $fc_number = $lastFcNumber ? $lastFcNumber + 1 : 1001;
-        
-        // Add the file_number and fc_number to the request data
-        $data = $request->all();
-        $data['file_number'] = empty($data['doctor_id']) ? null : $file_number;
-        $data['fc_number'] = $fc_number;
+        // Additional validation for Regular/Free Consultancy
+        if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
+            $request->validate([
+                'spouse_name' => 'required'
+            ]);
+        }
 
-        Patient::create($data);
+        // Generate FC Number and File Number based on type
+        $fcNumber = null;
+        $fileNumber = null;
+
+        if ($request->type == 'Free Consultancy') {
+            // Generate FC Number for Free Consultancy patients (starting from 1001)
+            $lastFcNumber = Patient::whereNotNull('fc_number')
+                ->where('fc_number', '!=', '')
+                ->where(DB::raw('CAST(fc_number AS UNSIGNED)'), '>=', 1001)
+                ->orderBy(DB::raw('CAST(fc_number AS UNSIGNED)'), 'desc')
+                ->first();
+            $fcNumber = $lastFcNumber ? (intval($lastFcNumber->fc_number) + 1) : 1001;
+        } 
         
+        // Generate File Number for non-Free Consultancy patient types
+        if ($request->type != 'Free Consultancy') {
+            $lastFileNumber = Patient::whereNotNull('file_number')
+                ->where('file_number', '!=', '')
+                ->where(DB::raw('CAST(file_number AS UNSIGNED)'), '>=', 1001)
+                ->orderBy(DB::raw('CAST(file_number AS UNSIGNED)'), 'desc')
+                ->first();
+            $fileNumber = $lastFileNumber ? (intval($lastFileNumber->file_number) + 1) : 1001;
+        }
+
+        // Double-check if the generated numbers are unique
+        if ($fcNumber) {
+            while (Patient::where('fc_number', $fcNumber)->exists()) {
+                $fcNumber++;
+            }
+        }
+        
+        if ($fileNumber) {
+            while (Patient::where('file_number', $fileNumber)->exists()) {
+                $fileNumber++;
+            }
+        }
+
+        $patient = Patient::create(array_merge(
+            $request->all(),
+            [
+                'fc_number' => $fcNumber,
+                'file_number' => $fileNumber
+            ]
+        ));
+
         return redirect()->route('patients.index')->with('success', 'Patient created successfully.');
     }
 
@@ -93,37 +162,73 @@ class PatientController extends Controller
 
     public function edit(Patient $patient)
     {
-        
-        $doctors = Doctor::all();     
-        return view('patients.edit', compact('patient','doctors'));
+        $doctors = Doctor::where('is_active', true)->get();
+        return view('patients.edit', compact('patient', 'doctors'));
     }
     
     public function update(Request $request, Patient $patient)
     {
         $request->validate([
-            'patient_name' => 'required|string|max:255',
-            'patient_dob' => 'required|date',
-            'patient_cnic' => 'required|regex:/^[0-9]{5}-[0-9]{7}-[0-9]$/|unique:patients,patient_cnic,' . $patient->id,
-            'patient_contact' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'spouse_cnic' => 'nullable|regex:/^[0-9]{5}-[0-9]{7}-[0-9]$/',
-            'spouse_contact' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'emergency_contact_number' => 'nullable|regex:/^\(03[0-9]{2}\) [0-9]{3}-[0-9]{4}$/',
-            'doctor_coordinator_id' => 'required|exists:doctors,id',
-            'doctor_id' => 'nullable|exists:doctors,id',
+            'patient_name' => 'required',
+            'patient_contact' => 'required',
+            'type' => 'required'
         ]);
-        
-        $data = $request->all();
 
-        if (empty($patient->file_number)) {
-            // Auto-increment `file_number` starting from 1001
-            $lastFileNumber = Patient::max('file_number');
-            $file_number = $lastFileNumber ? $lastFileNumber + 1 : 1001;
-
-            // Add the file_number and fc_number to the request data            
-            $data['file_number'] = empty($data['doctor_id']) ? null : $file_number;
+        // Additional validation for Gyne/Ultrasound
+        if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
+            $request->validate([
+                'filetype' => 'required'
+            ]);
         }
 
-        $patient->update($data);
+        // Additional validation for Regular/Free Consultancy
+        if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
+            $request->validate([
+                'spouse_name' => 'required'
+            ]);
+        }
+
+        // Handle FC Number and File Number generation if type changes
+        $fcNumber = $patient->fc_number;
+        $fileNumber = $patient->file_number;
+
+        // If patient type is changing to Free Consultancy and doesn't have an FC number
+        if ($request->type == 'Free Consultancy' && (!$fcNumber || $fcNumber == '')) {
+            $lastFcNumber = Patient::whereNotNull('fc_number')
+                ->where('fc_number', '!=', '')
+                ->where(DB::raw('CAST(fc_number AS UNSIGNED)'), '>=', 1001)
+                ->orderBy(DB::raw('CAST(fc_number AS UNSIGNED)'), 'desc')
+                ->first();
+            $fcNumber = $lastFcNumber ? (intval($lastFcNumber->fc_number) + 1) : 1001;
+            
+            // Ensure uniqueness
+            while (Patient::where('fc_number', $fcNumber)->exists()) {
+                $fcNumber++;
+            }
+        }
+
+        // If patient type is changing from Free Consultancy to another type and doesn't have a file number
+        if ($request->type != 'Free Consultancy' && (!$fileNumber || $fileNumber == '')) {
+            $lastFileNumber = Patient::whereNotNull('file_number')
+                ->where('file_number', '!=', '')
+                ->where(DB::raw('CAST(file_number AS UNSIGNED)'), '>=', 1001)
+                ->orderBy(DB::raw('CAST(file_number AS UNSIGNED)'), 'desc')
+                ->first();
+            $fileNumber = $lastFileNumber ? (intval($lastFileNumber->file_number) + 1) : 1001;
+            
+            // Ensure uniqueness
+            while (Patient::where('file_number', $fileNumber)->exists()) {
+                $fileNumber++;
+            }
+        }
+
+        $patient->update(array_merge(
+            $request->all(),
+            [
+                'fc_number' => $fcNumber,
+                'file_number' => $fileNumber
+            ]
+        ));
 
         return redirect()->route('patients.index')->with('success', 'Patient updated successfully.');
     }
