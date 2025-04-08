@@ -2,6 +2,10 @@
 
 @section('title') Create Patient @endsection
 
+@section('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endsection
+
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -242,8 +246,38 @@
 
 @section('scripts')
 <script src="{{ URL::asset('/assets/libs/inputmask/inputmask.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function(){
+    // Select2 initialization with custom matcher for doctor and coordinator selects
+    function initializeSelect2() {
+        $('#doctor_id, #doctor_coordinator_id').select2({
+            placeholder: "Select...",
+            width: '100%',
+            matcher: function(params, data) {
+                // Return all options if there's no search term
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+
+                // Convert search term to lowercase for case-insensitive matching
+                const searchTerm = params.term.toLowerCase();
+
+                // Check if the doctor/coordinator name contains the search term
+                if (data.text.toLowerCase().indexOf(searchTerm) > -1) {
+                    return data;
+                }
+
+                // No match found
+                return null;
+            },
+            allowClear: true
+        });
+    }
+
+    // Initialize Select2 on page load
+    initializeSelect2();
+
     // Set initial visibility for Free Consultancy (default)
     $('#doctorSelectionContainer').hide();
     $('#doctorCoordinatorContainer').show();
@@ -308,8 +342,8 @@ $(document).ready(function(){
         const coordinatorSelect = $('select[name="doctor_coordinator_id"]');
         
         // Reset selections
-        doctorSelect.val('');
-        coordinatorSelect.val('');
+        doctorSelect.val('').trigger('change');
+        coordinatorSelect.val('').trigger('change');
 
         // Hide all options first
         doctorSelect.find('option').hide();
@@ -342,6 +376,11 @@ $(document).ready(function(){
                 }
             });
         }
+
+        // Refresh Select2 to reflect the visibility changes
+        doctorSelect.select2('destroy');
+        coordinatorSelect.select2('destroy');
+        initializeSelect2();
     }
     
     // Handle patient type change
@@ -421,6 +460,11 @@ $(document).ready(function(){
             $('#doctor_coordinator_id').prop('required', false);
             filterDoctors(selectedType);
         }
+
+        // After showing/hiding containers, reinitialize Select2
+        setTimeout(function() {
+            initializeSelect2();
+        }, 100);
     }
 });
 
