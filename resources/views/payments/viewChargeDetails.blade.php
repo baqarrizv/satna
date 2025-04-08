@@ -3,80 +3,80 @@
 @section('title') {{ $type }} @endsection
 
 @section('css')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <style>
-        .service-select optgroup {
-            font-weight: bold;
-            color: #495057;
-            background-color: #f8f9fa;
-            padding: 5px;
-            font-size: 1rem;
-        }
+<style>
+    .service-select optgroup {
+        font-weight: bold;
+        color: #495057;
+        background-color: #f8f9fa;
+        padding: 5px;
+        font-size: 1rem;
+    }
 
-        .service-select optgroup[label] {
-            color: #495057;
-            font-weight: bold;
-            padding: 8px 5px;
-            background-color: #e9ecef;
-        }
+    .service-select optgroup[label] {
+        color: #495057;
+        font-weight: bold;
+        padding: 8px 5px;
+        background-color: #e9ecef;
+    }
 
-        .service-select option {
-            padding: 5px 15px;
-            color: #212529;
-            background-color: #ffffff;
-        }
+    .service-select option {
+        padding: 5px 15px;
+        color: #212529;
+        background-color: #ffffff;
+    }
 
-        [data-bs-theme="dark"] .service-select optgroup {
-            color: #e9ecef;
-            background-color: #343a40;
-            font-size: 1rem;
-        }
+    [data-bs-theme="dark"] .service-select optgroup {
+        color: #e9ecef;
+        background-color: #343a40;
+        font-size: 1rem;
+    }
 
-        [data-bs-theme="dark"] .service-select optgroup[label] {
-            color: #e9ecef;
-            font-weight: bold;
-            padding: 8px 5px;
-            background-color: #495057;
-        }
+    [data-bs-theme="dark"] .service-select optgroup[label] {
+        color: #e9ecef;
+        font-weight: bold;
+        padding: 8px 5px;
+        background-color: #495057;
+    }
 
-        [data-bs-theme="dark"] .service-select option {
-            color: #f8f9fa;
-            background-color: #212529;
-        }
+    [data-bs-theme="dark"] .service-select option {
+        color: #f8f9fa;
+        background-color: #212529;
+    }
 
-        .service-select option:hover {
-            background-color: #e9ecef;
-        }
+    .service-select option:hover {
+        background-color: #e9ecef;
+    }
 
-        [data-bs-theme="dark"] .service-select option:hover {
-            background-color: #495057;
-        }
+    [data-bs-theme="dark"] .service-select option:hover {
+        background-color: #495057;
+    }
 
-        .service-select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            background-color: #fff;
-        }
+    .service-select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: #fff;
+    }
 
-        [data-bs-theme="dark"] .service-select {
-            background-color: #212529;
-            border-color: #495057;
-            color: #f8f9fa;
-        }
+    [data-bs-theme="dark"] .service-select {
+        background-color: #212529;
+        border-color: #495057;
+        color: #f8f9fa;
+    }
 
-        .select2-container .select2-selection--single {
-            height: 38px !important;
-            padding: 5px 10px;
-        }
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        padding: 5px 10px;
+    }
 
-        .select2-container--default .select2-selection--single {
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-    </style>
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+</style>
 @endsection
 
 @section('content')
@@ -91,7 +91,7 @@
     </div>
 
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <div class="row justify-content-center">
@@ -146,15 +146,15 @@
                                                 <select name="services[]" class="form-control service-select" required>
                                                     <option value="">Select Service</option>
                                                     @foreach($groupedServices as $departmentName => $services)
-                                                        @if(count($services) > 0)
-                                                            <optgroup label="{{ $departmentName }}">
-                                                                @foreach($services as $service)
-                                                                    <option value="{{ $service->id }}" data-charges="{{ $service->charges }}">
-                                                                        {{ $service->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endif
+                                                    @if(count($services) > 0)
+                                                    <optgroup label="{{ $departmentName }}">
+                                                        @foreach($services as $service)
+                                                        <option value="{{ $service->id }}" data-charges="{{ $service->charges }}">
+                                                            {{ $service->name }}
+                                                        </option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                    @endif
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -194,7 +194,7 @@
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label"><strong>Total</strong></label>
-                                    <input type="number" id="total" name="total" class="form-control" 
+                                    <input type="number" id="total" name="total" class="form-control"
                                         value="{{ $type === 'Appointment Charges' ? $patient->doctor->doctor_charges : '' }}" readonly>
                                 </div>
                                 <div class="col-md-12">
@@ -206,7 +206,7 @@
                                         <option value="Pay Order" {{ old('payment_mode') == 'Pay Order' ? 'selected' : '' }}>Pay Order</option>
                                         <option value="Deposit" {{ old('payment_mode') == 'Deposit' ? 'selected' : '' }}>Deposit</option>
                                     </select>
-                                </div>  
+                                </div>
                                 <div class="col-md-12">
                                     <label for="receiver_name" class="form-label">Receiver's Name</label>
                                     <input type="text" id="receiver_name" name="receiver_name" class="form-control" value="{{ old('receiver_name') }}">
@@ -241,23 +241,32 @@
         if ($.trim(params.term) === '') {
             return data;
         }
-        
+
         // Convert search term to lowercase for case-insensitive matching
         const searchTerm = params.term.toLowerCase();
-        
+
         // Check if the service name contains the search term
         if (data.text.toLowerCase().indexOf(searchTerm) > -1) {
             return data;
         }
-        
+
         // Check if we're in an optgroup and if the group name contains the search term
         if (data.element && data.element.parentElement && data.element.parentElement.tagName === 'OPTGROUP') {
             const groupLabel = data.element.parentElement.getAttribute('label');
             if (groupLabel && groupLabel.toLowerCase().indexOf(searchTerm) > -1) {
                 return data;
             }
+
+            // Advanced: Search all services within this department/group
+            // If any sibling in the same optgroup matches, show this option as part of the group context
+            const siblings = $(data.element.parentElement).find('option');
+            for (let i = 0; i < siblings.length; i++) {
+                if ($(siblings[i]).text().toLowerCase().indexOf(searchTerm) > -1) {
+                    return data;
+                }
+            }
         }
-        
+
         // No match found
         return null;
     }
@@ -274,12 +283,12 @@
         });
     }
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         // Initialize Select2 on page load
         initSelect2();
 
         // Service selection change handler
-        $(document).on('change', '.service-select', function () {
+        $(document).on('change', '.service-select', function() {
             $('.services').find('.text-danger').remove();
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
@@ -287,7 +296,7 @@
 
             const selectedValue = $(this).val();
             let duplicateFound = false;
-            $('.service-select').not(this).each(function () {
+            $('.service-select').not(this).each(function() {
                 if ($(this).val() === selectedValue && selectedValue !== '') {
                     duplicateFound = true;
                 }
@@ -308,7 +317,7 @@
             let total = 0;
             const $type = "{{ $type }}";
             if ($type === 'Service Charges') {
-                $('.service-charges').each(function () {
+                $('.service-charges').each(function() {
                     const charge = parseFloat($(this).val()) || 0;
                     total += charge;
                 });
@@ -322,43 +331,43 @@
         }
 
         // Add new row button handler - Fixed
-        $('.add-row').on('click', function () {
+        $('.add-row').on('click', function() {
             // Remove any error messages
             $('.services').find('.text-danger').remove();
 
             // Clone the first row
             const firstRow = $('.service-row').first();
             const newRow = firstRow.clone();
-            
+
             // Find and destroy the Select2 instance in the cloned row
             const select = newRow.find('.service-select');
-            
+
             // Reset form elements in the new row
             select.removeClass('select2-hidden-accessible').removeAttr('data-select2-id');
             select.find('option').removeAttr('data-select2-id');
             select.val('');
-            
+
             // Remove any select2 containers that were cloned
             newRow.find('.select2-container').remove();
-            
+
             // Clear the charges input
             newRow.find('.service-charges').val('');
-            
+
             // Remove any error messages
             newRow.find('.text-danger').remove();
-            
+
             // Add the new row to the DOM
             $('.service-row').last().after(newRow);
-            
+
             // Re-initialize Select2 on all dropdowns
             initSelect2();
-            
+
             // Enable all remove buttons
             $('.remove-row').prop('disabled', false);
         });
 
         // Remove row button handler
-        $(document).on('click', '.remove-row', function () {
+        $(document).on('click', '.remove-row', function() {
             if ($('.service-row').length > 1) {
                 $(this).closest('.service-row').remove();
             }
@@ -379,7 +388,7 @@
         calculateTotal();
 
         // Discount input handler
-        $(document).on('input', '#discount', function () {
+        $(document).on('input', '#discount', function() {
             calculateTotal();
         });
     });

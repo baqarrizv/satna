@@ -38,8 +38,8 @@
                                 <div class="col-md-6">
                                     <div class="form-check form-switch">
                                         <!-- Main event checkbox -->
-                                        <input class="form-check-input event-checkbox" type="checkbox" id="event_{{ $event->id }}" name="events[]" value="{{ $event->id }}" {{ isset($userSubscriptions[$event->id]) ? 'checked' : '' }} onchange="toggleGroup({{ $event->id }}, this.checked)">
-                                        <label class="form-check-label" for="event_{{ $event->id }}">{{ $event->name }}</label>
+                                        <input class="form-input event-checkbox" type="checkbox" id="event_{{ $event->id }}" name="events[]" value="{{ $event->id }}" {{ isset($userSubscriptions[$event->id]) ? 'checked' : '' }} onchange="toggleGroup({{ $event->id }}, this.checked)">
+                                        <label class="form-label" for="event_{{ $event->id }}">{{ $event->name }}</label>
                                     </div>
 
                                     <!-- Group of buttons for notification types -->

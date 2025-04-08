@@ -104,7 +104,12 @@
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
 
     <script type="text/javascript">
-        $(function () {
+        $(document).ready(function() {
+            var theme = sessionStorage.getItem("theme");
+            if (theme == "dark") {
+                $('body').attr('data-bs-theme', 'dark');
+            }
+
             // Initialize DataTable
             var table = $('#patients-table').DataTable({
                 processing: true,

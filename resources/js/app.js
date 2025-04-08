@@ -178,24 +178,19 @@ File: Main Js File
 
     // Initialize settings on page load
     function initSettings() {
-        // Clear any theme from sessionStorage to avoid conflicts
-        if (window.sessionStorage) {
-            sessionStorage.removeItem("theme");
-        }
-        
-        if (window.localStorage) {            
+        if (window.sessionStorage) {            
             // Get the stored theme from localStorage
-            var theme = localStorage.getItem("theme");
-            
+            var theme = sessionStorage.getItem("theme");
+            window.alert(theme);
             // If no theme is stored or not valid, set default to light
             if (!theme || (theme !== "light" && theme !== "dark")) {
-                localStorage.setItem("theme", "light");
+                sessionStorage.setItem("theme", "light");
                 applyTheme("light");  // Apply the light theme initially
             } else {
                 // Fix for "darkbut" value - normalize to "dark"
                 if (theme.startsWith("dark")) {
                     theme = "dark";
-                    localStorage.setItem("theme", "dark");
+                    sessionStorage.setItem("theme", "dark");
                 }
                 applyTheme(theme);  // Apply the stored theme
             }
@@ -221,10 +216,7 @@ File: Main Js File
 
     // Immediately apply theme on page load before DOM is ready
     (function() {
-        // Clear any theme from sessionStorage to avoid conflicts
-        if (window.sessionStorage) {
-            sessionStorage.removeItem("theme");
-        }
+       
 
         // Apply theme as early as possible to prevent flickering
         if (window.localStorage) {
@@ -241,12 +233,7 @@ File: Main Js File
     function layoutSetting() {
         var body = document.getElementsByTagName("body")[0];
 
-        $('#mode-setting-btn').on('click', function (e) {
-            // Clear any theme from sessionStorage to avoid conflicts
-            if (window.sessionStorage) {
-                sessionStorage.removeItem("theme");
-            }
-            
+        $('#mode-setting-btn').on('click', function (e) {  
             // Toggle between light and dark mode
             if (body.hasAttribute("data-bs-theme") && body.getAttribute("data-bs-theme") == "dark") {
                 localStorage.setItem("theme", "light");

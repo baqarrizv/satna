@@ -203,12 +203,12 @@
                             <h5 class="mt-4 mb-4">Notification Settings</h5>
                             <div class="row">
                                 <!-- Enable Push Notifications -->
-                                <div class="col-md-6">
+                                <div class="col-md-6 ">
                                     <div class="mb-3">
                                         <label for="enable_push_notifications" class="form-label">Enable Push Notifications</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="enable_push_notifications" name="enable_push_notifications" value="1" onchange="toggleOnesignal(this)" {{ old('enable_push_notifications', $setting->enable_push_notifications) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="enable_push_notifications">Enable Push Notifications</label>
+                                            <input class="form-input" type="checkbox" id="enable_push_notifications" name="enable_push_notifications" value="1" onchange="toggleOnesignal(this)" {{ old('enable_push_notifications', $setting->enable_push_notifications) ? 'checked' : '' }}>
+                                            <label class="form-label" for="enable_push_notifications">Enable Push Notifications</label>
                                         </div>
                                         @error('enable_push_notifications')
                                             <div class="text-danger">{{ $message }}</div>
@@ -221,8 +221,8 @@
                                     <div class="mb-3">
                                         <label for="enable_email_notifications" class="form-label">Enable Email Notifications</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="enable_email_notifications" value="1" name="enable_email_notifications" {{ old('enable_email_notifications', $setting->enable_email_notifications) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="enable_email_notifications">Enable Email Notifications</label>
+                                            <input class="form-input" type="checkbox" id="enable_email_notifications" value="1" name="enable_email_notifications" {{ old('enable_email_notifications', $setting->enable_email_notifications) ? 'checked' : '' }}>
+                                            <label class="form-label" for="enable_email_notifications">Enable Email Notifications</label>
                                         </div>
                                         @error('enable_email_notifications')
                                             <div class="text-danger">{{ $message }}</div>
@@ -261,10 +261,10 @@
                                     <div class="mb-3">
                                         <label for="enable_2fa" class="form-label">Enable Two-Factor Authentication (2FA)</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="enable_2fa" name="enable_2fa" value="1" 
+                                            <input class="form-input" type="checkbox" id="enable_2fa" name="enable_2fa" value="1" 
                                                 onchange="toggleTwoFa(this)"
                                                 {{ old('enable_2fa', $setting->enable_2fa) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="enable_2fa">Enable 2FA</label>
+                                            <label class="form-label" for="enable_2fa">Enable 2FA</label>
                                         </div>
                                         @error('enable_2fa')
                                             <div class="text-danger">{{ $message }}</div>
@@ -276,9 +276,9 @@
                                     <div class="mb-3">
                                         <label for="require_2fa_for_users" class="form-label">Require 2FA for All Users</label>
                                         <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="require_2fa_for_users" name="require_2fa_for_users" value="1"
+                                            <input class="form-input" type="checkbox" id="require_2fa_for_users" name="require_2fa_for_users" value="1"
                                                 {{ old('require_2fa_for_users', $setting->require_2fa_for_users) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="require_2fa_for_users">Mandatory for All Users</label>
+                                            <label class="form-label" for="require_2fa_for_users">Mandatory for All Users</label>
                                         </div>
                                         @error('require_2fa_for_users')
                                             <div class="text-danger">{{ $message }}</div>

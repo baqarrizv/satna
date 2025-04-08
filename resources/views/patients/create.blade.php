@@ -325,10 +325,6 @@ $(document).ready(function(){
         } else if (patientType === 'I/F') {
             // Show only Infertility department doctors
             doctorSelect.find('.doctor-option.infertility-doctors').show();
-            // If no infertility doctors, fallback to showing all
-            if (doctorSelect.find('.doctor-option.infertility-doctors:visible').length === 0) {
-                doctorSelect.find('.doctor-option').show();
-            }
         } else if (patientType === 'Free Consultancy') {
             // For Free Consultancy, show only coordinators that are not from Gynecology or Infertility departments
             coordinatorSelect.find('.coordinator-option').each(function() {

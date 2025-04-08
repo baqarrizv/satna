@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\StringType;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        // Required for column modifications
+        if (!Type::hasType('enum')) {
+            Type::addType('enum', StringType::class);
+        }
+
+        // Modify patient_type to include 'I/F' in the allowed list
+        DB::statement("ALTER TABLE payments MODIFY COLUMN patient_type ENUM('Free Consultancy', 'Regular Patient', 'Gyne',  'I/F') DEFAULT 'Free Consultancy'");
+        DB::statement("UPDATE payments SET patient_type = 'I/F' WHERE patient_type = 'Ultrasound'");
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        DB::statement("UPDATE payments SET patient_type = 'Ultrasound' WHERE patient_type = 'I/F'");
+        
+        // Revert back to the original ENUM values
+        DB::statement("ALTER TABLE payments MODIFY COLUMN patient_type ENUM('Free Consultancy', 'Regular Patient', 'Gyne', 'Ultrasound') DEFAULT 'Free Consultancy'");
+    }
+};
