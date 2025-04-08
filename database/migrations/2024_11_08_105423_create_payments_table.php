@@ -18,7 +18,7 @@ class CreatePaymentsTable extends Migration
             $table->unsignedBigInteger('patient_id');
             $table->string('fc_number')->nullable();
             $table->string('file_number')->nullable();
-            $table->enum('patient_type', ['Free Consultancy', 'Regular Patient'])->default('Free Consultancy');
+            $table->enum('patient_type', ['Free Consultancy', 'Regular Patient', 'Gyne', 'I/F'])->default('Free Consultancy');
 
             // Doctor details
             $table->string('doctor_name')->nullable();

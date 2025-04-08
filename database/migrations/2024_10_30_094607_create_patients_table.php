@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('emergency_contact_relation')->nullable();
             $table->string('emergency_contact_number')->nullable();
 
-            $table->enum('type', ['Free Consultancy', 'Regular Patient'])->default('Free Consultancy');
+            $table->enum('type', ['Free Consultancy', 'Regular Patient', 'Gyne','I/F'])->default('Free Consultancy');
 
             $table->string('fc_number')->unique();
             $table->foreignId('doctor_coordinator_id')->nullable()->constrained('doctors')->nullOnDelete();

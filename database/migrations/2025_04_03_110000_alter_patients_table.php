@@ -54,7 +54,7 @@ return new class extends Migration
             $table->string('emergency_contact_number')->nullable()->change();
 
             // Patient Type - Update to include all types
-            DB::statement("ALTER TABLE patients MODIFY COLUMN type ENUM('Free Consultancy', 'Regular Patient', 'Gyne', 'Ultrasound') DEFAULT 'Free Consultancy'");
+            DB::statement("ALTER TABLE patients MODIFY COLUMN type ENUM('Free Consultancy', 'Regular Patient', 'Gyne', 'I/F') DEFAULT 'Free Consultancy'");
 
             // Make sure filetype exists and is set properly
             if (Schema::hasColumn('patients', 'filetype')) {

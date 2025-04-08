@@ -42,13 +42,13 @@ return new class extends Migration
             // Patient type with all possible values
             if (Schema::hasColumn('payments', 'patient_type')) {
                 // Update patient_type to include all types
-                DB::statement("ALTER TABLE payments MODIFY COLUMN patient_type ENUM('Free Consultancy', 'Regular Patient', 'Gyne', 'Ultrasound') DEFAULT 'Free Consultancy'");
+                DB::statement("ALTER TABLE payments MODIFY COLUMN patient_type ENUM('Free Consultancy', 'Regular Patient', 'Gyne', 'I/F') DEFAULT 'Free Consultancy'");
             } else {
                 $table->enum('patient_type', [
                     'Free Consultancy', 
                     'Regular Patient', 
                     'Gyne', 
-                    'Ultrasound'
+                    'I/F'
                 ])->default('Free Consultancy');
             }
 
