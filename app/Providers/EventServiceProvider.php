@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use App\Listeners\LogAuthenticationActivity;
+use App\Models\Doctor;
+use App\Observers\DoctorObserver;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -40,6 +42,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // Register the Doctor observer
+        Doctor::observe(DoctorObserver::class);
     }
 }

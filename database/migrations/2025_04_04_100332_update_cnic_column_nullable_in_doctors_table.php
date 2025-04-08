@@ -28,11 +28,32 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // First, update any NULL cnic values to an empty string to avoid data truncation
-        DB::table('doctors')->whereNull('cnic')->update(['cnic' => '']);
+        // First drop the unique constraint so we can modify data
+        try {
+            Schema::table('doctors', function (Blueprint $table) {
+                $table->dropUnique('doctors_cnic_unique');
+            });
+        } catch (\Exception $e) {
+            // Constraint might not exist, continue
+        }
         
+        // Update NULL cnic values to unique placeholders
+        $nullCnicDoctors = DB::table('doctors')->whereNull('cnic')->get();
+        foreach ($nullCnicDoctors as $index => $doctor) {
+            $placeholder = 'TEMP_CNIC_' . $doctor->id . '_' . uniqid();
+            DB::table('doctors')
+                ->where('id', $doctor->id)
+                ->update(['cnic' => $placeholder]);
+        }
+        
+        // Make the column non-nullable
         Schema::table('doctors', function (Blueprint $table) {
             $table->string('cnic')->nullable(false)->change();
+        });
+        
+        // Re-add the unique constraint
+        Schema::table('doctors', function (Blueprint $table) {
+            $table->unique('cnic');
         });
     }
 };

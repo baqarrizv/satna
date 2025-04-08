@@ -384,8 +384,8 @@ $(document).ready(function(){
     // Calculate doctor and clinic portions
     function calculatePortions() {
         var doctorCharges = $('#doctor_charges').val() || 0;
-        var doctorPortion = $('#doctor_portion').val() || 0;
-        var clinicPortion = $('#clinic_portion').val() || 0;
+        var doctorPortion = parseFloat($('#doctor_portion').val()) || 0;
+        var clinicPortion = parseFloat($('#clinic_portion').val()) || 0;
         
         // Calculate actual amounts
         var doctorAmount = (doctorCharges * doctorPortion / 100).toFixed(2);
@@ -396,8 +396,30 @@ $(document).ready(function(){
         $('#clinic_portion_amount').text('Amount: Rs. ' + clinicAmount);
     }
     
-    // Attach event handlers
-    $('#doctor_charges, #doctor_portion, #clinic_portion').on('input', calculatePortions);
+    // When doctor portion changes, update clinic portion
+    $('#doctor_portion').on('input', function() {
+        var doctorPortion = parseFloat($(this).val()) || 0;
+        if (doctorPortion > 100) {
+            $(this).val(100);
+            doctorPortion = 100;
+        }
+        $('#clinic_portion').val((100 - doctorPortion).toFixed(0));
+        calculatePortions();
+    });
+    
+    // When clinic portion changes, update doctor portion
+    $('#clinic_portion').on('input', function() {
+        var clinicPortion = parseFloat($(this).val()) || 0;
+        if (clinicPortion > 100) {
+            $(this).val(100);
+            clinicPortion = 100;
+        }
+        $('#doctor_portion').val((100 - clinicPortion).toFixed(0));
+        calculatePortions();
+    });
+    
+    // Doctor charges still updates both calculations
+    $('#doctor_charges').on('input', calculatePortions);
     
     // Initial calculation
     calculatePortions();
