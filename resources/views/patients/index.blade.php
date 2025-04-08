@@ -40,8 +40,8 @@
                                     <option value="">All Types</option>
                                     <option value="Free Consultancy">Free Consultancy</option>
                                     <option value="Regular Patient">Regular Patient</option>
-                                    <option value="Gyne">Gyne</option>
-                                    <option value="Ultrasound">Ultrasound</option>
+                                    <option value="Gyne">Gyne(Gynecology)</option>
+                                    <option value="I/F">I/F(Infertility)</option>
                                 </select>
                             </div>
                         </div>
