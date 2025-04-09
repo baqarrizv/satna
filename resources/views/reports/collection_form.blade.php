@@ -44,7 +44,6 @@
                         <div class="row">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">Generate PDF Report</button>
-                                <a href="{{ route('home') }}" class="btn btn-secondary">Cancel</a>
                             </div>
                         </div>
                     </form>

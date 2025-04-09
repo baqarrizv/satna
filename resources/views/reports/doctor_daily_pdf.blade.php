@@ -103,14 +103,14 @@
                 <td>{{ number_format($totals['deposit'], 2) }}</td>
                 <td>{{ number_format($totals['total'], 2) }}</td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td>Tax from Card Payments</td>
                 <td>-</td>
                 <td>{{ number_format($totals['tax'], 2) }}</td>
                 <td>-</td>
                 <td>-</td>
                 <td>{{ number_format($totals['tax'], 2) }}</td>
-            </tr>
+            </tr> -->
         </tbody>
     </table>
 </body>

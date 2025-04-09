@@ -25,7 +25,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('reports.doctorDaily.generate') }}">
+                    <form method="GET" action="{{ route('reports.doctorDaily.generate') }}" target="_blank">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">

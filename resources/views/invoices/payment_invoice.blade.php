@@ -256,7 +256,7 @@
                 
                 @if($payment->payment_mode === 'Card')
                 <tr>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax ({{ env('TAX_PERCENT', 17) }}%)</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax (1.7%)</td>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
                 </tr>
                 @endif

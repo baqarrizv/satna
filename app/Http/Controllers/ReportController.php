@@ -20,6 +20,7 @@ class ReportController extends Controller
         // Fetch doctor charges from `payments` - Only fetch records with doctor_charges > 0 for appointment charges
         $doctorPayments = Payment::whereDate('created_at', $date)
             ->where('doctor_charges', '>', 0) // Only appointment charges
+            ->where('refunded', 0)
             ->select(
                 'doctor_department_name',
                 'doctor_name',
@@ -37,6 +38,7 @@ class ReportController extends Controller
         // Fetch service payments directly from payments table - These are records with doctor_charges = 0
         $directServicePayments = Payment::whereDate('created_at', $date)
             ->where('doctor_charges', '=', 0) // Only service charges from payments table
+            ->where('refunded', 0)
             ->whereNotIn('id', function($query) {
                 $query->select('payment_id')
                     ->from('payment_services')
@@ -58,7 +60,8 @@ class ReportController extends Controller
 
         // Fetch services data from `payment_services` (this will be used in addition to direct service payments)
         $servicePayments = PaymentService::whereHas('payment', function ($query) use ($date) {
-            $query->whereDate('created_at', $date);
+            $query->whereDate('created_at', $date)
+            ->where('refunded', 0);
         })
             ->join('payments', 'payment_services.payment_id', '=', 'payments.id')
             ->select(
@@ -220,9 +223,10 @@ class ReportController extends Controller
 
         // First, get all payment IDs that have associated services
         $paymentIdsWithServices = PaymentService::select('payment_id')->distinct()->pluck('payment_id')->toArray();
-
+        // Get all payments for the doctor on the specified date
         $payments = Payment::whereDate('payments.created_at', $date)
-            ->where('doctor_id', $doctor)
+            ->where('payments.doctor_id', $doctor)
+            ->where('payments.refunded', 0)
             ->whereNotIn('payments.id', $paymentIdsWithServices) // Only include payments without associated services
             ->where('doctor_charges', '>', 0) // Ensure it's an appointment charge (doctor_charges > 0)
             ->join('patients', 'payments.patient_id', '=', 'patients.id')
@@ -235,8 +239,11 @@ class ReportController extends Controller
                 DB::raw('CASE WHEN payments.payment_mode = "Pay Order" THEN payments.total ELSE 0 END as pay_order'),
                 DB::raw('CASE WHEN payments.payment_mode = "Deposit" THEN payments.total ELSE 0 END as deposit'),
                 'payments.total',
-                'payments.tax'
+                'payments.tax',
+                'payments.doctor_charges',  // Added to distinguish appointment charges
+                'payments.created_at'
             )
+            ->orderBy('payments.created_at')
             ->get();
 
         $totals = [

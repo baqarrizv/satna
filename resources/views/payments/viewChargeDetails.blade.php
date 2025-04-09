@@ -192,7 +192,7 @@
                                 
                                 <!-- Tax fields - initially hidden -->
                                 <div class="col-md-12 tax-field" style="display:none;">
-                                    <label class="form-label"><strong>Tax Amount ({{ env('TAX_PERCENT', 1.7) }}%)</strong></label>
+                                    <label class="form-label"><strong>Tax Amount (1.7%)</strong></label>
                                     <input type="number" id="tax_amount" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-12 tax-field" style="display:none;">
@@ -231,7 +231,7 @@
         $('#payment_mode').on('change', function() {
             const paymentMode = $(this).val();
             
-            if (paymentMode === 'Card') {
+            if (paymentMode === 'Card' && parseFloat($('#total').val()) >= 50000) {
                 // Show tax fields and update labels
                 $('.tax-field').show();
                 $('#total_label').html('<strong>Subtotal</strong>');
@@ -246,24 +246,32 @@
         });
 
         // Trigger change event if Card is already selected
-        if ($('#payment_mode').val() === 'Card') {
+        if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
             $('#payment_mode').trigger('change');
         }
         
         // Function to calculate tax and total with tax
         function calculateTaxAndTotal() {
             const subtotal = parseFloat($('#total').val()) || 0;
-            const taxPercent = parseFloat("{{ env('TAX_PERCENT', 17) }}");
-            const taxAmount = (subtotal * taxPercent / 100).toFixed(2);
-            const totalWithTax = (subtotal + parseFloat(taxAmount)).toFixed(2);
-            
-            $('#tax_amount').val(taxAmount);
-            $('#total_with_tax').val(totalWithTax);
+            const taxPercent = 1.7;
+
+            // Calculate original tax
+            const rawTaxAmount = subtotal * taxPercent / 100;
+
+            // Apply custom rounding to tax amount
+            const taxAmount = (rawTaxAmount % 1 >= 0.5)
+                ? Math.ceil(rawTaxAmount)
+                : Math.floor(rawTaxAmount);
+
+            const totalWithTax = subtotal + taxAmount;
+
+            $('#tax_amount').val(taxAmount.toFixed(2));
+            $('#total_with_tax').val(totalWithTax.toFixed(2));
         }
 
         // Recalculate tax when subtotal changes
         $('#total').on('change', function() {
-            if ($('#payment_mode').val() === 'Card') {
+            if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
                 calculateTaxAndTotal();
             }
         });
@@ -341,7 +349,7 @@
             $('#total').val(discountedTotal > 0 ? discountedTotal : 0);
             
             // If Card payment, recalculate tax
-            if ($('#payment_mode').val() === 'Card') {
+            if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
                 calculateTaxAndTotal();
             }
         }

@@ -225,17 +225,18 @@ class PaymentController extends Controller
             $netAmount = $sub_total - $request->discount;
             
             // Calculate tax if payment mode is Card
-            if ($request->payment_mode === 'Card') {
-                $taxPercent = env('TAX_PERCENT');
+            if ($request->payment_mode === 'Card' && $netAmount >= 50000) {
+                $taxPercent = 1.7;
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
             }
-            
+
             $paymentData['total'] = $netAmount;
             
-            // Add doctor's name for service charges
+            // Add doctor's information for service charges
             if ($patient->doctor) {
+                $paymentData['doctor_id'] = $patient->doctor->id;
                 $paymentData['doctor_name'] = $patient->doctor->name;
                 $paymentData['doctor_department_name'] = $patient->doctor->department->name;
             }
@@ -249,8 +250,8 @@ class PaymentController extends Controller
             $netAmount = $doctor->doctor_charges - $discount;
 
             // Calculate tax if payment mode is Card
-            if ($request->payment_mode === 'Card') {
-                $taxPercent = env('TAX_PERCENT');
+            if ($request->payment_mode === 'Card' && $netAmount >= 50000) {
+                $taxPercent = 1.7;
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
