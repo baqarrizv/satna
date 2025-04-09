@@ -37,6 +37,11 @@ class ReportController extends Controller
         // Fetch service payments directly from payments table - These are records with doctor_charges = 0
         $directServicePayments = Payment::whereDate('created_at', $date)
             ->where('doctor_charges', '=', 0) // Only service charges from payments table
+            ->whereNotIn('id', function($query) {
+                $query->select('payment_id')
+                    ->from('payment_services')
+                    ->whereNotNull('payment_id');
+            }) // Exclude payments that have associated services in payment_services table
             ->select(
                 'doctor_department_name as department_name',
                 DB::raw('"Service Charges" as service_name'),

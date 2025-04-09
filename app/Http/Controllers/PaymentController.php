@@ -226,7 +226,7 @@ class PaymentController extends Controller
             
             // Calculate tax if payment mode is Card
             if ($request->payment_mode === 'Card') {
-                $taxPercent = env('TAX_PERCENT', 17);
+                $taxPercent = env('TAX_PERCENT');
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
@@ -250,7 +250,7 @@ class PaymentController extends Controller
 
             // Calculate tax if payment mode is Card
             if ($request->payment_mode === 'Card') {
-                $taxPercent = env('TAX_PERCENT', 17);
+                $taxPercent = env('TAX_PERCENT');
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
