@@ -112,11 +112,11 @@
 
                         <!-- File Type Selection (for Gyne) -->
                         <div class="row" id="fileTypeContainer" style="display: none;">
-                            <div class="col-md-4">
+                            <div class="col-md-4 if-hide-field">
                                 <div class="mb-3">
                                     <label for="filetype" class="form-label">Type <span class="text-danger">*</span></label>
                                     <select name="filetype" class="form-control">
-                                        <option value="">Select File Type</option>
+                                        <option value="">Select Type</option>
                                         <option value="New">New</option>
                                         <option value="Follow Up">Follow Up</option>
                                     </select>
@@ -133,6 +133,7 @@
                                         <option value="">Select Purpose</option>
                                         <option value="Gyne">Gyne</option>
                                         <option value="A/N">A/N</option>
+                                        <option value="P/N">P/N</option>
                                         <option value="Ultrasound">Ultrasound</option>
                                         <option value="Blood Test">Blood Test</option>
                                     </select>
@@ -141,8 +142,6 @@
                                     @enderror
                                 </div>
                             </div>
-                            
-                            
                         </div>
 
                         <!-- Personal Information -->
@@ -167,7 +166,12 @@
                                     @enderror
                                 </div>
                             </div>
-                            
+                            <div class="col-md-4">
+                                <div class="mb-3 gyne-hide-field">
+                                    <label for="patient_dob" class="form-label">Date of Birth</label>
+                                    <input type="date" name="patient_dob" class="form-control" value="{{ old('patient_dob') }}">
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="patient_cnic" class="form-label">CNIC <span id="cnic-required" class="text-danger" style="display: none;">*</span></label>
@@ -180,21 +184,16 @@
                                     <small class="form-text text-muted">Format: 00000-0000000-0</small>
                                 </div>
                             </div>
+                            
+                            
                             <div class="col-md-4">
-                                <div class="mb-3">
+                                <div class="mb-3 if-hide-field">
                                     <label for="alternative_contact" class="form-label">Alternative Contact</label>
                                     <input type="text" id="alternative_contact" name="alternative_contact" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="patient_dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="patient_dob" class="form-control" value="{{ old('patient_dob') }}">
-                                </div>
-                            </div>
-                            
                             <div class="col-md-8">
-                                <div class="mb-3">
+                                <div class="mb-3 gyne-hide-field">
                                     <label for="patient_address" class="form-label">Address</label>
                                     <textarea name="patient_address" class="form-control" rows="3">{{ old('patient_address') }}</textarea>
                                 </div>
@@ -202,18 +201,18 @@
                         </div>
 
                         <!-- Spouse Information -->
-                        <div class="row">
+                        <div class="row gyne-hide-section">
                             <h5 class="mb-4">Spouse Information</h5>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="spouse_name" class="form-label">Spouse Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="spouse_name" class="form-control" required>
+                                    <label for="spouse_name" class="form-label">Spouse Name <span class="if-required text-danger">*</span></label>
+                                    <input type="text" name="spouse_name" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="spouse_contact" class="form-label">Spouse Contact <span class="text-danger">*</span></label>
-                                    <input type="text" id="spouse_contact" name="spouse_contact" class="form-control" required>
+                                    <label for="spouse_contact" class="form-label">Spouse Contact <span class="if-required text-danger">*</span></label>
+                                    <input type="text" id="spouse_contact" name="spouse_contact" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -269,15 +268,18 @@ $(document).ready(function(){
     $('form').on('submit', function(e) {
         var selectedType = $('input[name="type"]:checked').val();
         
-        // Skip CNIC validation for Gyne as fields are hidden
-        if (selectedType === 'Gyne') {
-            var purpose = $('#purpose').val();
-            if (!purpose) {
-                e.preventDefault();
-                alert('Purpose is required for Gyne patients.');
-                $('#purpose').focus();
-                return false;
+        // Skip CNIC validation for Gyne and I/F as fields are hidden
+        if (selectedType === 'Gyne' || selectedType === 'I/F') {
+            if (selectedType === 'Gyne') {
+                var purpose = $('#purpose').val();
+                if (!purpose) {
+                    e.preventDefault();
+                    alert('Purpose is required for Gyne patients.');
+                    $('#purpose').focus();
+                    return false;
+                }
             }
+            return true;
         } else {
             // For other patient types
             var cnic = $('#patient_cnic').val();
@@ -366,6 +368,15 @@ $(document).ready(function(){
             // Show CNIC fields
             $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Show Type field
+            $('.if-hide-field').show();
+            // Set spouse fields as optional
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'Regular Patient') {
             $('#doctorSelectionContainer').show();
@@ -382,12 +393,23 @@ $(document).ready(function(){
             // Show CNIC fields
             $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Show Type field
+            $('.if-hide-field').show();
+            // Set spouse fields as optional
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'Gyne') {
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').show();
             $('#gyneOptionContainer').show();
+            // For Gyne patients, show Type field but not Alternative Contact
+            $('.if-hide-field').show();
             // Update required attributes for doctor fields
             $('#doctor_id').prop('required', true);
             $('#doctor_coordinator_id').prop('required', false);
@@ -398,12 +420,21 @@ $(document).ready(function(){
             // Hide CNIC fields for Gyne
             $('[for="patient_cnic"]').closest('.mb-3').hide();
             $('[for="spouse_cnic"]').closest('.mb-3').hide();
+            // Hide DOB, Address, and Spouse fields for Gyne
+            $('.gyne-hide-field').hide();
+            $('.gyne-hide-section').hide();
+            // Set all spouse fields as not required
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'I/F') {
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').show();
             $('#gyneOptionContainer').hide();
+            // Hide Type field and Alternative Contact for I/F
+            $('.if-hide-field').hide();
             // Both patient and spouse information required for I/F
             $('input[name="patient_name"]').prop('required', true);
             $('input[name="spouse_name"]').prop('required', true);
@@ -412,10 +443,14 @@ $(document).ready(function(){
             // Reset requirements for CNIC
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', false);
-            // Show CNIC fields
-            $('[for="patient_cnic"]').closest('.mb-3').show();
+            // Hide CNIC fields for I/F
+            $('[for="patient_cnic"]').closest('.mb-3').hide();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Set spouse fields as required for I/F
+            $('.if-required').show();
             // Update required attributes for doctor fields
             $('#doctor_id').prop('required', true);
             $('#doctor_coordinator_id').prop('required', false);

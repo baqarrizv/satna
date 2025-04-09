@@ -145,7 +145,7 @@
 
                         <!-- File Type for Gyne/Ultrasound -->
                         <div id="fileTypeContainer" class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-4 if-hide-field">
                                 <div class="mb-3">
                                     <label for="filetype" class="form-label">Type</label>
                                     <select name="filetype" class="form-control @error('filetype') is-invalid @enderror">
@@ -166,19 +166,13 @@
                                         <option value="">Select Purpose</option>
                                         <option value="Gyne" {{ $patient->purpose == 'Gyne' ? 'selected' : '' }}>Gyne</option>
                                         <option value="A/N" {{ $patient->purpose == 'A/N' ? 'selected' : '' }}>A/N</option>
+                                        <option value="P/N" {{ $patient->purpose == 'P/N' ? 'selected' : '' }}>P/N</option>
                                         <option value="Ultrasound" {{ $patient->purpose == 'Ultrasound' ? 'selected' : '' }}>Ultrasound</option>
                                         <option value="Blood Test" {{ $patient->purpose == 'Blood Test' ? 'selected' : '' }}>Blood Test</option>
                                     </select>
                                     @error('purpose')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="alternative_contact" class="form-label">Alternative Contact</label>
-                                    <input type="text" id="alternative_contact" name="alternative_contact" class="form-control" value="{{ $patient->alternative_contact }}">
                                 </div>
                             </div>
                         </div>
@@ -220,14 +214,21 @@
                             </div>
 
                             <div class="col-md-4">
-                                <div class="mb-3">
+                                <div class="mb-3 if-hide-field">
+                                    <label for="alternative_contact" class="form-label">Alternative Contact</label>
+                                    <input type="text" id="alternative_contact" name="alternative_contact" class="form-control" value="{{ $patient->alternative_contact }}">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3 gyne-hide-field">
                                     <label for="patient_dob" class="form-label">Date of Birth</label>
                                     <input type="date" name="patient_dob" class="form-control" value="{{ $patient->patient_dob ? $patient->patient_dob->format('Y-m-d') : '' }}">
                                 </div>
                             </div>
 
                             <div class="col-md-8">
-                                <div class="mb-3">
+                                <div class="mb-3 gyne-hide-field">
                                     <label for="patient_address" class="form-label">Address</label>
                                     <textarea name="patient_address" class="form-control" rows="3">{{ $patient->patient_address }}</textarea>
                                 </div>
@@ -235,18 +236,18 @@
                         </div>
 
                         <!-- Spouse Information -->
-                        <div class="row">
+                        <div class="row gyne-hide-section">
                             <h5 class="mb-4">Spouse Information</h5>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="spouse_name" class="form-label">Spouse Name <span class="text-danger">*</span></label>
-                                    <input type="text" name="spouse_name" class="form-control" value="{{ $patient->spouse_name }}" required>
+                                    <label for="spouse_name" class="form-label">Spouse Name <span class="if-required text-danger">*</span></label>
+                                    <input type="text" name="spouse_name" class="form-control" value="{{ $patient->spouse_name }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="spouse_contact" class="form-label">Spouse Contact <span class="text-danger">*</span></label>
-                                    <input type="text" id="spouse_contact" name="spouse_contact" class="form-control" value="{{ $patient->spouse_contact }}" required>
+                                    <label for="spouse_contact" class="form-label">Spouse Contact <span class="if-required text-danger">*</span></label>
+                                    <input type="text" id="spouse_contact" name="spouse_contact" class="form-control" value="{{ $patient->spouse_contact }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -277,192 +278,153 @@
 </div>
 @endsection
 
-@section('scripts')
+@section('script')
 <script src="{{ URL::asset('/assets/libs/inputmask/inputmask.min.js') }}"></script>
 <script>
 $(document).ready(function(){
-    // Initialize input masks
+    // Initialize masks
     $('#patient_cnic').inputmask('99999-9999999-9');
     $('#spouse_cnic').inputmask('99999-9999999-9');
     $('#patient_contact, #spouse_contact, #alternative_contact').inputmask('(0399) 999-9999');
-
-    // Form validation
-    $('form').on('submit', function(e) {
-        var selectedType = $('input[name="type"]:checked').val();
-        
-        // Skip CNIC validation for Gyne as fields are hidden
-        if (selectedType === 'Gyne') {
-            var purpose = $('#purpose').val();
-            if (!purpose) {
-                e.preventDefault();
-                alert('Purpose is required for Gyne patients.');
-                $('#purpose').focus();
-                return false;
-            }
-        } else {
-            // For other patient types
-            var cnic = $('#patient_cnic').val();
-            if (cnic) {
-                // Only validate CNIC format if a value is provided
-                var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
-                if (!cnicRegex.test(cnic)) {
-                    e.preventDefault();
-                    alert('Please enter a valid CNIC number in the format: 00000-0000000-0');
-                    $('#patient_cnic').focus();
-                    return false;
-                }
-            }
-            
-            var spouseCnic = $('#spouse_cnic').val();
-            if (spouseCnic) {
-                // Only validate spouse CNIC format if a value is provided
-                var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
-                if (!cnicRegex.test(spouseCnic)) {
-                    e.preventDefault();
-                    alert('Please enter a valid spouse CNIC number in the format: 00000-0000000-0');
-                    $('#spouse_cnic').focus();
-                    return false;
-                }
-            }
-        }
+    
+    // On page load, set the initial state based on selected patient type
+    var selectedType = $('input[name="type"]:checked').val();
+    hideandshow(selectedType);
+    
+    // Handle patient type changes
+    $('input[name="type"]').change(function(){
+        selectedType = $(this).val();
+        hideandshow(selectedType);
     });
-
-    // Function to filter doctors based on department
-    function filterDoctors(patientType) {
-        const doctorSelect = $('select[name="doctor_id"]');
-        const coordinatorSelect = $('select[name="doctor_coordinator_id"]');
-        
-        // Reset selections if not already set
-        if (!doctorSelect.val()) doctorSelect.val('');
-        if (!coordinatorSelect.val()) coordinatorSelect.val('');
-
-        // Hide all options first
-        doctorSelect.find('option').hide();
-        coordinatorSelect.find('option').hide();
-        
-        // Always show the "Select Doctor" option and selected options
-        doctorSelect.find('option:first, option:selected').show();
-        coordinatorSelect.find('option:first, option:selected').show();
-
-        if (patientType === 'Gyne') {
-            // Show only Gynecology department doctors
-            doctorSelect.find('.doctor-option.gynecology-doctors').show();
-            coordinatorSelect.find('.coordinator-option.gynecology-coordinators').show();
-        } else if (patientType === 'I/F') {
-            // Show only Infertility department doctors
-            doctorSelect.find('.doctor-option.infertility-doctors').show();
-            coordinatorSelect.find('.coordinator-option.infertility-coordinators').show();
-            // If no infertility doctors, fallback to showing all
-            if (doctorSelect.find('.doctor-option.infertility-doctors:visible').length === 0) {
-                doctorSelect.find('.doctor-option').show();
-            }
-        } else {
-            // For Regular Patient and Free Consultancy, show all doctors EXCEPT Gynecology and Infertility
-            doctorSelect.find('.doctor-option').each(function() {
-                const dept = $(this).data('department')?.toLowerCase() || '';
-                if (dept !== 'gynecology' && dept !== 'infertility') {
-                    $(this).show();
-                }
-            });
-            coordinatorSelect.find('.coordinator-option').each(function() {
-                const dept = $(this).data('department')?.toLowerCase() || '';
-                if (dept !== 'gynecology' && dept !== 'infertility') {
-                    $(this).show();
-                }
-            });
-        }
-        
-        // Always ensure the selected option is visible regardless of department
-        doctorSelect.find('option:selected').show();
-        coordinatorSelect.find('option:selected').show();
-    }
-
-    // Handle patient type change
-    function handlePatientTypeChange() {
-        var selectedType = $('input[name="type"]:checked').val();
-        var hasCoordinatorValue = $('select[name="doctor_coordinator_id"]').val() !== "";
-        
-        // Default behavior
+    
+    function hideandshow(selectedType){
         if (selectedType === 'Free Consultancy') {
             $('#doctorSelectionContainer').hide();
             $('#doctorCoordinatorContainer').show();
             $('#fileTypeContainer').hide();
-            $('#gyneOptionContainer').hide();
-            // Update required attributes for doctor fields
+            // Update required attributes
             $('#doctor_id').prop('required', false);
             $('#doctor_coordinator_id').prop('required', true);
-            // Reset requirements for CNIC
+            // Reset CNIC requirement
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', false);
             // Show CNIC fields
             $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Show Type and Alternative Contact
+            $('.if-hide-field').show();
+            // Set spouse fields as optional
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
         } else if (selectedType === 'Regular Patient') {
             $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide(); // Initially hide
+            $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').hide();
-            $('#gyneOptionContainer').hide();
-            // Update required attributes for doctor fields
+            // Update required attributes
             $('#doctor_id').prop('required', true);
             $('#doctor_coordinator_id').prop('required', false);
-            // Reset requirements for CNIC
+            // Reset CNIC requirement
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', false);
             // Show CNIC fields
             $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Show Type and Alternative Contact
+            $('.if-hide-field').show();
+            // Set spouse fields as optional
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
         } else if (selectedType === 'Gyne') {
             $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide(); // Initially hide
+            $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').show();
-            $('#gyneOptionContainer').show();
-            // Update required attributes for doctor fields
+            // Show Type field for Gyne
+            $('.if-hide-field').show();
+            // Update required attributes
             $('#doctor_id').prop('required', true);
             $('#doctor_coordinator_id').prop('required', false);
             // No CNIC required for Gyne
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', true);
             // Hide CNIC fields for Gyne
             $('[for="patient_cnic"]').closest('.mb-3').hide();
             $('[for="spouse_cnic"]').closest('.mb-3').hide();
+            // Hide DOB, Address, and Spouse fields for Gyne
+            $('.gyne-hide-field').hide();
+            $('.gyne-hide-section').hide();
+            // Set all spouse fields as not required
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
         } else if (selectedType === 'I/F') {
             $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide(); // Initially hide
+            $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').show();
-            $('#gyneOptionContainer').hide();
+            // Hide Type field for I/F
+            $('.if-hide-field').hide();
+            // Update required attributes
+            $('#doctor_id').prop('required', true);
+            $('#doctor_coordinator_id').prop('required', false);
             // Both patient and spouse information required for I/F
             $('input[name="patient_name"]').prop('required', true);
             $('input[name="spouse_name"]').prop('required', true);
             $('input[name="patient_contact"]').prop('required', true);
             $('input[name="spouse_contact"]').prop('required', true);
-            // Reset requirements for CNIC
+            // Reset CNIC requirement
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', false);
-            // Show CNIC fields
-            $('[for="patient_cnic"]').closest('.mb-3').show();
+            // Hide patient CNIC but show spouse CNIC fields
+            $('[for="patient_cnic"]').closest('.mb-3').hide();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
+            // Show DOB, Address, and Spouse fields
+            $('.gyne-hide-field').show();
+            $('.gyne-hide-section').show();
+            // Set spouse fields as required for I/F
+            $('.if-required').show();
         }
-        
-        // Override: Always show coordinator if it has a value
-        if (hasCoordinatorValue) {
-            $('#doctorCoordinatorContainer').show();
-            // If it has a value and is showing, make it required
-            $('#doctor_coordinator_id').prop('required', true);
-        }
-        
-        // Apply doctor filtering
-        filterDoctors(selectedType);
     }
-
-    // Initial setup based on selected type
-    handlePatientTypeChange();
-
-    // Listen for changes
-    $('input[name="type"]').change(handlePatientTypeChange);
+    
+    // Form validation for CNIC format
+    $('form').on('submit', function(e) {
+        var selectedType = $('input[name="type"]:checked').val();
+        
+        // Skip CNIC validation for Gyne and I/F patients
+        if (selectedType === 'Gyne' || selectedType === 'I/F') {
+            return true;
+        }
+        
+        var cnic = $('#patient_cnic').val();
+        if (cnic) {
+            // Only validate CNIC format if a value is provided
+            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+            if (!cnicRegex.test(cnic)) {
+                e.preventDefault();
+                alert('Please enter a valid CNIC number in the format: 00000-0000000-0');
+                $('#patient_cnic').focus();
+                return false;
+            }
+        }
+        
+        var spouseCnic = $('#spouse_cnic').val();
+        if (spouseCnic) {
+            // Only validate spouse CNIC format if a value is provided
+            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+            if (!cnicRegex.test(spouseCnic)) {
+                e.preventDefault();
+                alert('Please enter a valid spouse CNIC number in the format: 00000-0000000-0');
+                $('#spouse_cnic').focus();
+                return false;
+            }
+        }
+    });
 });
 </script>
 @endsection

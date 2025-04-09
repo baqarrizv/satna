@@ -79,7 +79,8 @@ class ReportController extends Controller
             'online' => 0,
             'pay_order' => 0,
             'deposit' => 0,
-            'total' => 0
+            'total' => 0,
+            'tax' => 0
         ];
 
         // Add doctor payments to revenue streams (appointment charges)
@@ -172,6 +173,13 @@ class ReportController extends Controller
             $total['total'] += $service->total ?? 0;
         }
 
+        // Now also fetch total tax from card payments
+        $cardTax = Payment::whereDate('created_at', $date)
+            ->where('payment_mode', 'Card')
+            ->sum('tax');
+            
+        $total['tax'] = $cardTax;
+
         // Generate PDF
         $data = [
             'total' => $total,
@@ -216,7 +224,8 @@ class ReportController extends Controller
                 DB::raw('CASE WHEN payments.payment_mode = "Online" THEN payments.total ELSE 0 END as online'),
                 DB::raw('CASE WHEN payments.payment_mode = "Pay Order" THEN payments.total ELSE 0 END as pay_order'),
                 DB::raw('CASE WHEN payments.payment_mode = "Deposit" THEN payments.total ELSE 0 END as deposit'),
-                'payments.total'
+                'payments.total',
+                'payments.tax'
             )
             ->get();
 
@@ -226,7 +235,8 @@ class ReportController extends Controller
             'online' => $payments->sum('online'),
             'pay_order' => $payments->sum('pay_order'),
             'deposit' => $payments->sum('deposit'),
-            'total' => $payments->sum('total')
+            'total' => $payments->sum('total'),
+            'tax' => $payments->where('payment_mode', 'Card')->sum('tax')
         ];
 
         $doctor_details = Doctor::find($doctor);

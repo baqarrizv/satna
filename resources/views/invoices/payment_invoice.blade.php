@@ -243,8 +243,33 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700;">Amount Received</td>
-                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">{{ number_format($payment->total, 2) }}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 2) }}</td>
+                </tr>
+                
+                @if($payment->discount > 0)
+                <tr>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Discount</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 2) }}</td>
+                </tr>
+                @endif
+                
+                @if($payment->payment_mode === 'Card')
+                <tr>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax ({{ env('TAX_PERCENT', 17) }}%)</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
+                </tr>
+                @endif
+                
+                <tr>
+                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
+                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
+                        @if($payment->payment_mode === 'Card')
+                            {{ number_format($payment->total + $payment->tax, 2) }}
+                        @else
+                            {{ number_format($payment->total, 2) }}
+                        @endif
+                    </td>
                 </tr>
             </tfoot>
         </table>

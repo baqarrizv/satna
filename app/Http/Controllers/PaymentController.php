@@ -58,7 +58,7 @@ class PaymentController extends Controller
                     </a>';
                 })
                 ->addColumn('action', function ($payment) {
-                    if (!$payment->closed && !$payment->refunded && Auth::check() && Auth::user()->can('Refund Payments')) {
+                    if (!$payment->closed && !$payment->refunded && Auth::check()) {
                         return '<form action="' . route('payments.refund', $payment->id) . '" method="POST" style="display:inline-block;">
                             ' . csrf_field() . '
                             ' . method_field('PUT') . '
@@ -167,7 +167,10 @@ class PaymentController extends Controller
                 return $a <=> $b;
             });
 
-            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices'));
+            // Get all doctors for the doctor selection dropdown
+            $doctors = Doctor::all();
+
+            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors'));
         }
     }
 
@@ -181,7 +184,8 @@ class PaymentController extends Controller
             'total' => 'required|numeric|min:0',
             'payment_mode' => 'required|string',
             'receiver_name' => 'nullable|string|max:255',
-            'remarks' => 'nullable|string'
+            'remarks' => 'nullable|string',
+            'doctor_id' => 'nullable|exists:doctors,id'
         ]);
 
         if (!empty($request->services)) {
@@ -218,7 +222,17 @@ class PaymentController extends Controller
 
             $paymentData['sub_total'] = $sub_total;
             $paymentData['discount'] = min($request->discount, $sub_total);
-            $paymentData['total'] = $sub_total - $request->discount;
+            $netAmount = $sub_total - $request->discount;
+            
+            // Calculate tax if payment mode is Card
+            if ($request->payment_mode === 'Card') {
+                $taxPercent = env('TAX_PERCENT', 17);
+                $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
+            } else {
+                $paymentData['tax'] = 0;
+            }
+            
+            $paymentData['total'] = $netAmount;
             
             // Add doctor's name for service charges
             if ($patient->doctor) {
@@ -228,18 +242,30 @@ class PaymentController extends Controller
         }
 
         if ($request->type === 'Appointment Charges') {
-            $discount = min($request->discount, $patient->doctor->doctor_charges);
-            $total = $patient->doctor->doctor_charges - $discount;
+            // Get doctor information
+            $doctor = $request->doctor_id ? Doctor::findOrFail($request->doctor_id) : $patient->doctor;
+            
+            $discount = min($request->discount, $doctor->doctor_charges);
+            $netAmount = $doctor->doctor_charges - $discount;
 
-            $paymentData['doctor_name'] = $patient->doctor->name;
-            $paymentData['doctor_department_name'] = $patient->doctor->department->name;
-            $paymentData['sub_total'] = $patient->doctor->doctor_charges;
+            // Calculate tax if payment mode is Card
+            if ($request->payment_mode === 'Card') {
+                $taxPercent = env('TAX_PERCENT', 17);
+                $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
+            } else {
+                $paymentData['tax'] = 0;
+            }
+
+            $paymentData['doctor_id'] = $doctor->id;
+            $paymentData['doctor_name'] = $doctor->name;
+            $paymentData['doctor_department_name'] = $doctor->department->name;
+            $paymentData['sub_total'] = $doctor->doctor_charges;
             $paymentData['discount'] = $discount;
-            $paymentData['total'] = $total;
+            $paymentData['total'] = $netAmount;
 
-            $paymentData['doctor_charges'] = $patient->doctor->doctor_charges;
-            $paymentData['doctor_portion'] = $patient->doctor->doctor_portion;
-            $paymentData['clinic_portion'] = $patient->doctor->clinic_portion;
+            $paymentData['doctor_charges'] = $doctor->doctor_charges;
+            $paymentData['doctor_portion'] = $doctor->doctor_portion;
+            $paymentData['clinic_portion'] = $doctor->clinic_portion;
         }
 
         $payment = Payment::create($paymentData);
@@ -375,6 +401,9 @@ class PaymentController extends Controller
             return $a <=> $b;
         });
 
-        return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices'));
+        // Get all doctors for the doctor selection dropdown
+        $doctors = Doctor::all();
+
+        return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors'));
     }
 }

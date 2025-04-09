@@ -110,6 +110,15 @@
                 <td>{{ number_format($total['deposit'] ?? 0, 2) }}</td>
                 <td>{{ number_format($total['total'] ?? 0, 2) }}</td>
             </tr>
+            <tr>
+                <td colspan="3" style="text-align: center; font-weight: bold;">Tax from Card Payments</td>
+                <td>-</td>
+                <td>{{ number_format($total['tax'] ?? 0, 2) }}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{ number_format($total['tax'] ?? 0, 2) }}</td>
+            </tr>
         </tfoot>
     </table>
 </body>

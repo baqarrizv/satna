@@ -37,6 +37,8 @@ class Patient extends Model
         'doctor_coordinator_id',
         'file_number',
         'doctor_id',
+        'purpose',
+        'alternative_contact',
     ];
 
     /**

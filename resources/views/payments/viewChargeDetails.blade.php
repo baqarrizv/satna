@@ -3,8 +3,6 @@
 @section('title') {{ $type }} @endsection
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
 <style>
     .service-select optgroup {
         font-weight: bold;
@@ -12,13 +10,6 @@
         background-color: #f8f9fa;
         padding: 5px;
         font-size: 1rem;
-    }
-
-    .service-select optgroup[label] {
-        color: #495057;
-        font-weight: bold;
-        padding: 8px 5px;
-        background-color: #e9ecef;
     }
 
     .service-select option {
@@ -33,24 +24,9 @@
         font-size: 1rem;
     }
 
-    [data-bs-theme="dark"] .service-select optgroup[label] {
-        color: #e9ecef;
-        font-weight: bold;
-        padding: 8px 5px;
-        background-color: #495057;
-    }
-
     [data-bs-theme="dark"] .service-select option {
         color: #f8f9fa;
         background-color: #212529;
-    }
-
-    .service-select option:hover {
-        background-color: #e9ecef;
-    }
-
-    [data-bs-theme="dark"] .service-select option:hover {
-        background-color: #495057;
     }
 
     .service-select {
@@ -65,16 +41,6 @@
         background-color: #212529;
         border-color: #495057;
         color: #f8f9fa;
-    }
-
-    .select2-container .select2-selection--single {
-        height: 38px !important;
-        padding: 5px 10px;
-    }
-
-    .select2-container--default .select2-selection--single {
-        border: 1px solid #ced4da;
-        border-radius: 4px;
     }
 </style>
 @endsection
@@ -185,9 +151,17 @@
                                 <div class="appointment">
                                     <div class="row mb-3">
                                         <div class="col-md-5">
-                                            <label class="form-label"><strong>Appointment Charges</strong></label>
+                                            <label class="form-label"><strong>Doctor *</strong></label>
+                                            <select id="doctor_id" name="doctor_id" class="form-control" required>
+                                                @foreach($doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}" data-charges="{{ $doctor->doctor_charges }}" {{ $patient->doctor_id == $doctor->id ? 'selected' : '' }}>
+                                                        {{ $doctor->name }} ({{ $doctor->department->name }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="col-md-5">
+                                            <label class="form-label"><strong>Appointment Charges</strong></label>
                                             <input type="number" id="doctor_charges" name="doctor_charges" readonly class="form-control" value="{{ $patient->doctor->doctor_charges }}">
                                         </div>
                                     </div>
@@ -240,102 +214,32 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
 <script>
-    // Pre-load services data as JSON to avoid mixing Blade with JavaScript
-    const departmentsData = {
-        @foreach($groupedServices as $departmentName => $servicesGroup)
-            "{{ $departmentName }}": [
-                @foreach($servicesGroup as $service)
-                    {
-                        id: "{{ $service->id }}",
-                        text: "{{ $service->name }}",
-                        charges: "{{ $service->charges }}"
-                    },
-                @endforeach
-            ],
-        @endforeach
-    };
-
-    // Improved custom matcher function for better searching
-    function matchCustom(params, data) {
-        // Return all options if there's no search term
-        if ($.trim(params.term) === '') {
-            return data;
-        }
-
-        // Convert search term to lowercase for case-insensitive matching
-        const searchTerm = params.term.toLowerCase();
-
-        // Check if the service name contains the search term
-        if (data.text.toLowerCase().indexOf(searchTerm) > -1) {
-            return data;
-        }
-
-        // No match found
-        return null;
-    }
-
-    // Initialize Select2 on service dropdowns
-    function initSelect2() {
-        $('.service-select').select2({
-            placeholder: "Select Service",
-            width: '100%',
-            matcher: function(params, data) {
-                return matchCustom(params, data);
-            },
-            allowClear: true
-        });
-        
-        // Initialize department filter with Select2
-        $('.department-filter').select2({
-            placeholder: "Select Department",
-            width: '100%',
-            allowClear: true
-        });
-    }
-
     $(document).ready(function() {
-        // Initialize Select2 on page load
-        initSelect2();
-        
         // Department filter change handler
         $(document).on('change', '.department-filter', function() {
             const selectedDepartment = $(this).val();
             const serviceSelect = $(this).closest('.service-row').find('.service-select');
             
             // Reset service selection
-            serviceSelect.val('').trigger('change');
+            serviceSelect.val('');
             
-            if (selectedDepartment && departmentsData[selectedDepartment]) {
-                // Enable service select
+            if (selectedDepartment) {
+                // Show only options from the selected department
                 serviceSelect.prop('disabled', false);
-                serviceSelect.empty().append('<option value="">Select Service</option>');
-                
-                // Add only services from the selected department
-                const services = departmentsData[selectedDepartment];
-                
-                // Add services to dropdown
-                services.forEach(function(service) {
-                    const option = new Option(service.text, service.id, false, false);
-                    $(option).data('charges', service.charges);
-                    serviceSelect.append(option);
-                });
+                serviceSelect.find('option').hide();
+                serviceSelect.find('option:first').text('Select Service').show();
+                serviceSelect.find('option[data-department="' + selectedDepartment + '"]').show();
             } else {
-                // Disable service select if no department selected
+                // If no department selected, disable service select
                 serviceSelect.prop('disabled', true);
-                serviceSelect.empty().append('<option value="">Select Department First</option>');
+                serviceSelect.find('option').hide();
+                serviceSelect.find('option:first').text('Select Department First').show();
             }
-            
-            // Refresh Select2
-            serviceSelect.trigger('change');
         });
 
         // Service selection change handler
         $(document).on('change', '.service-select', function() {
-            if ($(this).prop('disabled')) return;
-            
             $('.services').find('.text-danger').remove();
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
@@ -351,11 +255,19 @@
 
             if (duplicateFound) {
                 const errorMsg = '<div class="text-danger">This service has already been added!</div>';
-                $(this).val('').trigger('change');
+                $(this).val('');
                 $(this).closest('.service-row').find('.service-charges').val('');
                 $(this).closest('.service-row').after(errorMsg);
             }
 
+            calculateTotal();
+        });
+
+        // Doctor selection change handler for appointment charges
+        $(document).on('change', '#doctor_id', function() {
+            const selectedOption = $(this).find('option:selected');
+            const charges = selectedOption.data('charges');
+            $('#doctor_charges').val(charges);
             calculateTotal();
         });
 
@@ -377,7 +289,7 @@
             $('#total').val(discountedTotal > 0 ? discountedTotal : 0);
         }
 
-        // Add new row button handler - Fixed
+        // Add new row button handler
         $('.add-row').on('click', function() {
             // Remove any error messages
             $('.services').find('.text-danger').remove();
@@ -386,7 +298,7 @@
             const firstRow = $('.service-row').first();
             const newRow = firstRow.clone();
 
-            // Create a unique ID for the new department filter to avoid ID conflicts
+            // Create a unique ID for the new elements
             const rowCount = $('.service-row').length;
             const newDepartmentFilterId = 'department-filter-' + rowCount;
             const newServiceSelectId = 'service-select-' + rowCount;
@@ -394,26 +306,14 @@
             // Update IDs in the new row
             newRow.find('.department-filter').attr('id', newDepartmentFilterId);
             newRow.find('.service-select').attr('id', newServiceSelectId);
-
-            // Remove Select2 classes and data
-            newRow.find('select').each(function() {
-                $(this).removeClass('select2-hidden-accessible').removeAttr('data-select2-id');
-                $(this).find('option').removeAttr('data-select2-id');
-            });
             
             // Reset the form fields
             newRow.find('.department-filter').val('');
-            newRow.find('.service-select').prop('disabled', true).empty().append('<option value="">Select Department First</option>');
+            newRow.find('.service-select').val('');
             newRow.find('.service-charges').val('');
-
-            // Remove any Select2 containers
-            newRow.find('.select2-container').remove();
 
             // Add the new row to the DOM
             $('.service-row').last().after(newRow);
-
-            // Re-initialize Select2 on all dropdowns
-            initSelect2();
 
             // Enable all remove buttons
             $('.remove-row').prop('disabled', false);

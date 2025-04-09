@@ -7,6 +7,8 @@
     <link href="{{ URL::asset('/assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Select2 CSS -->
     <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- DataTables Buttons CSS -->
+    <link href="{{ URL::asset('/assets/libs/datatables/buttons.dataTables.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -34,10 +36,12 @@
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="payment_mode_filter" class="form-label">Payment Mode</label>
-                            <select class="form-control select2" id="payment_mode_filter">
+                            <select class="form-control" id="payment_mode_filter">
                                 <option value="">All</option>
                                 <option value="Cash">Cash</option>
-                                <option value="CC">CC</option>
+                                <option value="Card">Card</option>
+                                <option value="Pay Order">Pay Order</option>
+                                <option value="Deposit">Deposit</option>
                                 <option value="Online">Online</option>
                             </select>
                         </div>
@@ -67,7 +71,7 @@
                         </div>
                     </div>
 
-                    <table class="table table-bordered dt-responsive nowrap w-100" id="payments-table">
+                    <table class="table table-bordered datatable-export  dt-responsive nowrap w-100" id="payments-table">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -80,7 +84,7 @@
                                 <th>Mode</th>
                                 <th>Date</th>
                                 <th>Invoice</th>
-                                <th>Actions</th>
+                                <th class="no-export">Actions</th>
                             </tr>
                         </thead>
                     </table>
@@ -96,6 +100,14 @@
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
     <!-- Select2 JS -->
     <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
+    
+    <!-- DataTables Buttons JS -->
+    <script src="{{ URL::asset('/assets/libs/datatables/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/libs/datatables/buttons.html5.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/libs/datatables/buttons.print.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/libs/datatables/jszip.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/libs/datatables/pdfmake.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/libs/datatables/vfs_fonts.js') }}"></script>
 
     <script type="text/javascript">
         $(function () {
@@ -156,7 +168,28 @@
                 ],
                 responsive: true,
                 pageLength: 25,
-                order: [[1, 'desc']]
+                order: [[1, 'desc']],
+                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"row"<"col-sm-12 col-md-6"B>><"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: 'Export to Excel',
+                        className: 'btn btn-success my-2',
+                        exportOptions: {
+                            columns: ':visible:not(.no-export)'
+                        },
+                        title: 'Payments_Export_' + new Date().toISOString().slice(0, 10)
+                    },
+                    {
+                        extend: 'pdf',
+                        text: 'Export to PDF',
+                        className: 'btn btn-danger my-2 mx-2',
+                        exportOptions: {
+                            columns: ':visible:not(.no-export)'
+                        },
+                        title: 'Payments_Export_' + new Date().toISOString().slice(0, 10)
+                    }
+                ]
             });
 
             // Handle filter changes

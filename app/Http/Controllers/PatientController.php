@@ -96,7 +96,8 @@ class PatientController extends Controller
         // Additional validation for Gyne/Ultrasound
         if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
             $request->validate([
-                'filetype' => 'required'
+                'filetype' => 'required',
+                'purpose' => 'required'
             ]);
         }
 
@@ -177,7 +178,8 @@ class PatientController extends Controller
         // Additional validation for Gyne/Ultrasound
         if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
             $request->validate([
-                'filetype' => 'required'
+                'filetype' => 'required',
+                'purpose' => 'required'
             ]);
         }
 
