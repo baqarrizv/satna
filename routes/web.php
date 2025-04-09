@@ -213,8 +213,12 @@ Route::group(['middleware' => ['auth', 'enforce2fa']], function () {
         ->name('services.byDepartment')
         ->middleware('can:View Service');
     
-    Route::get('reports/daily-collection', [ReportController::class, 'generateDailyCollectionReport'])
+    Route::get('reports/daily-collection', [ReportController::class, 'dailyCollectionReportForm'])
         ->name('reports.dailyCollection')
+        ->middleware('can:View Reports');
+
+    Route::get('reports/daily-collection/generate', [ReportController::class, 'generateDailyCollectionReport'])
+        ->name('reports.dailyCollection.generate')
         ->middleware('can:View Reports');
 
     Route::get('/reports/doctor-daily', [ReportController::class, 'doctorDailyReportForm'])

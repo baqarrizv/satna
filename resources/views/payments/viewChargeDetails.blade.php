@@ -170,18 +170,9 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="col-md-12">
-                                    <label class="form-label"><strong>Discount</strong></label>
-                                    <input type="number" id="discount" name="discount" class="form-control" value="0">
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="form-label"><strong>Total</strong></label>
-                                    <input type="number" id="total" name="total" class="form-control"
-                                        value="{{ $type === 'Appointment Charges' ? $patient->doctor->doctor_charges : '' }}" readonly>
-                                </div>
-                                <div class="col-md-12">
+                            <div class="col-md-12">
                                     <label for="payment_mode" class="form-label">Payment Mode *</label>
-                                    <select name="payment_mode" class="form-control" required>
+                                    <select name="payment_mode" id="payment_mode" class="form-control" required>
                                         <option value="Cash" {{ old('payment_mode') == 'Cash' ? 'selected' : '' }}>Cash</option>
                                         <option value="Card" {{ old('payment_mode') == 'Card' ? 'selected' : '' }}>Card</option>
                                         <option value="Online" {{ old('payment_mode') == 'Online' ? 'selected' : '' }}>Online</option>
@@ -189,6 +180,26 @@
                                         <option value="Deposit" {{ old('payment_mode') == 'Deposit' ? 'selected' : '' }}>Deposit</option>
                                     </select>
                                 </div>
+                                <div class="col-md-12">
+                                    <label class="form-label"><strong>Discount</strong></label>
+                                    <input type="number" id="discount" name="discount" class="form-control" value="0">
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label" id="total_label"><strong>Total</strong></label>
+                                    <input type="number" id="total" name="total" class="form-control"
+                                        value="{{ $type === 'Appointment Charges' ? $patient->doctor->doctor_charges : '' }}" readonly>
+                                </div>
+                                
+                                <!-- Tax fields - initially hidden -->
+                                <div class="col-md-12 tax-field" style="display:none;">
+                                    <label class="form-label"><strong>Tax Amount ({{ env('TAX_PERCENT', 1.7) }}%)</strong></label>
+                                    <input type="number" id="tax_amount" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-12 tax-field" style="display:none;">
+                                    <label class="form-label"><strong>Total with Tax</strong></label>
+                                    <input type="number" id="total_with_tax" class="form-control" readonly>
+                                </div>
+                                
                                 <div class="col-md-12">
                                     <label for="receiver_name" class="form-label">Receive From</label>
                                     <input type="text" id="receiver_name" name="receiver_name" class="form-control" value="{{ old('receiver_name', $patient->patient_name) }}">
@@ -216,6 +227,47 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Payment mode change handler
+        $('#payment_mode').on('change', function() {
+            const paymentMode = $(this).val();
+            
+            if (paymentMode === 'Card') {
+                // Show tax fields and update labels
+                $('.tax-field').show();
+                $('#total_label').html('<strong>Subtotal</strong>');
+                
+                // Calculate tax
+                calculateTaxAndTotal();
+            } else {
+                // Hide tax fields and reset labels
+                $('.tax-field').hide();
+                $('#total_label').html('<strong>Total</strong>');
+            }
+        });
+
+        // Trigger change event if Card is already selected
+        if ($('#payment_mode').val() === 'Card') {
+            $('#payment_mode').trigger('change');
+        }
+        
+        // Function to calculate tax and total with tax
+        function calculateTaxAndTotal() {
+            const subtotal = parseFloat($('#total').val()) || 0;
+            const taxPercent = parseFloat("{{ env('TAX_PERCENT', 17) }}");
+            const taxAmount = (subtotal * taxPercent / 100).toFixed(2);
+            const totalWithTax = (subtotal + parseFloat(taxAmount)).toFixed(2);
+            
+            $('#tax_amount').val(taxAmount);
+            $('#total_with_tax').val(totalWithTax);
+        }
+
+        // Recalculate tax when subtotal changes
+        $('#total').on('change', function() {
+            if ($('#payment_mode').val() === 'Card') {
+                calculateTaxAndTotal();
+            }
+        });
+
         // Department filter change handler
         $(document).on('change', '.department-filter', function() {
             const selectedDepartment = $(this).val();
@@ -287,6 +339,11 @@
             const discount = parseFloat($('#discount').val()) || 0;
             const discountedTotal = total - discount;
             $('#total').val(discountedTotal > 0 ? discountedTotal : 0);
+            
+            // If Card payment, recalculate tax
+            if ($('#payment_mode').val() === 'Card') {
+                calculateTaxAndTotal();
+            }
         }
 
         // Add new row button handler

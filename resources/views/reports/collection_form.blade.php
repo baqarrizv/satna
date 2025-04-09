@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title') Doctor Daily Collection Report @endsection
+@section('title') Daily Collection Report @endsection
 
 @section('css')
     <!-- Select2 CSS -->
@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="mb-0">Doctor Daily Collection Report</h4>
+                <h4 class="mb-0">Daily Collection Report</h4>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('reports.doctorDaily.generate') }}">
+                    <form method="GET" action="{{ route('reports.dailyCollection.generate') }}" target="_blank">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -44,6 +44,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">Generate PDF Report</button>
+                                <a href="{{ route('home') }}" class="btn btn-secondary">Cancel</a>
                             </div>
                         </div>
                     </form>

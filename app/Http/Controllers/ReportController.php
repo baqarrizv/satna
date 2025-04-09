@@ -204,6 +204,11 @@ class ReportController extends Controller
         return view('reports.doctor_daily_form', compact('doctors'));
     }
 
+    public function dailyCollectionReportForm()
+    {
+        return view('reports.collection_form');
+    }
+
     public function generateDoctorDailyReport(Request $request)
     {
         $date = $request->input('date', now()->format('Y-m-d'));
