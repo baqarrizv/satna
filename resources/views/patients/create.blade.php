@@ -3,7 +3,7 @@
 @section('title') Create Patient @endsection
 
 @section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- No additional CSS needed -->
 @endsection
 
 @section('content')
@@ -35,7 +35,7 @@
                                     <label class="form-label fw-bold">Patient Type</label>
                                     <div class="d-flex flex-wrap gap-2">
                                         <div class="form-check p-2">
-                                            <input type="radio" id="freeConsultancy" name="type" class="form-check-input" value="Free Consultancy" checked>
+                                            <input type="radio" id="freeConsultancy" name="type" class="form-check-input" value="Free Consultancy">
                                             <label class="form-check-label" for="freeConsultancy">Free Consultancy</label>
                                         </div>
                                         <div class="form-check p-2">
@@ -47,7 +47,7 @@
                                             <label class="form-check-label" for="ultrasound">I/F(Infertility)</label>
                                         </div>
                                         <div class="form-check p-2">
-                                            <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient">
+                                            <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient" checked>
                                             <label class="form-check-label" for="regularPatient">Regular Patient</label>
                                         </div>
                                     </div>
@@ -244,56 +244,26 @@
 </div>
 @endsection
 
-@section('scripts')
+@section('script')
 <script src="{{ URL::asset('/assets/libs/inputmask/inputmask.min.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function(){
-    // Select2 initialization with custom matcher for doctor and coordinator selects
-    function initializeSelect2() {
-        $('#doctor_id, #doctor_coordinator_id').select2({
-            placeholder: "Select...",
-            width: '100%',
-            matcher: function(params, data) {
-                // Return all options if there's no search term
-                if ($.trim(params.term) === '') {
-                    return data;
-                }
-
-                // Convert search term to lowercase for case-insensitive matching
-                const searchTerm = params.term.toLowerCase();
-
-                // Check if the doctor/coordinator name contains the search term
-                if (data.text.toLowerCase().indexOf(searchTerm) > -1) {
-                    return data;
-                }
-
-                // No match found
-                return null;
-            },
-            allowClear: true
-        });
-    }
-
-    // Initialize Select2 on page load
-    initializeSelect2();
-
-    // Set initial visibility for Free Consultancy (default)
-    $('#doctorSelectionContainer').hide();
-    $('#doctorCoordinatorContainer').show();
+    // Set initial visibility for Regular Patient (default)
+    $('#doctorSelectionContainer').show();
+    $('#doctorCoordinatorContainer').hide();
     $('#fileTypeContainer').hide();
     $('#gyneOptionContainer').hide();
-    $('#doctor_id').prop('required', false);
-    $('#doctor_coordinator_id').prop('required', true);
+    $('#doctor_id').prop('required', true);
+    $('#doctor_coordinator_id').prop('required', false);
 
     // Initialize input masks
     $('#patient_cnic').inputmask('99999-9999999-9');
     $('#spouse_cnic').inputmask('99999-9999999-9');
     $('#patient_contact, #spouse_contact, #alternative_contact').inputmask('(0399) 999-9999');
 
-    // Initialize the filter for Free Consultancy coordinators 
-    filterDoctors('Free Consultancy');
-    hideandshow('Free Consultancy');
+    // Initialize the filter for Regular Patient coordinators 
+    filterDoctors('Regular Patient');
+    hideandshow('Regular Patient');
     
     // Form validation
     $('form').on('submit', function(e) {
@@ -338,20 +308,16 @@ $(document).ready(function(){
 
     // Function to filter doctors based on department
     function filterDoctors(patientType) {
-        const doctorSelect = $('select[name="doctor_id"]');
-        const coordinatorSelect = $('select[name="doctor_coordinator_id"]');
+        var doctorSelect = $('#doctor_id');
+        var coordinatorSelect = $('#doctor_coordinator_id');
         
-        // Reset selections
-        doctorSelect.val('').trigger('change');
-        coordinatorSelect.val('').trigger('change');
-
         // Hide all options first
         doctorSelect.find('option').hide();
         coordinatorSelect.find('option').hide();
         
-        // Always show the "Select Doctor" option
-        doctorSelect.find('option:first').show();
-        coordinatorSelect.find('option:first').show();
+        // Always show the "Select Doctor" option and selected options
+        doctorSelect.find('option:first, option:selected').show();
+        coordinatorSelect.find('option:first, option:selected').show();
 
         if (patientType === 'Gyne') {
             // Show only Gynecology department doctors
@@ -376,11 +342,6 @@ $(document).ready(function(){
                 }
             });
         }
-
-        // Refresh Select2 to reflect the visibility changes
-        doctorSelect.select2('destroy');
-        coordinatorSelect.select2('destroy');
-        initializeSelect2();
     }
     
     // Handle patient type change
@@ -460,13 +421,8 @@ $(document).ready(function(){
             $('#doctor_coordinator_id').prop('required', false);
             filterDoctors(selectedType);
         }
-
-        // After showing/hiding containers, reinitialize Select2
-        setTimeout(function() {
-            initializeSelect2();
-        }, 100);
     }
 });
-
 </script>
 @endsection
+

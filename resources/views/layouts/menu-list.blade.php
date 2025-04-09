@@ -68,13 +68,13 @@
         <li class="menu-title">Reports</li>
 
         <li>
-            <a href="{{ route('reports.dailyCollection') }}">
+            <a href="{{ route('reports.dailyCollection') }}" target="_blank">
                 <i class="uil-plus"></i>
                 <span>Daily Collection</span>
             </a>
         </li>
         <li>
-            <a href="{{ route('reports.doctorDaily') }}">
+            <a href="{{ route('reports.doctorDaily') }}" target="_blank">
                 <i class="uil-plus"></i>
                 <span>Doctor Daily Collection</span>
             </a>

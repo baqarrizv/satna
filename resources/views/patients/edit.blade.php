@@ -340,9 +340,9 @@ $(document).ready(function(){
         doctorSelect.find('option').hide();
         coordinatorSelect.find('option').hide();
         
-        // Always show the "Select Doctor" option
-        doctorSelect.find('option:first').show();
-        coordinatorSelect.find('option:first').show();
+        // Always show the "Select Doctor" option and selected options
+        doctorSelect.find('option:first, option:selected').show();
+        coordinatorSelect.find('option:first, option:selected').show();
 
         if (patientType === 'Gyne') {
             // Show only Gynecology department doctors
@@ -371,6 +371,10 @@ $(document).ready(function(){
                 }
             });
         }
+        
+        // Always ensure the selected option is visible regardless of department
+        doctorSelect.find('option:selected').show();
+        coordinatorSelect.find('option:selected').show();
     }
 
     // Handle patient type change

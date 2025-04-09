@@ -28,7 +28,7 @@
                                 <label for="type" class="form-label">Charge Type</label>
                                 <select class="form-control @error('type') is-invalid @enderror" id="type" name="type" required>
                                     <option value="">Select Type</option>
-                                    <option value="Appointment Charges" {{ old('type') == 'Appointment Charges' ? 'selected' : '' }}>Appointment Charges</option>
+                                    <option value="Appointment Charges" {{ old('type') == 'Appointment Charges' ? 'selected' : '' }} selected>Appointment Charges</option>
                                     <option value="Service Charges" {{ old('type') == 'Service Charges' ? 'selected' : '' }}>Service Charges</option>
                                 </select>
                                 @error('type')

@@ -5,6 +5,8 @@
 @section('css')
     <!-- DataTables -->
     <link href="{{ URL::asset('/assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Select2 CSS -->
+    <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -32,7 +34,7 @@
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="payment_mode_filter" class="form-label">Payment Mode</label>
-                            <select class="form-control" id="payment_mode_filter">
+                            <select class="form-control select2" id="payment_mode_filter">
                                 <option value="">All</option>
                                 <option value="Cash">Cash</option>
                                 <option value="CC">CC</option>
@@ -41,8 +43,9 @@
                         </div>
                         <div class="col-md-3">
                             <label for="doctor_filter" class="form-label">Doctor</label>
-                            <select class="form-control" id="doctor_filter">
+                            <select class="form-control select2" id="doctor_filter">
                                 <option value="">All</option>
+                                <option value="all_docs">Select All</option>
                                 @foreach($doctors as $doctor)
                                     <option value="{{ $doctor->id }}">{{ $doctor->name }}</option>
                                 @endforeach
@@ -50,8 +53,9 @@
                         </div>
                         <div class="col-md-3">
                             <label for="service_filter" class="form-label">Service</label>
-                            <select class="form-control" id="service_filter">
+                            <select class="form-control select2" id="service_filter">
                                 <option value="">All</option>
+                                <option value="all_services">Select All</option>
                                 @foreach($services as $service)
                                     <option value="{{ $service->id }}">{{ $service->name }}</option>
                                 @endforeach
@@ -90,9 +94,33 @@
 @section('script')
     <!-- Required datatable js -->
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
+    <!-- Select2 JS -->
+    <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
 
     <script type="text/javascript">
         $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                width: '100%',
+                placeholder: 'Select an option',
+                allowClear: true
+            });
+            
+            // Handle "Select All" options
+            $('#doctor_filter').on('change', function() {
+                if ($(this).val() === 'all_docs') {
+                    // Reset to default "All" option
+                    $(this).val('').trigger('change');
+                }
+            });
+            
+            $('#service_filter').on('change', function() {
+                if ($(this).val() === 'all_services') {
+                    // Reset to default "All" option
+                    $(this).val('').trigger('change');
+                }
+            });
+            
             var table = $('#payments-table').DataTable({
                 processing: true,
                 serverSide: true,

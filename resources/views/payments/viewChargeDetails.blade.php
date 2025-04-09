@@ -141,24 +141,32 @@
                                 <div class="services">
                                     <div class="service-row">
                                         <div class="row mb-3">
-                                            <div class="col-md-5">
-                                                <label class="form-label"><strong>Service Type *</strong></label>
-                                                <select name="services[]" class="form-control service-select" required>
-                                                    <option value="">Select Service</option>
-                                                    @foreach($groupedServices as $departmentName => $services)
-                                                    @if(count($services) > 0)
-                                                    <optgroup label="{{ $departmentName }}">
-                                                        @foreach($services as $service)
-                                                        <option value="{{ $service->id }}" data-charges="{{ $service->charges }}">
-                                                            {{ $service->name }}
-                                                        </option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                    @endif
+                                            <div class="col-md-3">
+                                                <label class="form-label"><strong>Department *</strong></label>
+                                                <select id="department-filter-0" class="form-control department-filter" required>
+                                                    <option value="">Select Department</option>
+                                                    @php
+                                                        $departments = collect($groupedServices)->keys()->toArray();
+                                                    @endphp
+                                                    @foreach($departments as $departmentName)
+                                                        <option value="{{ $departmentName }}">{{ $departmentName }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-5">
+                                            <div class="col-md-4">
+                                                <label class="form-label"><strong>Service Type *</strong></label>
+                                                <select id="service-select-0" name="services[]" class="form-control service-select" required disabled>
+                                                    <option value="">Select Department First</option>
+                                                    @foreach($groupedServices as $departmentName => $services)
+                                                        @foreach($services as $service)
+                                                            <option value="{{ $service->id }}" data-charges="{{ $service->charges }}" data-department="{{ $departmentName }}" style="display: none;">
+                                                                {{ $service->name }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
                                                 <label class="form-label"><strong>Charges</strong></label>
                                                 <input type="number" name="charges[]" readonly class="form-control service-charges" value="">
                                             </div>
@@ -208,8 +216,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-12">
-                                    <label for="receiver_name" class="form-label">Receiver's Name</label>
-                                    <input type="text" id="receiver_name" name="receiver_name" class="form-control" value="{{ old('receiver_name') }}">
+                                    <label for="receiver_name" class="form-label">Receive From</label>
+                                    <input type="text" id="receiver_name" name="receiver_name" class="form-control" value="{{ old('receiver_name', $patient->patient_name) }}">
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label"><strong>Remarks</strong></label>
@@ -235,6 +243,21 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    // Pre-load services data as JSON to avoid mixing Blade with JavaScript
+    const departmentsData = {
+        @foreach($groupedServices as $departmentName => $servicesGroup)
+            "{{ $departmentName }}": [
+                @foreach($servicesGroup as $service)
+                    {
+                        id: "{{ $service->id }}",
+                        text: "{{ $service->name }}",
+                        charges: "{{ $service->charges }}"
+                    },
+                @endforeach
+            ],
+        @endforeach
+    };
+
     // Improved custom matcher function for better searching
     function matchCustom(params, data) {
         // Return all options if there's no search term
@@ -248,23 +271,6 @@
         // Check if the service name contains the search term
         if (data.text.toLowerCase().indexOf(searchTerm) > -1) {
             return data;
-        }
-
-        // Check if we're in an optgroup and if the group name contains the search term
-        if (data.element && data.element.parentElement && data.element.parentElement.tagName === 'OPTGROUP') {
-            const groupLabel = data.element.parentElement.getAttribute('label');
-            if (groupLabel && groupLabel.toLowerCase().indexOf(searchTerm) > -1) {
-                return data;
-            }
-
-            // Advanced: Search all services within this department/group
-            // If any sibling in the same optgroup matches, show this option as part of the group context
-            const siblings = $(data.element.parentElement).find('option');
-            for (let i = 0; i < siblings.length; i++) {
-                if ($(siblings[i]).text().toLowerCase().indexOf(searchTerm) > -1) {
-                    return data;
-                }
-            }
         }
 
         // No match found
@@ -281,14 +287,55 @@
             },
             allowClear: true
         });
+        
+        // Initialize department filter with Select2
+        $('.department-filter').select2({
+            placeholder: "Select Department",
+            width: '100%',
+            allowClear: true
+        });
     }
 
     $(document).ready(function() {
         // Initialize Select2 on page load
         initSelect2();
+        
+        // Department filter change handler
+        $(document).on('change', '.department-filter', function() {
+            const selectedDepartment = $(this).val();
+            const serviceSelect = $(this).closest('.service-row').find('.service-select');
+            
+            // Reset service selection
+            serviceSelect.val('').trigger('change');
+            
+            if (selectedDepartment && departmentsData[selectedDepartment]) {
+                // Enable service select
+                serviceSelect.prop('disabled', false);
+                serviceSelect.empty().append('<option value="">Select Service</option>');
+                
+                // Add only services from the selected department
+                const services = departmentsData[selectedDepartment];
+                
+                // Add services to dropdown
+                services.forEach(function(service) {
+                    const option = new Option(service.text, service.id, false, false);
+                    $(option).data('charges', service.charges);
+                    serviceSelect.append(option);
+                });
+            } else {
+                // Disable service select if no department selected
+                serviceSelect.prop('disabled', true);
+                serviceSelect.empty().append('<option value="">Select Department First</option>');
+            }
+            
+            // Refresh Select2
+            serviceSelect.trigger('change');
+        });
 
         // Service selection change handler
         $(document).on('change', '.service-select', function() {
+            if ($(this).prop('disabled')) return;
+            
             $('.services').find('.text-danger').remove();
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
@@ -339,22 +386,28 @@
             const firstRow = $('.service-row').first();
             const newRow = firstRow.clone();
 
-            // Find and destroy the Select2 instance in the cloned row
-            const select = newRow.find('.service-select');
+            // Create a unique ID for the new department filter to avoid ID conflicts
+            const rowCount = $('.service-row').length;
+            const newDepartmentFilterId = 'department-filter-' + rowCount;
+            const newServiceSelectId = 'service-select-' + rowCount;
+            
+            // Update IDs in the new row
+            newRow.find('.department-filter').attr('id', newDepartmentFilterId);
+            newRow.find('.service-select').attr('id', newServiceSelectId);
 
-            // Reset form elements in the new row
-            select.removeClass('select2-hidden-accessible').removeAttr('data-select2-id');
-            select.find('option').removeAttr('data-select2-id');
-            select.val('');
-
-            // Remove any select2 containers that were cloned
-            newRow.find('.select2-container').remove();
-
-            // Clear the charges input
+            // Remove Select2 classes and data
+            newRow.find('select').each(function() {
+                $(this).removeClass('select2-hidden-accessible').removeAttr('data-select2-id');
+                $(this).find('option').removeAttr('data-select2-id');
+            });
+            
+            // Reset the form fields
+            newRow.find('.department-filter').val('');
+            newRow.find('.service-select').prop('disabled', true).empty().append('<option value="">Select Department First</option>');
             newRow.find('.service-charges').val('');
 
-            // Remove any error messages
-            newRow.find('.text-danger').remove();
+            // Remove any Select2 containers
+            newRow.find('.select2-container').remove();
 
             // Add the new row to the DOM
             $('.service-row').last().after(newRow);

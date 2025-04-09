@@ -5,6 +5,8 @@
 @section('css')
     <!-- DataTables -->
     <link href="{{ URL::asset('/assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Select2 CSS -->
+    <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -48,8 +50,9 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="doctorFilter" class="form-label">Doctor</label>
-                                <select id="doctorFilter" class="form-control">
+                                <select id="doctorFilter" class="form-control select2">
                                     <option value="">All Doctors</option>
+                                    <option value="all_docs">Select All</option>
                                     @foreach(\App\Models\Doctor::where('is_active', true)->get() as $doctor)
                                         <option value="{{ $doctor->name }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
                                     @endforeach
@@ -59,8 +62,9 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="coordinatorFilter" class="form-label">Doctor's Coordinator</label>
-                                <select id="coordinatorFilter" class="form-control">
+                                <select id="coordinatorFilter" class="form-control select2">
                                     <option value="">All Coordinators</option>
+                                    <option value="all_coords">Select All</option>
                                     @foreach(\App\Models\Doctor::where('is_active', true)->get() as $doctor)
                                         <option value="{{ $doctor->name }}">{{ $doctor->name }} ({{ $doctor->doctor_id }})</option>
                                     @endforeach
@@ -102,6 +106,8 @@
 @section('script')
     <!-- Required datatable js -->
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
+    <!-- Select2 JS -->
+    <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
 
     <script type="text/javascript">
         $(document).ready(function() {
@@ -109,6 +115,29 @@
             if (theme == "dark") {
                 $('body').attr('data-bs-theme', 'dark');
             }
+
+            // Initialize Select2
+            $('.select2').select2({
+                width: '100%',
+                placeholder: 'Select an option',
+                allowClear: true
+            });
+
+            // Handle "Select All" option for doctor filter
+            $('#doctorFilter').on('change', function() {
+                if ($(this).val() === 'all_docs') {
+                    // Reset to default "All Doctors" option
+                    $(this).val('').trigger('change');
+                }
+            });
+
+            // Handle "Select All" option for coordinator filter
+            $('#coordinatorFilter').on('change', function() {
+                if ($(this).val() === 'all_coords') {
+                    // Reset to default "All Coordinators" option
+                    $(this).val('').trigger('change');
+                }
+            });
 
             // Initialize DataTable
             var table = $('#patients-table').DataTable({

@@ -216,7 +216,7 @@
                             <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->payment_mode }}</td>
                         </tr>
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receiver's Name</th>
+                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receive From</th>
                             <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->receiver_name ?? 'N/A' }}</td>
                         </tr>
                     </table>

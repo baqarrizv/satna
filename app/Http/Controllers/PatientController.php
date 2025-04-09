@@ -63,7 +63,7 @@ class PatientController extends Controller
                     }
                     
                     // Add Charges Button
-                    $actions .= '<a href="' . route('payments.addCharges') . '?patient=' . $patient->id . '" class="btn btn-outline-primary btn-sm ml-1" title="Add Charges">
+                    $actions .= '<a href="' . route('payments.addCharges') . '?patient=' . $patient->id . '" class="btn btn-outline-primary btn-sm ml-1" title="Add Charges" target="_blank" rel="noopener noreferrer">
                         <i class="uil-money-bill"></i>
                     </a>';
                     
