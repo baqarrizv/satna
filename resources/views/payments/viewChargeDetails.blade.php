@@ -434,7 +434,7 @@
             var taxAmount = 0;
             if (subtotal >= taxThreshold) {
                 taxAmount = (subtotal * taxPercentage) / 100;
-                taxAmount = Math.round(taxAmount * 100) / 100; // Round to 2 decimal places
+                taxAmount = Math.round(taxAmount * 100 / 100); // Round to 2 decimal places
                 $('.tax-field').show();
                 $('#total_label').html('<strong>Subtotal</strong>');
                 console.log("Applied tax:", taxPercentage + "%. Amount:", taxAmount);
@@ -449,8 +449,8 @@
             console.log("Total with tax:", totalWithTax);
             
             // Update the displayed values
-            $('#tax_amount').val(taxAmount.toFixed(2));
-            $('#total_with_tax').val(totalWithTax.toFixed(2));
+            $('#tax_amount').val(taxAmount);
+            $('#total_with_tax').val(Math.round(totalWithTax));
         }
 
         // Recalculate tax when subtotal changes
@@ -547,9 +547,9 @@
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
             
-            // Update charges
-            $(this).closest('.service-row').find('.service-charges').val(charges);
-            console.log('Service charges updated:', charges);
+            // Update charges - round to whole number
+            $(this).closest('.service-row').find('.service-charges').val(Math.round(charges));
+            console.log('Service charges updated:', Math.round(charges));
 
             // Check for duplicates
             const selectedValue = $(this).val();
@@ -579,7 +579,7 @@
         $(document).on('change', '#doctor_id', function() {
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
-            $('#doctor_charges').val(charges);
+            $('#doctor_charges').val(Math.round(charges));
             calculateTotal();
         });
 
