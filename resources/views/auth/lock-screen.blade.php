@@ -103,4 +103,34 @@
             icon.classList.add('fa-eye-slash');
         }
     }
+
+    // Check session status every second
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to check session status
+        function checkSessionStatus() {
+            fetch('{{ route("check.session") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.expired) {
+                    // Redirect to login page if session expired
+                    window.location.href = '{{ route("login") }}';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking session status:', error);
+            });
+        }
+
+        // Check session status immediately and then every second
+        checkSessionStatus();
+        setInterval(checkSessionStatus, 1000);
+    });
 </script>

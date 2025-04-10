@@ -23,7 +23,7 @@
             line-height: 1.4;
             color: var(--text-color);
             background-color: #fff;
-            padding: 2rem;
+            padding: 0 2.5rem;
             font-size: 0.875rem;
         }
 
@@ -50,8 +50,8 @@
         }
 
         .logo {
-            max-width: 200px;
-            height: auto;
+            max-width: 150px;
+            height: 70px;
             margin-bottom: 1rem;
         }
 
@@ -93,7 +93,7 @@
 
         .details-table th,
         .details-table td {
-            padding: 0.5rem;
+            padding: 0.1rem;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
         }
@@ -141,8 +141,8 @@
         }
 
         .logo-img {
-            max-height: 80px;
-            width: auto;
+            height: 45px;
+            width: 100px;
             display: block;
             margin: 0 auto;
         }
@@ -167,122 +167,122 @@
         }
     </style>
 </head>
-<body style="font-family: 'Helvetica', 'Arial', sans-serif; line-height: 1.4; color: #1f2937; background-color: #fff; font-size: 0.875rem;">
-    <div style="max-width: 100%; margin: 0 auto;">
+<body style="font-family: 'Helvetica', 'Arial', sans-serif;  color: #1f2937; background-color: #fff; font-size: 0.875rem;">
+    <div style="max-width: 100%; margin: 0">
         <!-- Header Section -->
-        <table style="width: 100%; margin-bottom: 1rem; border-bottom: 2px solid #e5e7eb;">
+        <table style="width: 100%; border-bottom: 2px solid #e5e7eb;">
             <tr>
-                <td style="text-align: center; padding: 10px 0;">   
+                <td style="text-align: center; padding: 10px 0; width: 15%;">   
                     <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'assets/images/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
-                    <h1 style="color: #2563eb; font-size: 1.5rem; text-align: center; margin-top: 0.5rem;">Payment Slip</h1>
+                </td>
+                <td style="padding: 10px 0; text-align: center; width: 85%;">
+                    <h1 style="color: #2563eb; margin-left: -90px; font-size: 1.5rem; margin-top: 0.5rem;">Payment Slip</h1>
                 </td>                
             </tr>
         </table>
 
         <!-- Details Grid -->
-        <table style="width: 100%; margin-bottom: 1.5rem;">
+        <table style="width: 100%;">
             <tr>
                 <!-- Patient Information -->
-                <td style="padding: 1rem; background-color: #f8fafc; border-radius: 0.5rem; vertical-align: top;">
+                <td style="background-color: #f8fafc; border-radius: 0.5rem; vertical-align: top;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Date</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->created_at->format('d-M-Y') }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Date</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->created_at->format('d-M-Y') }}</td>
                         </tr>
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Patient Name</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->patient->patient_name }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Patient Name</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->patient->patient_name }}</td>
                         </tr>
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Doctor Name</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->doctor_name ?? 'N/A' }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Doctor Name</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->doctor_name ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </td>
 
-                <!-- Medical Information -->
-                <td style="padding: 1rem; background-color: #f8fafc; border-radius: 0.5rem; vertical-align: top;">
+                <!-- Medical Information -->    
+                <td style="background-color: #f8fafc; border-radius: 0.5rem; vertical-align: top;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receipt #</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->id }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receipt #</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->id }}</td>
                         </tr>                        
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">FC-File #</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->fc_number ?? '' }} {{ $payment->file_number ?? '' }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">FC-File #</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->fc_number ?? '' }} {{ $payment->file_number ?? '' }}</td>
                         </tr>
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Payment Method</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->payment_mode }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Payment Method</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->payment_mode }}</td>
                         </tr>
                         <tr>
-                            <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receive From</th>
-                            <td style="padding: 0.5rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->receiver_name ?? 'N/A' }}</td>
+                            <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receive From</th>
+                            <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->receiver_name ?? 'N/A' }}</td>
                         </tr>
                     </table>
                 </td>
             </tr>
         </table>
-
+        <br>
         <!-- Payment Details -->
-        <table style="width: 100%; margin-top: 1.5rem; border-collapse: collapse;">
+        <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem;">
             <tbody>
                 @if ($payment->doctor_charges > 0)
                     <tr>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 0) }}</td>
+                        <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
+                        <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 0) }}</td>
                     </tr>
                 @else
                     @foreach ($payment->services as $service)
                         <tr>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
+                            <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
+                            <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
                         </tr>
                     @endforeach
                 @endif                
             </tbody>
             <tfoot>
                 <tr>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 0) }}</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 0) }}</td>
                 </tr>
                 
                 @if($payment->discount > 0)
                 <tr>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Discount</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 0) }}</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Discount</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 0) }}</td>
                 </tr>
                 @endif
                 
                 @if($payment->tax > 0)
                 <tr>
-                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">{{ $payment->tax_percentage ?? 0 }}%  Extra Charges</td>
-                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 0) }}</td>
+                    <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $payment->tax_percentage ?? 0 }}%  Extra Charges</td>
+                    <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 0) }}</td>
                 </tr>
                 @endif
                 
                 <tr>
-                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
-                    <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
+                    <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
+                    <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
                         {{ number_format($payment->total + ($payment->tax ?? 0), 0) }}
                     </td>
                 </tr>
             </tfoot>
         </table>
-        
-        <!-- Footer -->
-        <div style="margin-top: 2rem; text-align: center; font-size: 0.75rem; color: #6b7280;">
-            <p>Thank you for choosing Setna Medical Center</p>
-        </div>
-        
+        <br>
         <!-- Divider line -->
-        <hr style="border: 0; border-top: 1px solid black; margin: 1.5rem 0;">
-        
+        <hr style="border: 0; border-top: 1px solid black; margin: 0.1rem;">
+
         <!-- Print info -->
         <table style="width: 100%; font-size: 0.7rem; color: #6b7280;">
-            <tr>
+            <tr style="justify-content: space-between;">
                 <td style="text-align: left;">
                     User: {{ Auth::user()->name ?? 'System' }}
+                </td>
+                <td style="text-align: center;">
+                    <p>Thank you for choosing Setna Medical Center</p>
                 </td>
                 <td style="text-align: right;">
                     Created At: {{ $payment->created_at }}

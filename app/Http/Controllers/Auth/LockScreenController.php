@@ -37,4 +37,15 @@ class LockScreenController extends Controller
             return back()->withErrors(['password' => 'Incorrect password.']);
         }
     }
+    
+    // Check if the session is expired
+    public function checkSession(Request $request)
+    {
+        // Check if user is authenticated and if session is locked
+        $isExpired = !Auth::check() || !session('is_locked');
+        
+        return response()->json([
+            'expired' => $isExpired
+        ]);
+    }
 }

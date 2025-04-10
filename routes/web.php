@@ -52,6 +52,9 @@ Route::group(['middleware' => ['auth', 'enforce2fa']], function () {
     // Route to unlock the session after user authentication
     Route::post('/unlock', [LockScreenController::class, 'unlock'])->name('unlock');
 
+    // Route to check if session is expired
+    Route::get('/check-session', [LockScreenController::class, 'checkSession'])->name('check.session');
+
     // Route for editing settings, with permission check for 'Modify Settings'
     Route::get('/settings/edit', [SettingController::class, 'edit'])
         ->name('settings.edit')
