@@ -254,7 +254,7 @@
                                 
                                 <!-- Tax fields - initially hidden -->
                                 <div class="col-md-12 tax-field" style="display:none;">
-                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}%)</strong></label>
+                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}% {{ $settings->tax_threshold }})</strong></label>
                                     <input type="number" id="tax_amount" name="tax_amount" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-12 tax-field" style="display:none;">
@@ -350,8 +350,8 @@
         });
         
         // Get tax settings from data attributes
-        var taxPercentage = parseFloat($('.container-fluid').data('tax-percentage'));
-        var taxThreshold = parseFloat($('.container-fluid').data('tax-threshold'));
+        var taxPercentage = parseFloat("{{ $settings->tax_percentage }}");
+        var taxThreshold = parseFloat("{{ $settings->tax_threshold }}");
         
         console.log("Tax Percentage:", taxPercentage);
         console.log("Tax Threshold:", taxThreshold);
@@ -434,13 +434,18 @@
             var taxAmount = 0;
             if (subtotal >= taxThreshold) {
                 taxAmount = (subtotal * taxPercentage) / 100;
+                taxAmount = Math.round(taxAmount * 100) / 100; // Round to 2 decimal places
+                $('.tax-field').show();
+                $('#total_label').html('<strong>Subtotal</strong>');
                 console.log("Applied tax:", taxPercentage + "%. Amount:", taxAmount);
             } else {
                 console.log("No tax applied - below threshold");
+                $('.tax-field').hide();
+                $('#total_label').html('<strong>Total</strong>');
             }
             
             // Calculate total with tax
-            var totalWithTax = subtotal + taxAmount;
+            var totalWithTax = parseFloat(subtotal) + parseFloat(taxAmount);
             console.log("Total with tax:", totalWithTax);
             
             // Update the displayed values
@@ -568,7 +573,6 @@
 
             // Recalculate total
             calculateTotal();
-            showTaxFields($('#payment_mode').val());
         });
 
         // Doctor selection change handler for appointment charges
