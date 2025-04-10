@@ -140,7 +140,7 @@
                              <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="tax_threshold" class="form-label">Apply Tax If Amount Exceeds</label>
-                                    <input type="text" class="form-control @error('tax_threshold') is-invalid @enderror" id="tax_threshold" name="tax_threshold" value="{{ old('tax_threshold', $setting->tax_threshold) }}">
+                                    <input type="number" class="form-control @error('tax_threshold') is-invalid @enderror" id="tax_threshold" name="tax_threshold" value="{{ old('tax_threshold', $setting->tax_threshold) }}">
                                 </div>
                                 @error('tax_threshold')
                                 <div class="text-danger">{{ $message }}</div>
@@ -149,7 +149,7 @@
                             <!-- Tax Percentage -->
                              <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="tax_percentage" class="form-label">Tax Percentage</label>
+                                    <label for="tax_percentage" class="form-label">Tax Percentage (%)</label>
                                     <input type="text" class="form-control @error('tax_percentage') is-invalid @enderror" id="tax_percentage" name="tax_percentage" value="{{ old('tax_percentage', $setting->tax_percentage) }}">
                                 </div>
                                 @error('tax_percentage')

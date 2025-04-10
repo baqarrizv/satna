@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->decimal('tax_percentage', 10, 2)->nullable()->after('discount');
-            $table->decimal('tax', 10, 2)->nullable()->after('tax_percentage');
+            $table->decimal('tax_percentage', 5, 1)->default(0.0)->after('discount');
+            $table->decimal('tax', 10, 2)->default(0.00)->after('tax_percentage');
         });
     }
 

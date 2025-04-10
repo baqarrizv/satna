@@ -254,7 +254,7 @@
                                 
                                 <!-- Tax fields - initially hidden -->
                                 <div class="col-md-12 tax-field" style="display:none;">
-                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}%)</strong></label>
+                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}% for amount exceeding {{ $settings->tax_threshold }})</strong></label>
                                     <input type="number" id="tax_amount" name="tax_amount" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-12 tax-field" style="display:none;">
