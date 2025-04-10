@@ -73,7 +73,7 @@ class PaymentController extends Controller
                     }
                 })
                 ->editColumn('total', function ($payment) {
-                    return number_format($payment->total, 2);
+                    return number_format($payment->total, 0);
                 })
                 ->editColumn('created_at', function ($payment) {
                     return $payment->created_at->format('d-M-Y');

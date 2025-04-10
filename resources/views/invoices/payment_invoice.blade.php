@@ -230,13 +230,13 @@
                 @if ($payment->doctor_charges > 0)
                     <tr>
                         <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
-                        <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 2) }}</td>
+                        <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 0) }}</td>
                     </tr>
                 @else
                     @foreach ($payment->services as $service)
                         <tr>
                             <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
-                            <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 2) }}</td>
+                            <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
                         </tr>
                     @endforeach
                 @endif                
@@ -244,27 +244,27 @@
             <tfoot>
                 <tr>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 2) }}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 0) }}</td>
                 </tr>
                 
                 @if($payment->discount > 0)
                 <tr>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Discount</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 2) }}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 0) }}</td>
                 </tr>
                 @endif
                 
                 @if($payment->tax > 0)
                 <tr>
                     <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">{{ $payment->tax_percentage ?? 0 }}%  Extra Charges</td>
-                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
+                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 0) }}</td>
                 </tr>
                 @endif
                 
                 <tr>
                     <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
                     <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
-                        {{ number_format($payment->total + ($payment->tax ?? 0), 2) }}
+                        {{ number_format($payment->total + ($payment->tax ?? 0), 0) }}
                     </td>
                 </tr>
             </tfoot>

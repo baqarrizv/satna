@@ -160,7 +160,9 @@
                         }
                     },
                     {data: 'doctor_name', name: 'doctor_name'},
-                    {data: 'total', name: 'total'},
+                    {data: 'total', name: 'total', render: function (data) {
+                        return number_format(data, 0);
+                    }},
                     {data: 'payment_mode', name: 'payment_mode'},
                     {data: 'created_at', name: 'created_at'},
                     {data: 'invoice', name: 'invoice', orderable: false, searchable: false},

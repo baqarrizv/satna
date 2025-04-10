@@ -178,13 +178,13 @@
                             </div>
                           
                             <div class="col-md-8">
-                                <div class="mb-3 gyne-hide-field">
+                                <div class="mb-3 gyne-hide-field laboratory-hide-field">
                                     <label for="patient_address" class="form-label">Address</label>
                                     <textarea name="patient_address" class="form-control" rows="3">{{ old('patient_address') }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="mb-3">
+                                <div class="mb-3 laboratory-hide-field">
                                     <label for="patient_cnic" class="form-label">CNIC <span id="cnic-required" class="text-danger" style="display: none;">*</span></label>
                                     <input type="text" id="patient_cnic" name="patient_cnic" class="form-control @error('patient_cnic') is-invalid @enderror" value="{{ old('patient_cnic') }}">
                                     @error('patient_cnic')
@@ -481,8 +481,10 @@ $(document).ready(function(){
             $('#purpose').prop('required', false);
             // Show CNIC field, DOB, and Alternative Contact
             $('[for="patient_cnic"]').closest('.mb-3').show();
+
             // Show DOB field
             $('.gyne-hide-field').show();
+            $('.laboratory-hide-field').hide();
             // Hide spouse section as it's not needed for Laboratory
             $('.gyne-hide-section').hide();
             // Show Alternative Contact field

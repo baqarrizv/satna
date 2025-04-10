@@ -90,12 +90,12 @@
                         @endif
                             <td>{{ $item['service'] ?? '-' }}</td>
                             <td>{{ $item['name'] ?? '-' }}</td>
-                            <td>{{ number_format($item['cash'] ?? 0, 2) }}</td>
-                            <td>{{ number_format($item['card'] ?? 0, 2) }}</td>
-                            <td>{{ number_format($item['pay_order'] ?? 0, 2) }}</td>
-                            <td>{{ number_format($item['online'] ?? 0, 2) }}</td>
-                            <td>{{ number_format($item['deposit'] ?? 0, 2) }}</td>
-                            <td>{{ number_format($item['amount'] ?? 0, 2) }}</td>
+                            <td>{{ number_format($item['cash'] ?? 0, 0) }}</td>
+                            <td>{{ number_format($item['card'] ?? 0, 0) }}</td>
+                            <td>{{ number_format($item['pay_order'] ?? 0, 0) }}</td>
+                            <td>{{ number_format($item['online'] ?? 0, 0) }}</td>
+                            <td>{{ number_format($item['deposit'] ?? 0, 0) }}</td>
+                            <td>{{ number_format($item['amount'] ?? 0, 0) }}</td>
                         </tr>
                     @endforeach
             @endforeach
@@ -103,21 +103,21 @@
         <tfoot>
             <tr>
                 <td colspan="3" style="text-align: center; font-weight: bold;">Total</td>
-                <td>{{ number_format($total['cash'] ?? 0, 2) }}</td>
-                <td>{{ number_format($total['card'] ?? 0, 2) }}</td>
-                <td>{{ number_format($total['pay_order'] ?? 0, 2) }}</td>
-                <td>{{ number_format($total['online'] ?? 0, 2) }}</td>
-                <td>{{ number_format($total['deposit'] ?? 0, 2) }}</td>
-                <td>{{ number_format($total['total'] ?? 0, 2) }}</td>
+                <td>{{ number_format($total['cash'] ?? 0, 0) }}</td>
+                <td>{{ number_format($total['card'] ?? 0, 0) }}</td>
+                <td>{{ number_format($total['pay_order'] ?? 0, 0) }}</td>
+                <td>{{ number_format($total['online'] ?? 0, 0) }}</td>
+                <td>{{ number_format($total['deposit'] ?? 0, 0) }}</td>
+                <td>{{ number_format($total['total'] ?? 0, 0) }}</td>
             </tr>
             <!-- <tr>
                 <td colspan="3" style="text-align: center; font-weight: bold;">Tax from Card Payments</td>
                 <td>-</td>
-                <td>{{ number_format($total['tax'] ?? 0, 2) }}</td>
+                <td>{{ number_format($total['tax'] ?? 0, 0) }}</td>
                 <td>-</td>
                 <td>-</td>
                 <td>-</td>
-                <td>{{ number_format($total['tax'] ?? 0, 2) }}</td>
+                <td>{{ number_format($total['tax'] ?? 0, 0) }}</td>
             </tr> -->
         </tfoot>
     </table>

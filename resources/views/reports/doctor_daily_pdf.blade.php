@@ -88,28 +88,28 @@
             @foreach($payments as $payment)
             <tr>
                 <td>{{ $payment->patient_name }}</td>
-                <td>{{ number_format($payment->cash, 2) }}</td>
-                <td>{{ number_format($payment->card, 2) }}</td>
-                <td>{{ number_format($payment->pay_order, 2) }}</td>
-                <td>{{ number_format($payment->deposit, 2) }}</td>
-                <td>{{ number_format($payment->total, 2) }}</td>
+                <td>{{ number_format($payment->cash, 0) }}</td>
+                <td>{{ number_format($payment->card, 0) }}</td>
+                <td>{{ number_format($payment->pay_order, 0) }}</td>
+                <td>{{ number_format($payment->deposit, 0) }}</td>
+                <td>{{ number_format($payment->total, 0) }}</td>
             </tr>
             @endforeach
             <tr class="total-row">
                 <td>Total</td>
-                <td>{{ number_format($totals['cash'], 2) }}</td>
-                <td>{{ number_format($totals['card'], 2) }}</td>
-                <td>{{ number_format($totals['pay_order'], 2) }}</td>
-                <td>{{ number_format($totals['deposit'], 2) }}</td>
-                <td>{{ number_format($totals['total'], 2) }}</td>
+                <td>{{ number_format($totals['cash'], 0) }}</td>
+                <td>{{ number_format($totals['card'], 0) }}</td>
+                <td>{{ number_format($totals['pay_order'], 0) }}</td>
+                <td>{{ number_format($totals['deposit'], 0) }}</td>
+                <td>{{ number_format($totals['total'], 0) }}</td>
             </tr>
             <!-- <tr>
                 <td>Tax from Card Payments</td>
                 <td>-</td>
-                <td>{{ number_format($totals['tax'], 2) }}</td>
+                <td>{{ number_format($totals['tax'], 0) }}</td>
                 <td>-</td>
                 <td>-</td>
-                <td>{{ number_format($totals['tax'], 2) }}</td>
+                <td>{{ number_format($totals['tax'], 0) }}</td>
             </tr> -->
         </tbody>
     </table>

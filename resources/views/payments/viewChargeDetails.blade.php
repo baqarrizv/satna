@@ -104,8 +104,8 @@
 
 @section('content')
 <div class="container-fluid" 
-    data-tax-percentage="{{ isset($settings) ? $settings->tax_percentage : 1.7 }}" 
-    data-tax-threshold="{{ isset($settings) ? $settings->tax_threshold : 50000 }}">
+    data-tax-percentage="{{ $settings->tax_percentage }}" 
+    data-tax-threshold="{{ $settings->tax_threshold }}">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
