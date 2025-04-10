@@ -22,7 +22,7 @@ class SettingsTableSeeder extends Seeder
                 'phone' => '123-456-7890',
                 'email' => 'info@mywebsite.com',
                 'tax_percentage' => 0,
-                'tax_threshold' => 0,
+                'tax_threshold' => 0.00,
                 'smtp_email' => 'noreply@projectview.live',
                 'smtp_password' => Crypt::encryptString('+,lhVaqnMAd]'),
                 'smtp_host' => 'projectview.live',

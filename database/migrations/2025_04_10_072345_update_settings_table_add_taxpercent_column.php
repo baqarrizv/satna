@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('settings', function (Blueprint $table) {
             //create a new column called tax_percentage
-            $table->decimal('tax_percentage', 5)->nullable()->after('email');
-            $table->decimal('tax_threshold', 10, 2)->nullable()->after('tax_percentage');
+            $table->decimal('tax_percentage', 5, 1)->default(0.0)->after('email');
+            $table->decimal('tax_threshold', 10, 2)->default(0.00)->after('tax_percentage');
         });
     }
 

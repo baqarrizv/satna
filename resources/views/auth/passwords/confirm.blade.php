@@ -11,9 +11,9 @@
                     <div>
                         <br>
                         <a href="{{ url('/') }}" class="mb-2 d-block auth-logo">
-                            <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="250"
+                            <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="220"
                                  class="logo logo-dark">
-                            <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="250"
+                            <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="220"
                                  class="logo logo-light">
                         </a>
                         <div class="card">
@@ -37,14 +37,17 @@
                                                 @endif
                                             </div>
                                             <label for="password">Password</label>
-                                            <input id="password" type="password"
-                                                class="form-control @error('password') is-invalid @enderror" name="password"
-                                                required autocomplete="current-password">
-                                            @error('password')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
+                                            <div class="password-field">
+                                                <input id="password" type="password"
+                                                    class="form-control @error('password') is-invalid @enderror" name="password"
+                                                    required autocomplete="current-password">
+                                                <i class="fas fa-eye-slash password-toggle" onclick="togglePassword('password', this)"></i>
+                                                @error('password')
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
                                         </div>
 
                                         <div class="mt-3 text-end">
@@ -67,3 +70,32 @@
             <!-- end container -->
         </div>
     @endsection
+
+<style>
+    .password-field {
+        position: relative;
+    }
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #6c757d;
+    }
+</style>
+
+<script>
+    function togglePassword(inputId, icon) {
+        const passwordInput = document.getElementById(inputId);
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    }
+</script>
