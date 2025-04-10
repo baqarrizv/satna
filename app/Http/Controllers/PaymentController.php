@@ -285,17 +285,12 @@ class PaymentController extends Controller
         }
 
         $invoice_url = route('payments.invoice', $payment->id);
-        // Return a view that will handle both redirects
-        // return view('payments.redirect', [
-            //     'redirect_url' => route('payments.index'),
-            //     'invoice_url' => $invoice_url,
-            //     'message' => 'Payment created successfully!'
-            // ]);
-        
-        return view('payments.redirect', [
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Payment created successfully!',
             'redirect_url' => route('payments.index'),
-            'invoice_url' => $invoice_url,
-            'message' => 'Payment created successfully!'
+            'invoice_url' => $invoice_url
         ]);
     }
 

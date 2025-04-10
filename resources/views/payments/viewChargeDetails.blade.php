@@ -123,7 +123,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('payments.applyCharges') }}" method="POST" target="_blank">
+                    <form action="{{ route('payments.applyCharges') }}" method="POST" id="paymentForm">
                         @csrf
                         <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                         <input type="hidden" name="type" value="{{ $type }}">
@@ -706,6 +706,35 @@
 
         // Initial total calculation
         calculateTotal();
+
+        // Replace the form submit handler with this
+        $('#paymentForm').on('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+            
+            var form = $(this);
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        // Open invoice in new tab
+                        window.open(response.invoice_url, '_blank');
+                        
+                        // Redirect current page to list
+                        window.location.href = response.redirect_url;
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    alert('An error occurred while processing your request.');
+                }
+            });
+        });
     });
 
 </script>
