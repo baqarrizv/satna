@@ -172,6 +172,13 @@
                                     <input type="date" name="patient_dob" class="form-control" value="{{ old('patient_dob') }}">
                                 </div>
                             </div>
+                          
+                            <div class="col-md-8">
+                                <div class="mb-3 gyne-hide-field">
+                                    <label for="patient_address" class="form-label">Address</label>
+                                    <textarea name="patient_address" class="form-control" rows="3">{{ old('patient_address') }}</textarea>
+                                </div>
+                            </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="patient_cnic" class="form-label">CNIC <span id="cnic-required" class="text-danger" style="display: none;">*</span></label>
@@ -185,21 +192,15 @@
                                 </div>
                             </div>
                             
-                            
+                        </div>
+                        <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3 if-hide-field">
                                     <label for="alternative_contact" class="form-label">Alternative Contact</label>
                                     <input type="text" id="alternative_contact" name="alternative_contact" class="form-control">
                                 </div>
                             </div>
-                            <div class="col-md-8">
-                                <div class="mb-3 gyne-hide-field">
-                                    <label for="patient_address" class="form-label">Address</label>
-                                    <textarea name="patient_address" class="form-control" rows="3">{{ old('patient_address') }}</textarea>
-                                </div>
-                            </div>
                         </div>
-
                         <!-- Spouse Information -->
                         <div class="row gyne-hide-section">
                             <h5 class="mb-4">Spouse Information</h5>

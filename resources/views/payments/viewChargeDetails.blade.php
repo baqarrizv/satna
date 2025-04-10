@@ -3,6 +3,7 @@
 @section('title') {{ $type }} @endsection
 
 @section('css')
+<link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
     .service-select optgroup {
         font-weight: bold;
@@ -41,6 +42,62 @@
         background-color: #212529;
         border-color: #495057;
         color: #f8f9fa;
+    }
+    
+    /* Select2 Custom Styling */
+    .select2-container--default .select2-selection--single {
+        height: 38px;
+        padding: 6px 12px;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 24px;
+        color: #495057;
+    }
+    
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+    
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    
+    .select2-dropdown {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single {
+        background-color: #212529;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .select2-dropdown {
+        background-color: #212529;
+        border-color: #495057;
+    }
+    
+    [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+        background-color: #343a40;
+        border-color: #495057;
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .select2-container--default .select2-results__option {
+        color: #f8f9fa;
+    }
+    
+    [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #0d6efd;
     }
 </style>
 @endsection
@@ -111,7 +168,7 @@
                                         <div class="row mb-3">
                                             <div class="col-md-3">
                                                 <label class="form-label"><strong>Department *</strong></label>
-                                                <select id="department-filter-0" class="form-control department-filter" required>
+                                                <select id="department-filter-0" class="form-control department-filter select2" required>
                                                     <option value="">Select Department</option>
                                                     @php
                                                         $departments = collect($groupedServices)->keys()->toArray();
@@ -123,11 +180,14 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label"><strong>Service Type *</strong></label>
-                                                <select id="service-select-0" name="services[]" class="form-control service-select" required disabled>
+                                                <select id="service-select-0" name="services[]" class="form-control service-select select2" required disabled>
                                                     <option value="">Select Department First</option>
                                                     @foreach($groupedServices as $departmentName => $services)
                                                         @foreach($services as $service)
-                                                            <option value="{{ $service->id }}" data-charges="{{ $service->charges }}" data-department="{{ $departmentName }}" style="display: none;">
+                                                            <option value="{{ $service->id }}" 
+                                                                data-charges="{{ $service->charges }}" 
+                                                                data-department="{{ $departmentName }}" 
+                                                                style="display: none;">
                                                                 {{ $service->name }}
                                                             </option>
                                                         @endforeach
@@ -154,7 +214,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-5">
                                             <label class="form-label"><strong>Doctor *</strong></label>
-                                            <select id="doctor_id" name="doctor_id" class="form-control" required>
+                                            <select id="doctor_id" name="doctor_id" class="form-control select2" required>
                                                 @foreach($doctors as $doctor)
                                                     <option value="{{ $doctor->id }}" data-charges="{{ $doctor->doctor_charges }}" {{ $patient->doctor_id == $doctor->id ? 'selected' : '' }}>
                                                         {{ $doctor->name }} ({{ $doctor->department->name }})
@@ -227,11 +287,71 @@
 @endsection
 
 @section('scripts')
+<script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
+
 <script>
     $(document).ready(function() {
+        // Initialize Select2
+        initializeSelect2();
+        
+        // Process initial department selection
+        $('.department-filter').each(function() {
+            const selectedDepartment = $(this).val();
+            if (selectedDepartment) {
+                const serviceSelect = $(this).closest('.service-row').find('.service-select');
+                
+                // Make sure select is enabled
+                serviceSelect.prop('disabled', false);
+                
+                // Make only relevant options visible
+                serviceSelect.find('option').hide();
+                serviceSelect.find('option:first').text('Select Service').show();
+                serviceSelect.find('option[data-department="' + selectedDepartment + '"]').show();
+                
+                console.log('Initial setup: Found ' + serviceSelect.find('option[data-department="' + selectedDepartment + '"]').length + 
+                    ' options for department: ' + selectedDepartment);
+            }
+        });
+        
+        // Fix for empty rows that might be present initially
+        $('.service-row').each(function(index) {
+            // Make sure the department filter has a unique ID
+            const departmentFilter = $(this).find('.department-filter');
+            departmentFilter.attr('id', 'department-filter-' + index);
+            
+            // Make sure the service select has a unique ID
+            const serviceSelect = $(this).find('.service-select');
+            serviceSelect.attr('id', 'service-select-' + index);
+            
+            // Ensure both selects are properly initialized with Select2
+            if (!departmentFilter.hasClass('select2-hidden-accessible')) {
+                departmentFilter.select2({
+                    width: '100%',
+                    placeholder: 'Select Department',
+                    dropdownParent: departmentFilter.parent()
+                });
+            }
+            
+            if (!serviceSelect.prop('disabled') && !serviceSelect.hasClass('select2-hidden-accessible')) {
+                serviceSelect.select2({
+                    width: '100%',
+                    placeholder: 'Select Service',
+                    dropdownParent: serviceSelect.parent(),
+                    templateResult: function(data) {
+                        // Skip hidden options
+                        const $option = $(data.element);
+                        if ($option.css('display') === 'none') {
+                            return null;
+                        }
+                        return data.text;
+                    }
+                });
+            }
+        });
+        
         // Get tax settings from data attributes
-        var taxPercentage = {{ $settings->tax_percentage ?? 1.7 }};
-        var taxThreshold = {{ $settings->tax_threshold ?? 50000 }};
+        var taxPercentage = parseFloat($('.container-fluid').data('tax-percentage')) || 1.7;
+        var taxThreshold = parseFloat($('.container-fluid').data('tax-threshold')) || 50000;
         
         console.log("Tax Percentage:", taxPercentage);
         console.log("Tax Threshold:", taxThreshold);
@@ -239,6 +359,44 @@
         // Initial calculation if Card is selected
         if ($('#payment_mode').val() === 'Card') {
             showTaxFields('Card');
+        }
+        
+        // Function to initialize Select2
+        function initializeSelect2() {
+            // Department filters
+            $('.department-filter').each(function() {
+                $(this).select2({
+                    width: '100%',
+                    placeholder: 'Select Department',
+                    dropdownParent: $(this).parent()
+                });
+            });
+            
+            // Service selects - only initialize those that aren't disabled
+            $('.service-select').each(function() {
+                if (!$(this).prop('disabled')) {
+                    $(this).select2({
+                        width: '100%',
+                        placeholder: 'Select Service',
+                        dropdownParent: $(this).parent(),
+                        templateResult: function(data) {
+                            // Skip hidden options
+                            const $option = $(data.element);
+                            if ($option.css('display') === 'none') {
+                                return null;
+                            }
+                            return data.text;
+                        }
+                    });
+                }
+            });
+            
+            // Doctor select
+            $('#doctor_id').select2({
+                width: '100%',
+                placeholder: 'Select Doctor',
+                dropdownParent: $('#doctor_id').parent()
+            });
         }
         
         // Payment mode change handler
@@ -316,47 +474,99 @@
         // Department filter change handler
         $(document).on('change', '.department-filter', function() {
             const selectedDepartment = $(this).val();
-            const serviceSelect = $(this).closest('.service-row').find('.service-select');
+            const serviceRow = $(this).closest('.service-row');
+            const serviceSelect = serviceRow.find('.service-select');
+            
+            console.log('Department changed:', selectedDepartment);
             
             // Reset service selection
-            serviceSelect.val('');
+            serviceSelect.val('').trigger('change');
             
             if (selectedDepartment) {
-                // Show only options from the selected department
+                // Destroy the Select2 instance first
+                if (serviceSelect.hasClass('select2-hidden-accessible')) {
+                    serviceSelect.select2('destroy');
+                }
+                
+                // Enable the service select
                 serviceSelect.prop('disabled', false);
+                
+                // Reset all options first
                 serviceSelect.find('option').hide();
                 serviceSelect.find('option:first').text('Select Service').show();
-                serviceSelect.find('option[data-department="' + selectedDepartment + '"]').show();
+                
+                // Show options for the selected department
+                const departmentOptions = serviceSelect.find('option[data-department="' + selectedDepartment + '"]');
+                departmentOptions.show();
+                
+                console.log('Found ' + departmentOptions.length + ' options for department: ' + selectedDepartment);
+                
+                // Reinitialize Select2
+                serviceSelect.select2({
+                    width: '100%',
+                    placeholder: 'Select Service',
+                    dropdownParent: serviceSelect.parent(),
+                    templateResult: function(data) {
+                        // Skip hidden options
+                        const $option = $(data.element);
+                        if ($option.css('display') === 'none') {
+                            return null;
+                        }
+                        return data.text;
+                    }
+                });
             } else {
                 // If no department selected, disable service select
+                if (serviceSelect.hasClass('select2-hidden-accessible')) {
+                    serviceSelect.select2('destroy');
+                }
+                
                 serviceSelect.prop('disabled', true);
                 serviceSelect.find('option').hide();
                 serviceSelect.find('option:first').text('Select Department First').show();
+                
+                // Reinitialize Select2
+                serviceSelect.select2({
+                    width: '100%',
+                    placeholder: 'Select Department First',
+                    dropdownParent: serviceSelect.parent()
+                });
             }
         });
 
         // Service selection change handler
         $(document).on('change', '.service-select', function() {
+            console.log('Service selection changed');
             $('.services').find('.text-danger').remove();
+            
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
+            
+            // Update charges
             $(this).closest('.service-row').find('.service-charges').val(charges);
+            console.log('Service charges updated:', charges);
 
+            // Check for duplicates
             const selectedValue = $(this).val();
-            let duplicateFound = false;
-            $('.service-select').not(this).each(function() {
-                if ($(this).val() === selectedValue && selectedValue !== '') {
-                    duplicateFound = true;
-                }
-            });
+            if (selectedValue !== '') {
+                let duplicateFound = false;
+                $('.service-select').not(this).each(function() {
+                    if ($(this).val() === selectedValue) {
+                        duplicateFound = true;
+                        return false; // Break the loop
+                    }
+                });
 
-            if (duplicateFound) {
-                const errorMsg = '<div class="text-danger">This service has already been added!</div>';
-                $(this).val('');
-                $(this).closest('.service-row').find('.service-charges').val('');
-                $(this).closest('.service-row').after(errorMsg);
+                if (duplicateFound) {
+                    const errorMsg = '<div class="text-danger">This service has already been added!</div>';
+                    $(this).val('').trigger('change');
+                    $(this).closest('.service-row').find('.service-charges').val('');
+                    $(this).closest('.service-row').after(errorMsg);
+                    console.log('Duplicate service detected');
+                }
             }
 
+            // Recalculate total
             calculateTotal();
         });
 
@@ -393,42 +603,92 @@
 
         // Add new row button handler
         $('.add-row').on('click', function() {
+            console.log('Add row button clicked');
+            
             // Remove any error messages
             $('.services').find('.text-danger').remove();
 
-            // Clone the first row
-            const firstRow = $('.service-row').first();
-            const newRow = firstRow.clone();
-
-            // Create a unique ID for the new elements
+            // Create a completely new row instead of cloning
             const rowCount = $('.service-row').length;
             const newDepartmentFilterId = 'department-filter-' + rowCount;
             const newServiceSelectId = 'service-select-' + rowCount;
             
-            // Update IDs in the new row
-            newRow.find('.department-filter').attr('id', newDepartmentFilterId);
-            newRow.find('.service-select').attr('id', newServiceSelectId);
+            // HTML for the new row
+            const newRowHtml = `
+            <div class="service-row">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Department *</strong></label>
+                        <select id="${newDepartmentFilterId}" class="form-control department-filter" required>
+                            <option value="">Select Department</option>
+                            ${$('.department-filter').first().find('option').not(':first').map(function() {
+                                return `<option value="${$(this).val()}">${$(this).text()}</option>`;
+                            }).get().join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label"><strong>Service Type *</strong></label>
+                        <select id="${newServiceSelectId}" name="services[]" class="form-control service-select" required disabled>
+                            <option value="">Select Department First</option>
+                            ${$('.service-select').first().find('option').not(':first').map(function() {
+                                return `<option value="${$(this).val()}" 
+                                    data-charges="${$(this).data('charges')}" 
+                                    data-department="${$(this).data('department')}" 
+                                    style="display: none;">${$(this).text()}</option>`;
+                            }).get().join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label"><strong>Charges</strong></label>
+                        <input type="number" name="charges[]" readonly class="form-control service-charges" value="">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button" class="btn btn-danger remove-row">-</button>
+                    </div>
+                </div>
+            </div>`;
             
-            // Reset the form fields
-            newRow.find('.department-filter').val('');
-            newRow.find('.service-select').val('');
-            newRow.find('.service-charges').val('');
-
             // Add the new row to the DOM
-            $('.service-row').last().after(newRow);
-
+            $('.service-row').last().after(newRowHtml);
+            
+            // Initialize Select2 on the new department filter
+            $('#' + newDepartmentFilterId).select2({
+                width: '100%',
+                placeholder: 'Select Department',
+                dropdownParent: $('#' + newDepartmentFilterId).parent()
+            });
+            
             // Enable all remove buttons
             $('.remove-row').prop('disabled', false);
+            
+            console.log('New row added successfully');
         });
 
         // Remove row button handler
         $(document).on('click', '.remove-row', function() {
+            console.log('Remove row button clicked');
+            
             if ($('.service-row').length > 1) {
-                $(this).closest('.service-row').remove();
+                // Properly destroy Select2 before removing row
+                const row = $(this).closest('.service-row');
+                
+                if (row.find('.department-filter').hasClass('select2-hidden-accessible')) {
+                    row.find('.department-filter').select2('destroy');
+                }
+                
+                if (row.find('.service-select').hasClass('select2-hidden-accessible')) {
+                    row.find('.service-select').select2('destroy');
+                }
+                
+                // Remove the row
+                row.remove();
+                console.log('Row removed successfully');
+                
+                // Recalculate total
+                calculateTotal();
             }
 
-            calculateTotal();
-
+            // Update button state
             if ($('.service-row').length === 1) {
                 $('.remove-row').prop('disabled', true);
             }

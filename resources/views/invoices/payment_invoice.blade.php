@@ -256,8 +256,8 @@
                 
                 @if($payment->tax > 0)
                 <tr>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax ({{ $settings->tax_percentage ?? 0 }}%)</td>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
+                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">{{ $settings->tax_percentage ?? 0 }}%  Extra Charges</td>
+                    <td style="font-size: 12px; padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
                 </tr>
                 @endif
                 
