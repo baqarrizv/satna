@@ -350,8 +350,8 @@
         });
         
         // Get tax settings from data attributes
-        var taxPercentage = parseFloat($('.container-fluid').data('tax-percentage')) || 1.7;
-        var taxThreshold = parseFloat($('.container-fluid').data('tax-threshold')) || 50000;
+        var taxPercentage = parseFloat($('.container-fluid').data('tax-percentage'));
+        var taxThreshold = parseFloat($('.container-fluid').data('tax-threshold'));
         
         console.log("Tax Percentage:", taxPercentage);
         console.log("Tax Threshold:", taxThreshold);
@@ -568,6 +568,7 @@
 
             // Recalculate total
             calculateTotal();
+            showTaxFields($('#payment_mode').val());
         });
 
         // Doctor selection change handler for appointment charges

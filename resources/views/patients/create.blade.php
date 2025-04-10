@@ -47,6 +47,10 @@
                                             <label class="form-check-label" for="ultrasound">I/F(Infertility)</label>
                                         </div>
                                         <div class="form-check p-2">
+                                            <input type="radio" id="laboratory" name="type" class="form-check-input" value="Laboratory">
+                                            <label class="form-check-label" for="laboratory">Laboratory</label>
+                                        </div>
+                                        <div class="form-check p-2">
                                             <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient" checked>
                                             <label class="form-check-label" for="regularPatient">Regular Patient</label>
                                         </div>
@@ -336,6 +340,9 @@ $(document).ready(function(){
                     $(this).show();
                 }
             });
+        } else if (patientType === 'Laboratory') {
+            // For Laboratory patients, we don't need to filter doctors
+            doctorSelect.find('.doctor-option').show();
         } else {
             // For Regular Patient, show all doctors EXCEPT Infertility and Gynecology
             doctorSelect.find('.doctor-option').each(function() {
@@ -455,6 +462,35 @@ $(document).ready(function(){
             // Update required attributes for doctor fields
             $('#doctor_id').prop('required', true);
             $('#doctor_coordinator_id').prop('required', false);
+            filterDoctors(selectedType);
+        } else if (selectedType === 'Laboratory') {
+            // Configuration for Laboratory patient type
+            $('#doctorSelectionContainer').hide();
+            $('#doctorCoordinatorContainer').hide();
+            $('#fileTypeContainer').hide();
+            $('#gyneOptionContainer').hide();
+            // Update required attributes for doctor fields
+
+            $('#doctor_id').prop('required', false).hide();
+            $('#doctor_coordinator_id').prop('required', false).hide();
+            // Make patient name and contact required, but not CNIC
+            $('input[name="patient_name"]').prop('required', true);
+            $('input[name="patient_contact"]').prop('required', true);
+            $('#patient_cnic').prop('required', false);
+            $('#cnic-required').hide();
+            $('#purpose').prop('required', false);
+            // Show CNIC field, DOB, and Alternative Contact
+            $('[for="patient_cnic"]').closest('.mb-3').show();
+            // Show DOB field
+            $('.gyne-hide-field').show();
+            // Hide spouse section as it's not needed for Laboratory
+            $('.gyne-hide-section').hide();
+            // Show Alternative Contact field
+            $('.if-hide-field').show();
+            // Set spouse fields as not required
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
             filterDoctors(selectedType);
         }
     }

@@ -61,6 +61,10 @@
                                             <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient" {{ $patient->type == 'Regular Patient' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="regularPatient">Regular Patient</label>
                                         </div>
+                                        <div class="form-check p-2">
+                                            <input type="radio" id="laboratory" name="type" class="form-check-input" value="Laboratory" {{ $patient->type == 'Laboratory' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="laboratory">Laboratory</label>
+                                        </div>
                                     </div>
                                     @error('type')
                                         <div class="text-danger">{{ $message }}</div>
@@ -334,6 +338,9 @@ $(document).ready(function(){
                     $(this).show();
                 }
             });
+        } else if (patientType === 'Laboratory') {
+            // For Laboratory patients, we don't need to filter doctors
+            doctorSelect.find('.doctor-option').show();
         } else {
             // For Regular Patient, show all doctors EXCEPT Infertility and Gynecology
             doctorSelect.find('.doctor-option').each(function() {
@@ -392,6 +399,34 @@ $(document).ready(function(){
             // Show Type field
             $('.if-hide-field').show();
             // Set spouse fields as optional
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
+            filterDoctors(selectedType);
+        } else if (selectedType === 'Laboratory') {
+            // Configuration for Laboratory patient type
+            $('#doctorSelectionContainer').show();
+            $('#doctorCoordinatorContainer').hide();
+            $('#fileTypeContainer').hide();
+            $('#gyneOptionContainer').hide();
+            // Update required attributes for doctor fields
+            $('#doctor_id').prop('required', true);
+            $('#doctor_coordinator_id').prop('required', false);
+            // Make patient name and contact required, but not CNIC
+            $('input[name="patient_name"]').prop('required', true);
+            $('input[name="patient_contact"]').prop('required', true);
+            $('#patient_cnic').prop('required', false);
+            $('#cnic-required').hide();
+            $('#purpose').prop('required', false);
+            // Show CNIC field, DOB, and Alternative Contact
+            $('[for="patient_cnic"]').closest('.mb-3').show();
+            // Show DOB field
+            $('.gyne-hide-field').show();
+            // Hide spouse section as it's not needed for Laboratory
+            $('.gyne-hide-section').hide();
+            // Show Alternative Contact field
+            $('.if-hide-field').show();
+            // Set spouse fields as not required
             $('input[name="spouse_name"]').prop('required', false);
             $('input[name="spouse_contact"]').prop('required', false);
             $('.if-required').hide();

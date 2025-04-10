@@ -108,6 +108,8 @@ class PatientController extends Controller
             ]);
         }
 
+        // Laboratory patient type doesn't need additional validation
+
         // Generate FC Number and File Number based on type
         $fcNumber = null;
         $fileNumber = null;
@@ -189,6 +191,8 @@ class PatientController extends Controller
                 'spouse_name' => 'required'
             ]);
         }
+
+        // Laboratory patient type doesn't need additional validation
 
         // Handle FC Number and File Number generation if type changes
         $fcNumber = $patient->fc_number;
