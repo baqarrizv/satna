@@ -21,6 +21,8 @@ class SettingsTableSeeder extends Seeder
                 'description' => 'This is the default site description.',
                 'phone' => '123-456-7890',
                 'email' => 'info@mywebsite.com',
+                'tax_percentage' => 0,
+                'tax_threshold' => 0,
                 'smtp_email' => 'noreply@projectview.live',
                 'smtp_password' => Crypt::encryptString('+,lhVaqnMAd]'),
                 'smtp_host' => 'projectview.live',

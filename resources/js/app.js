@@ -225,33 +225,17 @@ File: Main Js File
 
     // Initialize settings on page load
     function initSettings() {
-        if (window.localStorage) {
-            // Get the stored theme from localStorage or sessionStorage
-            var theme =
-                localStorage.getItem("theme") ||
-                sessionStorage.getItem("theme");
-
-            // If no theme is stored or not valid, set default to light
-            if (!theme || (theme !== "light" && theme !== "dark")) {
-                localStorage.setItem("theme", "light");
-                sessionStorage.setItem("theme", "light");
-                applyTheme("light"); // Apply the light theme initially
-            } else {
-                // Fix for "darkbut" value - normalize to "dark"
-                if (theme.startsWith("dark")) {
-                    theme = "dark";
-                    localStorage.setItem("theme", "dark");
-                    sessionStorage.setItem("theme", "dark");
-                }
-                applyTheme(theme); // Apply the stored theme
-            }
+        if(localStorage.getItem('theme') == 'dark'){
+            applyTheme('dark');
+        }else{
+            applyTheme('light');
         }
     }
 
     // Apply the theme based on stored value
     function applyTheme(theme) {
         var body = document.getElementsByTagName("body")[0];
-
+        theme = "dark";
         if (theme === "dark") {
             document.body.setAttribute("data-bs-theme", "dark");
             document.body.setAttribute("data-topbar", "dark");
@@ -284,7 +268,7 @@ File: Main Js File
             var storedTheme =
                 localStorage.getItem("theme") ||
                 sessionStorage.getItem("theme");
-            if (storedTheme === "dark" || storedTheme === "darkbut") {
+            if (storedTheme === "dark") {
                 document.documentElement.setAttribute("data-bs-theme", "dark");
                 document.documentElement.setAttribute("data-topbar", "dark");
                 document.documentElement.setAttribute("data-sidebar", "dark");
@@ -303,20 +287,17 @@ File: Main Js File
                 body.getAttribute("data-bs-theme") == "dark"
             ) {
                 localStorage.setItem("theme", "light");
-                sessionStorage.setItem("theme", "light");
                 applyTheme("light");
             } else {
                 localStorage.setItem("theme", "dark");
-                sessionStorage.setItem("theme", "dark");
                 applyTheme("dark");
             }
         });
 
         // Ensure toggle button state matches current theme
-        var currentTheme =
-            localStorage.getItem("theme") || sessionStorage.getItem("theme");
+        var currentTheme = localStorage.getItem("theme");
 
-        if (currentTheme === "dark" || currentTheme === "darkbut") {
+        if (currentTheme === "dark") {
             // If we're in dark mode, make sure checkbox is checked
             $("#mode-setting-btn").prop("checked", true);
         } else {
@@ -347,5 +328,6 @@ File: Main Js File
     $(document).ready(function () {
         init();
         initSettings();
+        apl
     });
 })(jQuery);

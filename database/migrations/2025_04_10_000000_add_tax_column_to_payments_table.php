@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->decimal('tax', 10, 2)->nullable()->after('discount');
+            $table->decimal('tax_percentage', 10, 2)->nullable()->after('discount');
+            $table->decimal('tax', 10, 2)->nullable()->after('tax_percentage');
         });
     }
 
@@ -22,7 +23,12 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->dropColumn('tax');
+            if (Schema::hasColumn('payments', 'tax_percentage')) {  
+                $table->dropColumn('tax_percentage');
+            }
+            if (Schema::hasColumn('payments', 'tax')) {
+                $table->dropColumn('tax');
+            }
         });
     }
 }; 

@@ -25,7 +25,13 @@ return new class extends Migration
     {
         Schema::table('settings', function (Blueprint $table) {
             //drop the column tax_percentage
-            $table->dropColumn('tax_percentage');
+            if (Schema::hasColumn('settings', 'tax_percentage')) {
+                $table->dropColumn('tax_percentage');
+            }
+            //drop the column tax_threshold
+            if (Schema::hasColumn('settings', 'tax_threshold')) {
+                $table->dropColumn('tax_threshold');
+            }
         });
     }
 };

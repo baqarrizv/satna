@@ -11,9 +11,9 @@
                     <div>
                         <br>
                         <a href="{{ url('/') }}" class="mb-2 d-block auth-logo">
-                            <img src="{{ config('settings.logo_dark') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_dark') }}" alt="" height="80" width="250"
                                  class="logo logo-dark">
-                            <img src="{{ config('settings.logo_light') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_light') }}" alt="" height="80" width="250"
                                  class="logo logo-light">
                         </a>
                         <div class="card">

@@ -235,8 +235,10 @@ class PaymentController extends Controller
             // Calculate tax if payment mode is Card
             if ($request->payment_mode === 'Card' && $netAmount >= $taxThreshold) {
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
+                $paymentData['tax_percentage'] = $taxPercent;
             } else {
                 $paymentData['tax'] = 0;
+                $paymentData['tax_percentage'] = 0;
             }
 
             $paymentData['total'] = $netAmount;

@@ -10,9 +10,9 @@
                     <div class="text-center">
                         <br>
                         <a href="{{ url('/') }}" class="mb-2 d-block auth-logo">
-                            <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="250"
                                  class="logo logo-dark">
-                            <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="100"
+                            <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" height="80" width="250"
                                  class="logo logo-light">
                         </a>
                     </div>
