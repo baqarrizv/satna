@@ -142,6 +142,9 @@ class PaymentController extends Controller
             // Get all departments and services with a direct approach
             $departments = Department::all()->keyBy('id');
             $services = Service::all();
+            
+            // Get settings for tax percentage
+            $settings = \App\Models\Setting::first();
 
             // Manually prepare grouped structure
             $groupedServices = [];
@@ -170,7 +173,7 @@ class PaymentController extends Controller
             // Get all doctors for the doctor selection dropdown
             $doctors = Doctor::all();
 
-            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors'));
+            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors', 'settings'));
         }
     }
 
@@ -196,6 +199,11 @@ class PaymentController extends Controller
         }
 
         $patient = Patient::findOrFail($request->patient_id);
+        
+        // Get settings for tax percentage
+        $settings = \App\Models\Setting::first();
+        $taxPercent = $settings->tax_percentage ?? 0;
+        $taxThreshold = $settings->tax_threshold ?? 0;
 
         $paymentData = [
             'patient_id' => $patient->id,
@@ -225,8 +233,7 @@ class PaymentController extends Controller
             $netAmount = $sub_total - $request->discount;
             
             // Calculate tax if payment mode is Card
-            if ($request->payment_mode === 'Card' && $netAmount >= 50000) {
-                $taxPercent = 1.7;
+            if ($request->payment_mode === 'Card' && $netAmount >= $taxThreshold) {
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
@@ -250,8 +257,7 @@ class PaymentController extends Controller
             $netAmount = $doctor->doctor_charges - $discount;
 
             // Calculate tax if payment mode is Card
-            if ($request->payment_mode === 'Card' && $netAmount >= 50000) {
-                $taxPercent = 1.7;
+            if ($request->payment_mode === 'Card' && $netAmount >= $taxThreshold) {
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
             } else {
                 $paymentData['tax'] = 0;
@@ -349,12 +355,13 @@ class PaymentController extends Controller
     public function generateInvoice(Payment $payment)
     {
         $payment->load('patient', 'services');
+        $settings = \App\Models\Setting::first();
 
         session(['redirect_back_url' => route('payments.index')]);
 
         // return view('invoices.payment_invoice', compact('payment'));
 
-        $pdf = Pdf::loadView('invoices.payment_invoice', compact('payment'));
+        $pdf = Pdf::loadView('invoices.payment_invoice', compact('payment', 'settings'));
         return $pdf->stream('invoice-' . $payment->id . '.pdf');
     }
 
@@ -377,6 +384,9 @@ class PaymentController extends Controller
         // Get all departments and services with a direct approach
         $departments = Department::all()->keyBy('id');
         $services = Service::all();
+
+        // Get settings for tax percentage
+        $settings = \App\Models\Setting::first();
 
         // Manually prepare grouped structure
         $groupedServices = [];
@@ -405,6 +415,6 @@ class PaymentController extends Controller
         // Get all doctors for the doctor selection dropdown
         $doctors = Doctor::all();
 
-        return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors'));
+        return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors', 'settings'));
     }
 }

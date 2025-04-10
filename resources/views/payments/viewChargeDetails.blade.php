@@ -46,7 +46,9 @@
 @endsection
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" 
+    data-tax-percentage="{{ isset($settings) ? $settings->tax_percentage : 1.7 }}" 
+    data-tax-threshold="{{ isset($settings) ? $settings->tax_threshold : 50000 }}">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
@@ -192,12 +194,12 @@
                                 
                                 <!-- Tax fields - initially hidden -->
                                 <div class="col-md-12 tax-field" style="display:none;">
-                                    <label class="form-label"><strong>Tax Amount (1.7%)</strong></label>
-                                    <input type="number" id="tax_amount" class="form-control" readonly>
+                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}%)</strong></label>
+                                    <input type="number" id="tax_amount" name="tax_amount" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-12 tax-field" style="display:none;">
                                     <label class="form-label"><strong>Total with Tax</strong></label>
-                                    <input type="number" id="total_with_tax" class="form-control" readonly>
+                                    <input type="number" id="total_with_tax" name="total_with_tax" class="form-control" readonly>
                                 </div>
                                 
                                 <div class="col-md-12">
@@ -227,51 +229,86 @@
 @section('scripts')
 <script>
     $(document).ready(function() {
+        // Get tax settings from data attributes
+        var taxPercentage = {{ $settings->tax_percentage ?? 1.7 }};
+        var taxThreshold = {{ $settings->tax_threshold ?? 50000 }};
+        
+        console.log("Tax Percentage:", taxPercentage);
+        console.log("Tax Threshold:", taxThreshold);
+        
+        // Initial calculation if Card is selected
+        if ($('#payment_mode').val() === 'Card') {
+            showTaxFields('Card');
+        }
+        
         // Payment mode change handler
         $('#payment_mode').on('change', function() {
             const paymentMode = $(this).val();
-            
-            if (paymentMode === 'Card' && parseFloat($('#total').val()) >= 50000) {
-                // Show tax fields and update labels
-                $('.tax-field').show();
-                $('#total_label').html('<strong>Subtotal</strong>');
-                
-                // Calculate tax
-                calculateTaxAndTotal();
+            showTaxFields(paymentMode);
+        });
+        // Function to show/hide tax fields based on payment mode
+        function showTaxFields(paymentMode) {
+            if (paymentMode === 'Card') {
+                var subtotal = parseFloat($('#total').val()) || 0;
+                if(subtotal >= taxThreshold) {
+                    // Show tax fields and update labels
+                    $('.tax-field').show();
+                    $('#total_label').html('<strong>Subtotal</strong>');
+                    // Calculate tax immediately
+                    calculateTaxAndTotal();
+                } else {
+                    $('.tax-field').hide();
+                    $('#total_label').html('<strong>Total</strong>');
+                }
             } else {
                 // Hide tax fields and reset labels
                 $('.tax-field').hide();
                 $('#total_label').html('<strong>Total</strong>');
             }
-        });
-
-        // Trigger change event if Card is already selected
-        if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
-            $('#payment_mode').trigger('change');
         }
         
         // Function to calculate tax and total with tax
         function calculateTaxAndTotal() {
-            const subtotal = parseFloat($('#total').val()) || 0;
-            const taxPercent = 1.7;
-
-            // Calculate original tax
-            const rawTaxAmount = subtotal * taxPercent / 100;
-
-            // Apply custom rounding to tax amount
-            const taxAmount = (rawTaxAmount % 1 >= 0.5)
-                ? Math.ceil(rawTaxAmount)
-                : Math.floor(rawTaxAmount);
-
-            const totalWithTax = subtotal + taxAmount;
-
+            var subtotal = parseFloat($('#total').val()) || 0;
+            console.log("Calculating tax. Subtotal:", subtotal, "Threshold:", taxThreshold);
+            
+            // Only apply tax if subtotal is at or above threshold
+            var taxAmount = 0;
+            if (subtotal >= taxThreshold) {
+                taxAmount = (subtotal * taxPercentage) / 100;
+                console.log("Applied tax:", taxPercentage + "%. Amount:", taxAmount);
+            } else {
+                console.log("No tax applied - below threshold");
+            }
+            
+            // Calculate total with tax
+            var totalWithTax = subtotal + taxAmount;
+            console.log("Total with tax:", totalWithTax);
+            
+            // Update the displayed values
             $('#tax_amount').val(taxAmount.toFixed(2));
             $('#total_with_tax').val(totalWithTax.toFixed(2));
         }
 
         // Recalculate tax when subtotal changes
-        $('#total').on('change', function() {
-            if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
+        $('#total').on('change keyup', function() {
+            if ($('#payment_mode').val() === 'Card') {
+                var subtotal = parseFloat($(this).val()) || 0;
+                if (subtotal >= taxThreshold) {
+                    $('.tax-field').show();
+                    $('#total_label').html('<strong>Subtotal</strong>');
+                    calculateTaxAndTotal();
+                } else {
+                    $('.tax-field').hide();
+                    $('#total_label').html('<strong>Total</strong>');
+                }
+            }
+        });
+        
+        // Also recalculate when discount changes
+        $('#discount').on('change keyup', function() {
+            calculateTotal();
+            if ($('#payment_mode').val() === 'Card') {
                 calculateTaxAndTotal();
             }
         });
@@ -349,7 +386,7 @@
             $('#total').val(discountedTotal > 0 ? discountedTotal : 0);
             
             // If Card payment, recalculate tax
-            if ($('#payment_mode').val() === 'Card' && parseFloat($('#total').val()) >= 50000) {
+            if ($('#payment_mode').val() === 'Card') {
                 calculateTaxAndTotal();
             }
         }
@@ -404,11 +441,6 @@
 
         // Initial total calculation
         calculateTotal();
-
-        // Discount input handler
-        $(document).on('input', '#discount', function() {
-            calculateTotal();
-        });
     });
 </script>
 @endsection

@@ -254,9 +254,9 @@
                 </tr>
                 @endif
                 
-                @if($payment->payment_mode === 'Card')
+                @if($payment->tax > 0)
                 <tr>
-                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax (1.7%)</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb;">Tax ({{ $settings->tax_percentage ?? 0 }}%)</td>
                     <td style="padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 2) }}</td>
                 </tr>
                 @endif
@@ -264,11 +264,7 @@
                 <tr>
                     <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
                     <td style="padding: 0.75rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
-                        @if($payment->payment_mode === 'Card')
-                            {{ number_format($payment->total + $payment->tax, 2) }}
-                        @else
-                            {{ number_format($payment->total, 2) }}
-                        @endif
+                        {{ number_format($payment->total + ($payment->tax ?? 0), 2) }}
                     </td>
                 </tr>
             </tfoot>

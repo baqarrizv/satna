@@ -120,7 +120,7 @@
             $('.select2').select2({
                 width: '100%',
                 placeholder: 'Select an option',
-                allowClear: true
+                allowClear: false
             });
 
             // Handle "Select All" option for doctor filter

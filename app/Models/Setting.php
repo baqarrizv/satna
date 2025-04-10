@@ -21,6 +21,8 @@ class Setting extends Model
         'fav_icon',
         'phone',
         'email',
+        'tax_percentage',
+        'tax_threshold',
         'smtp_email',
         'smtp_password',  // Remember: This should be encrypted when stored
         'smtp_host',

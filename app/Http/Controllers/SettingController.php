@@ -57,6 +57,8 @@ class SettingController extends Controller
             'fav_icon' => 'nullable|string|max:255',   // Favicon is optional, max length 255
             'phone' => 'nullable|string|max:255',      // Phone number is optional, max length 255
             'email' => 'nullable|email|max:255',       // Email should be a valid email, max length 255
+            'tax_percentage' => 'nullable|numeric|min:0|max:100', // Tax percentage can be decimal between 0 and 100
+            'tax_threshold' => 'nullable|numeric|min:0', // Minimum amount for tax deduction
             'smtp_email' => 'nullable|email|max:255',  // SMTP email should be valid, max length 255
             'smtp_password' => 'nullable|string|max:255', // SMTP password is optional, max length 255
             'smtp_host' => 'nullable|string|max:255',  // SMTP host is optional, max length 255
@@ -92,6 +94,8 @@ class SettingController extends Controller
             'fav_icon' => $newFavIcon,     // Update the favicon path after file move
             'phone' => $request->phone,    // Update the phone number if provided
             'email' => $request->email,    // Update the email if provided
+            'tax_percentage' => $request->tax_percentage, // Update the tax percentage if provided
+            'tax_threshold' => $request->tax_threshold, // Update the tax threshold if provided
             'smtp_email' => $request->smtp_email,  // Update the SMTP email if provided
             // Encrypt the SMTP password if a new one is provided; otherwise, keep the old one
             'smtp_password' => $request->smtp_password ? Crypt::encryptString($request->smtp_password) : $setting->smtp_password,
