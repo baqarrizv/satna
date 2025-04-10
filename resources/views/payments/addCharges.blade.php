@@ -38,7 +38,7 @@
                             <div class="col-12">
                                 <label for="patient" class="form-label">Patient ID or Contact Number</label>
                                 <input type="text" class="form-control @error('patient') is-invalid @enderror" id="patient" name="patient" 
-                                       value="{{ isset($patient) ? $patient->id : old('patient') }}" 
+                                       value="{{ isset($patient) ? $patient->id : (session('patientId') ?? old('patient')) }}" 
                                        {{ isset($patient) ? 'readonly' : '' }} required>
                                 <div class="form-text">Enter patient ID or contact number (format: (0399) 999-9999)</div>
                                 @error('patient')

@@ -264,16 +264,7 @@ File: Main Js File
     // Immediately apply theme on page load before DOM is ready
     (function () {
         // Try to get theme from both storage types
-        if (window.localStorage || window.sessionStorage) {
-            var storedTheme =
-                localStorage.getItem("theme") ||
-                sessionStorage.getItem("theme");
-            if (storedTheme === "dark") {
-                document.documentElement.setAttribute("data-bs-theme", "dark");
-                document.documentElement.setAttribute("data-topbar", "dark");
-                document.documentElement.setAttribute("data-sidebar", "dark");
-            }
-        }
+        initSettings();
     })();
 
     // Handle the theme toggle button

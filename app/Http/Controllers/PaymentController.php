@@ -128,7 +128,7 @@ class PaymentController extends Controller
 
             // Check if patient exists
             if (!$patient) {
-                return redirect()->route('payments.addCharges')
+                return redirect()->route('payments.addCharges', compact('patient'))
                     ->withErrors(['patient' => 'Patient not found. Please check the ID or contact number.']);
             }
 
@@ -136,6 +136,7 @@ class PaymentController extends Controller
 
             if ($type === 'Appointment Charges' && empty($patient->doctor->doctor_charges)) {
                 return redirect()->route('payments.addCharges')
+                    ->with(['patientId' => $patient->id])
                     ->withErrors(['patient' => 'Assign a doctor to this patient before adding Appointment Charges']);
             }
 
@@ -284,8 +285,13 @@ class PaymentController extends Controller
         }
 
         $invoice_url = route('payments.invoice', $payment->id);
-        
         // Return a view that will handle both redirects
+        // return view('payments.redirect', [
+            //     'redirect_url' => route('payments.index'),
+            //     'invoice_url' => $invoice_url,
+            //     'message' => 'Payment created successfully!'
+            // ]);
+        
         return view('payments.redirect', [
             'redirect_url' => route('payments.index'),
             'invoice_url' => $invoice_url,

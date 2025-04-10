@@ -44,6 +44,7 @@
                                     <option value="Regular Patient">Regular Patient</option>
                                     <option value="Gyne">Gyne(Gynecology)</option>
                                     <option value="I/F">I/F(Infertility)</option>
+                                    <option value="Laboratory">Laboratory</option>
                                 </select>
                             </div>
                         </div>
@@ -111,11 +112,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            var theme = sessionStorage.getItem("theme");
-            if (theme == "dark") {
-                $('body').attr('data-bs-theme', 'dark');
-            }
-
+            
             // Initialize Select2
             $('.select2').select2({
                 width: '100%',

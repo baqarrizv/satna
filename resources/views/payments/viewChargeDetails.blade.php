@@ -123,7 +123,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('payments.applyCharges') }}" method="POST">
+                    <form action="{{ route('payments.applyCharges') }}" method="POST" target="_blank">
                         @csrf
                         <input type="hidden" name="patient_id" value="{{ $patient->id }}">
                         <input type="hidden" name="type" value="{{ $type }}">
@@ -254,7 +254,7 @@
                                 
                                 <!-- Tax fields - initially hidden -->
                                 <div class="col-md-12 tax-field" style="display:none;">
-                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}% {{ $settings->tax_threshold }})</strong></label>
+                                    <label class="form-label"><strong>Tax Amount ({{ $settings->tax_percentage }}%)</strong></label>
                                     <input type="number" id="tax_amount" name="tax_amount" class="form-control" readonly>
                                 </div>
                                 <div class="col-md-12 tax-field" style="display:none;">
@@ -707,5 +707,6 @@
         // Initial total calculation
         calculateTotal();
     });
+
 </script>
 @endsection
