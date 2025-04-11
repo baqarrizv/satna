@@ -231,6 +231,14 @@ Route::group(['middleware' => ['auth', 'enforce2fa']], function () {
     Route::get('/reports/doctor-daily/generate', [ReportController::class, 'generateDoctorDailyReport'])
         ->name('reports.doctorDaily.generate')
         ->middleware('can:View Doctor Daily Report');
+
+    Route::get('/reports/department-daily', [ReportController::class, 'departmentDailyReportForm'])
+        ->name('reports.departmentDaily')
+        ->middleware('can:View Reports');
+
+    Route::get('/reports/department-daily/generate', [ReportController::class, 'generateDepartmentDailyReport'])
+        ->name('reports.departmentDaily.generate')
+        ->middleware('can:View Reports');
 });
 
 // Route for the offline page (PWA related), no authentication required

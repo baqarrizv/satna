@@ -18,4 +18,12 @@ class Department extends Model
     {
         return $this->hasMany(Service::class);
     }
+
+    /**
+     * Get the doctors for the department.
+     */
+    public function doctors()
+    {
+        return $this->hasMany(Doctor::class);
+    }
 }

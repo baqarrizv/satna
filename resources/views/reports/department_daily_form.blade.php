@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title') Doctor Daily Collection Report @endsection
+@section('title') Department Daily Collection Report @endsection
 
 @section('css')
     <!-- Select2 CSS -->
@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="mb-0">Doctor Daily Collection Report</h4>
+                <h4 class="mb-0">Department Daily Collection Report</h4>
             </div>
         </div>
     </div>
@@ -25,20 +25,21 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('reports.doctorDaily.generate') }}" target="_blank">
+                    <form method="GET" action="{{ route('reports.departmentDaily.generate') }}" target="_blank">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="doctor_id" class="form-label">Select Doctor</label>
-                                    <select name="doctor_id" id="doctor_id" class="form-control select2" required>
-                                        <option value="">Select Doctor</option>
-                                        @foreach($doctors as $doctor)
-                                            <option value="{{ $doctor->id }}" {{ request('doctor_id') == $doctor->id ? 'selected' : '' }}>
-                                                {{ $doctor->name }}
+                                    <label for="department_id" class="form-label">Select Department</label>
+                                    <select name="department_id" id="department_id" class="form-control select2" required>
+                                        <option value="">Select Department</option>
+                                        <option value="all">All Departments</option>
+                                        @foreach($departments as $department)
+                                            <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>
+                                                {{ $department->name }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('doctor_id')
+                                    @error('department_id')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>

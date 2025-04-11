@@ -22,4 +22,9 @@ class Payment extends Model
     {
         return $this->hasMany(PaymentService::class);
     }
+
+    public function doctor()
+    {
+        return $this->belongsTo(Doctor::class, 'doctor_id');
+    }
 }

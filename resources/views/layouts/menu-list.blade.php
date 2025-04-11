@@ -79,6 +79,12 @@
                 <span>Doctor Daily Collection</span>
             </a>
         </li>
+        <li>
+            <a href="{{ route('reports.departmentDaily') }}">
+                <i class="uil-plus"></i>
+                <span>Department Daily Collection</span>
+            </a>
+        </li>
 
         <li class="menu-title">Others</li>
 
