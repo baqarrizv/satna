@@ -148,6 +148,7 @@ class DoctorController extends Controller
 
     public function update(Request $request, Doctor $doctor)
     {
+        $doctor->doctor_charges = $this->unformat_number($request->doctor_charges);
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'dob' => 'nullable|date',
@@ -225,4 +226,8 @@ class DoctorController extends Controller
 
         return response()->json(['success' => true]);
     }
+    function unformat_number($formatted)
+{
+    return str_replace(',', '', $formatted);
+}
 }
