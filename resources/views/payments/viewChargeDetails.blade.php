@@ -4,102 +4,7 @@
 
 @section('css')
 <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
-<style>
-    .service-select optgroup {
-        font-weight: bold;
-        color: #495057;
-        background-color: #f8f9fa;
-        padding: 5px;
-        font-size: 1rem;
-    }
-
-    .service-select option {
-        padding: 5px 15px;
-        color: #212529;
-        background-color: #ffffff;
-    }
-
-    [data-bs-theme="dark"] .service-select optgroup {
-        color: #e9ecef;
-        background-color: #343a40;
-        font-size: 1rem;
-    }
-
-    [data-bs-theme="dark"] .service-select option {
-        color: #f8f9fa;
-        background-color: #212529;
-    }
-
-    .service-select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-        background-color: #fff;
-    }
-
-    [data-bs-theme="dark"] .service-select {
-        background-color: #212529;
-        border-color: #495057;
-        color: #f8f9fa;
-    }
-    
-    /* Select2 Custom Styling */
-    .select2-container--default .select2-selection--single {
-        height: 38px;
-        padding: 6px 12px;
-        background-color: #fff;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 24px;
-        color: #495057;
-    }
-    
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 36px;
-    }
-    
-    .select2-container--default .select2-search--dropdown .select2-search__field {
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-    }
-    
-    .select2-dropdown {
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-    }
-    
-    [data-bs-theme="dark"] .select2-container--default .select2-selection--single {
-        background-color: #212529;
-        border-color: #495057;
-    }
-    
-    [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #f8f9fa;
-    }
-    
-    [data-bs-theme="dark"] .select2-dropdown {
-        background-color: #212529;
-        border-color: #495057;
-    }
-    
-    [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
-        background-color: #343a40;
-        border-color: #495057;
-        color: #f8f9fa;
-    }
-    
-    [data-bs-theme="dark"] .select2-container--default .select2-results__option {
-        color: #f8f9fa;
-    }
-    
-    [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #0d6efd;
-    }
-</style>
+<link href="{{ URL::asset('/assets/css/charge-details.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -288,11 +193,11 @@
 
 @section('scripts')
 <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
-
+<script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
 <script>
     $(document).ready(function() {
         // Initialize Select2
-        initializeSelect2();
+        // initializeSelect2();
         
         // Process initial department selection
         $('.department-filter').each(function() {
@@ -362,43 +267,7 @@
         }
         
         // Function to initialize Select2
-        function initializeSelect2() {
-            // Department filters
-            $('.department-filter').each(function() {
-                $(this).select2({
-                    width: '100%',
-                    placeholder: 'Select Department',
-                    dropdownParent: $(this).parent()
-                });
-            });
-            
-            // Service selects - only initialize those that aren't disabled
-            $('.service-select').each(function() {
-                if (!$(this).prop('disabled')) {
-                    $(this).select2({
-                        width: '100%',
-                        placeholder: 'Select Service',
-                        dropdownParent: $(this).parent(),
-                        templateResult: function(data) {
-                            // Skip hidden options
-                            const $option = $(data.element);
-                            if ($option.css('display') === 'none') {
-                                return null;
-                            }
-                            return data.text;
-                        }
-                    });
-                }
-            });
-            
-            // Doctor select
-            $('#doctor_id').select2({
-                width: '100%',
-                placeholder: 'Select Doctor',
-                dropdownParent: $('#doctor_id').parent()
-            });
-        }
-        
+       
         // Payment mode change handler
         $('#payment_mode').on('change', function() {
             const paymentMode = $(this).val();

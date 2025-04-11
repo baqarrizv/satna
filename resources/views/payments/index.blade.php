@@ -100,6 +100,7 @@
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
     <!-- Select2 JS -->
     <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
     
     <!-- DataTables Buttons JS -->
     <script src="{{ URL::asset('/assets/libs/datatables/dataTables.buttons.min.js') }}"></script>
@@ -110,14 +111,7 @@
     <script src="{{ URL::asset('/assets/libs/datatables/vfs_fonts.js') }}"></script>
 
     <script type="text/javascript">
-        $(function () {
-            // Initialize Select2
-            $('.select2').select2({
-                width: '100%',
-                placeholder: 'Select an option',
-                allowClear: false
-            });
-            
+        $(function () { 
             // Handle "Select All" options
             $('#doctor_filter').on('change', function() {
                 if ($(this).val() === 'all_docs') {

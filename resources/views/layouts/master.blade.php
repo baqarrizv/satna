@@ -12,6 +12,7 @@
 <head>
     @include('layouts.title-meta')
     @include('layouts.head')
+    
 </head>
 
 @section('body')

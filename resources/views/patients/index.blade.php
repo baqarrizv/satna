@@ -109,17 +109,9 @@
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
     <!-- Select2 JS -->
     <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
-
+    <script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
     <script type="text/javascript">
         $(document).ready(function() {
-            
-            // Initialize Select2
-            $('.select2').select2({
-                width: '100%',
-                placeholder: 'Select an option',
-                allowClear: false
-            });
-
             // Handle "Select All" option for doctor filter
             $('#doctorFilter').on('change', function() {
                 if ($(this).val() === 'all_docs') {

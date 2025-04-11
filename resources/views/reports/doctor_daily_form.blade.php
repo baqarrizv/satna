@@ -74,8 +74,9 @@
 @section('script')
     <!-- Select2 JS -->
     <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
+    <script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
     
-    <script>
+    <!-- <script>
         $(document).ready(function() {
             // Initialize select2
             $('.select2').select2({
@@ -83,5 +84,5 @@
                 placeholder: 'Select an option',
             });
         });
-    </script>
+    </script> -->
 @endsection 
