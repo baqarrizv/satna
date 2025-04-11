@@ -2,6 +2,10 @@
 @section('title')
     Login
 @endsection
+@section('css')
+    <!-- Password toggle CSS -->
+    <link href="{{ URL::asset('assets/css/password-toggle.css') }}" rel="stylesheet" type="text/css" />
+@endsection
 @section('content')
     <div class="account-pages">
         <div class="container">
@@ -91,33 +95,9 @@
         </div>
         <!-- end container -->
     </div>
+@endsection
 
-    <style>
-        .password-field {
-            position: relative;
-        }
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #6c757d;
-        }
-    </style>
-
-    <script>
-        function togglePassword(inputId, icon) {
-            const passwordInput = document.getElementById(inputId);
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            }
-        }
-    </script>
+@section('script')
+    <!-- Password toggle JS -->
+    <script src="{{ URL::asset('assets/js/password-toggle.js') }}"></script>
 @endsection

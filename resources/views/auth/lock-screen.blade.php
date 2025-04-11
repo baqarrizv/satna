@@ -2,6 +2,10 @@
 @section('title')
     Lock Screen
 @endsection
+@section('css')
+    <!-- Password toggle CSS -->
+    <link href="{{ URL::asset('assets/css/password-toggle.css') }}" rel="stylesheet" type="text/css" />
+@endsection
 @section('content')
     <div class="account-pages">
         <div class="container">
@@ -76,61 +80,13 @@
     </div>
 @endsection
 
-<style>
-    .password-field {
-        position: relative;
-    }
-    .password-toggle {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: #6c757d;
-    }
-</style>
-
-<script>
-    function togglePassword(inputId, icon) {
-        const passwordInput = document.getElementById(inputId);
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        }
-    }
-
-    // Check session status every second
-    document.addEventListener('DOMContentLoaded', function() {
-        // Function to check session status
-        function checkSessionStatus() {
-            fetch('{{ route("check.session") }}', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                credentials: 'same-origin'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.expired) {
-                    // Redirect to login page if session expired
-                    window.location.href = '{{ route("login") }}';
-                }
-            })
-            .catch(error => {
-                console.error('Error checking session status:', error);
-            });
-        }
-
-        // Check session status immediately and then every second
-        checkSessionStatus();
-        setInterval(checkSessionStatus, 1000);
-    });
-</script>
+@section('script')
+    <!-- Password toggle JS -->
+    <script src="{{ URL::asset('assets/js/password-toggle.js') }}"></script>
+    <script>
+        // Define variables for session check in password-toggle.js
+        var checkSessionRoute = '{{ route("check.session") }}';
+        var loginRoute = '{{ route("login") }}';
+        var csrfToken = '{{ csrf_token() }}';
+    </script>
+@endsection
