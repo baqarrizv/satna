@@ -97,11 +97,7 @@
 
 @section('script')
     <!-- Required datatable js -->
-    <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
-    <!-- Select2 JS -->
-    <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
-    <script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
-    
+    <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>    
     <!-- DataTables Buttons JS -->
     <script src="{{ URL::asset('/assets/libs/datatables/dataTables.buttons.min.js') }}"></script>
     <script src="{{ URL::asset('/assets/libs/datatables/buttons.html5.min.js') }}"></script>

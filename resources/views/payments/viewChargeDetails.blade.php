@@ -192,13 +192,9 @@
 @endsection
 
 @section('scripts')
-<script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
-<script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
 <script>
     $(document).ready(function() {
-        // Initialize Select2
-        // initializeSelect2();
-        
+
         // Process initial department selection
         $('.department-filter').each(function() {
             const selectedDepartment = $(this).val();

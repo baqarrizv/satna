@@ -8,6 +8,9 @@
 <script src="{{ URL::asset('/assets/libs/jquery-counterup/jquery-counterup.min.js')}}"></script>
 <script src="{{ URL::asset('/assets/libs/dropzone/dropzone.min.js') }}"></script> 
 <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
+
 
 @if(config('settings.enable_push_notifications') && !empty(config('settings.onesignal_app_id')) && !empty(config('settings.onesignal_api_key')))
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
