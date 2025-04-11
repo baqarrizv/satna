@@ -153,32 +153,15 @@
                     {data: 'total', name: 'total'},
                     {data: 'payment_mode', name: 'payment_mode'},
                     {data: 'created_at', name: 'created_at'},
-                    {data: 'invoice', name: 'invoice', orderable: false, searchable: false},
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                    {data: 'invoice', name: 'invoice', orderable: false, searchable: false, className: 'no-export'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false , className: 'no-export'},
                 ],
                 responsive: true,
                 pageLength: 25,
                 order: [[1, 'desc']],
-                dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>><"row"<"col-sm-12 col-md-6"B>><"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                dom: '<"row"<"col-sm-4"l><"col-sm-4 text-center"B><"col-sm-4"f>><"row"<"col-sm-12"tr>><"row"<"col-sm-5"i><"col-sm-7"p>>',
                 buttons: [
-                    {
-                        extend: 'excel',
-                        text: 'Export to Excel',
-                        className: 'btn btn-success my-2',
-                        exportOptions: {
-                            columns: ':visible:not(.no-export)'
-                        },
-                        title: 'Payments_Export_' + new Date().toISOString().slice(0, 10)
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'Export to PDF',
-                        className: 'btn btn-danger my-2 mx-2',
-                        exportOptions: {
-                            columns: ':visible:not(.no-export)'
-                        },
-                        title: 'Payments_Export_' + new Date().toISOString().slice(0, 10)
-                    }
+                    'copy', 'csv', 'excel', 'pdf', 'print'
                 ]
             });
 

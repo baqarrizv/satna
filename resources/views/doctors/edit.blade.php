@@ -195,7 +195,7 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="doctor_charges" class="form-label">Doctor Charges <span class="text-danger">*</span></label>
-                                    <input type="number" name="doctor_charges" id="doctor_charges" step="1" required class="form-control @error('doctor_charges') is-invalid @enderror" value="{{ old('doctor_charges', $doctor->doctor_charges) }}">
+                                    <input type="text" name="doctor_charges" id="doctor_charges" step="1" required class="form-control @error('doctor_charges') is-invalid @enderror" value="{{ old('doctor_charges', $doctor->doctor_charges) }}">
                                     @error('doctor_charges')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror

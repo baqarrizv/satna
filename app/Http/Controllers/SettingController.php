@@ -35,6 +35,7 @@ class SettingController extends Controller
         $setting = Cache::remember('app_settings', 60, function () {
             return Setting::first() ?? new Setting();
         });
+        $setting->tax_threshold = number_format($setting->tax_threshold, 0);
 
         // Return the settings edit view with the settings data.
         return view('settings.edit', compact('setting'));

@@ -62,6 +62,9 @@ class DoctorController extends Controller
                     
                     return $actions;
                 })
+                ->editColumn('doctor_charges', function($doctor) {
+                    return number_format($doctor->doctor_charges, 0);
+                })
                 ->rawColumns(['status', 'action'])
                 ->make(true);
         }
@@ -139,7 +142,7 @@ class DoctorController extends Controller
     public function edit(Doctor $doctor)
     {
         $departments = Department::all();
-        
+        $doctor->doctor_charges = number_format($doctor->doctor_charges, 0);
         return view('doctors.edit', compact('doctor', 'departments'));
     }
 

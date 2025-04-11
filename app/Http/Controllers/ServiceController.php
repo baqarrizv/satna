@@ -39,7 +39,7 @@ class ServiceController extends Controller
                     return $actions;
                 })
                 ->editColumn('charges', function($service) {
-                    return number_format($service->charges, 2);
+                    return number_format($service->charges, 0);
                 })
                 ->rawColumns(['action'])
                 ->make(true);

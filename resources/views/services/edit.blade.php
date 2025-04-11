@@ -57,7 +57,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="charges" class="form-label">Charges</label>
-                                    <input type="number" name="charges" step="0.01" required class="form-control @error('charges') is-invalid @enderror" value="{{ old('charges', $service->charges) }}">
+                                    <input type="text" name="charges" step="0.01" required class="form-control @error('charges') is-invalid @enderror" value="{{ old('charges', $service->charges) }}">
                                     @error('charges')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror

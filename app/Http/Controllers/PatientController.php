@@ -166,7 +166,10 @@ class PatientController extends Controller
     public function edit(Patient $patient)
     {
         $doctors = Doctor::where('is_active', true)->get();
-        return view('patients.edit', compact('patient', 'doctors'));
+        $coordinators = Doctor::where('is_active', true)
+                             ->where('is_coordinator', true)
+                             ->get();
+        return view('patients.edit', compact('patient', 'doctors', 'coordinators'));
     }
     
     public function update(Request $request, Patient $patient)
