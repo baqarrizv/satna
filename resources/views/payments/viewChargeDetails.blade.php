@@ -129,7 +129,7 @@
                                         </div>
                                         <div class="col-md-5">
                                             <label class="form-label"><strong>Appointment Charges</strong></label>
-                                            <input type="number" id="doctor_charges" name="doctor_charges" readonly class="form-control" value="{{ $patient->doctor->doctor_charges }}">
+                                            <input type="text" id="doctor_charges" name="doctor_charges" readonly class="form-control" value="{{ number_format($patient->doctor->doctor_charges, 0) }}">
                                         </div>
                                     </div>
                                 </div>
@@ -444,7 +444,7 @@
         $(document).on('change', '#doctor_id', function() {
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
-            $('#doctor_charges').val(Math.round(charges));
+            $('#doctor_charges').val(Number(charges).toLocaleString());
             calculateTotal();
         });
 
@@ -458,7 +458,7 @@
                     total += charge;
                 });
             } else if ($type === 'Appointment Charges') {
-                total = parseFloat($('#doctor_charges').val()) || 0;
+                total = parseFloat($('#doctor_charges').val().replace(/,/g, '')) || 0;
             }
 
             const discount = parseFloat($('#discount').val()) || 0;

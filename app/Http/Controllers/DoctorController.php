@@ -28,7 +28,7 @@ class DoctorController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $doctors = Doctor::with('department');
+            $doctors = Doctor::with('department')->orderBy('id', 'DESC');
             
             return Datatables::of($doctors)
                 ->addIndexColumn()
