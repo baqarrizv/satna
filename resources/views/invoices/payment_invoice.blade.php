@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -162,22 +163,23 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-            
-        
+
+
         }
     </style>
 </head>
+
 <body style="font-family: 'Helvetica', 'Arial', sans-serif;  color: #1f2937; background-color: #fff; font-size: 0.875rem;">
     <div style="max-width: 100%; margin: 0">
         <!-- Header Section -->
         <table style="width: 100%; border-bottom: 2px solid #e5e7eb;">
             <tr>
-                <td style="text-align: center; padding: 10px 0; width: 15%;">   
-                    <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'assets/images/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
+                <td style="text-align: center; padding: 10px 0; width: 15%;">
+                    <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'storage/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
                 </td>
                 <td style="padding: 10px 0; text-align: center; width: 85%;">
                     <h1 style="color: #2563eb; margin-left: -90px; font-size: 1.5rem; margin-top: 0.5rem;">Payment Slip</h1>
-                </td>                
+                </td>
             </tr>
         </table>
 
@@ -202,13 +204,13 @@
                     </table>
                 </td>
 
-                <!-- Medical Information -->    
+                <!-- Medical Information -->
                 <td style="background-color: #f8fafc; border-radius: 0.5rem; vertical-align: top;">
                     <table style="width: 100%; border-collapse: collapse;">
                         <tr>
                             <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">Receipt #</th>
                             <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->id }}</td>
-                        </tr>                        
+                        </tr>
                         <tr>
                             <th style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #1e40af; width: 40%;">FC-File #</th>
                             <td style="padding: 0.1rem; text-align: left; border-bottom: 1px solid #e5e7eb;">{{ $payment->fc_number ?? '' }} {{ $payment->file_number ?? '' }}</td>
@@ -230,39 +232,39 @@
         <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem;">
             <tbody>
                 @if ($payment->doctor_charges > 0)
-                    <tr>
-                        <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
-                        <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 0) }}</td>
-                    </tr>
+                <tr>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->doctor_charges, 0) }}</td>
+                </tr>
                 @else
-                    @foreach ($payment->services as $service)
-                        <tr>
-                            <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
-                            <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
-                        </tr>
-                    @endforeach
-                @endif                
+                @foreach ($payment->services as $service)
+                <tr>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
+                </tr>
+                @endforeach
+                @endif
             </tbody>
             <tfoot>
                 <tr>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 0) }}</td>
                 </tr>
-                
+
                 @if($payment->discount > 0)
                 <tr>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Discount</td>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->discount, 0) }}</td>
                 </tr>
                 @endif
-                
+
                 @if($payment->tax > 0)
                 <tr>
-                    <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $payment->tax_percentage ?? 0 }}%  Extra Charges</td>
+                    <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $payment->tax_percentage ?? 0 }}% Extra Charges</td>
                     <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 0) }}</td>
                 </tr>
                 @endif
-                
+
                 <tr>
                     <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
                     <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
@@ -291,4 +293,5 @@
         </table>
     </div>
 </body>
+
 </html>

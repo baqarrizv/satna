@@ -47,8 +47,13 @@ class SettingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request)
+    public function update(Request $request, Setting $setting)
     {
+        // Unformat the tax threshold before validation
+        if ($request->has('tax_threshold')) {
+            $request->merge(['tax_threshold' => $this->unformat_number($request->tax_threshold)]);
+        }
+
         // Validate the incoming request data for settings update.
         $request->validate([
             'title' => 'nullable|string|max:255',    // Title is optional, should be a string, max length 255
@@ -116,5 +121,10 @@ class SettingController extends Controller
 
         // Redirect back to the settings page with a success message.
         return redirect()->back()->with('success', 'Settings updated successfully!');
+    }
+
+    function unformat_number($formatted)
+    {
+            return str_replace(',', '', $formatted);
     }
 }

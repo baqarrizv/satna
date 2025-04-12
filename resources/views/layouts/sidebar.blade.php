@@ -5,19 +5,19 @@
     <div class="navbar-brand-box">
         <a href="{{url('/')}}" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/SetnaSmall.jpg') }}" alt="" style="height: 67px; width: 72px;">
+                <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('storage/settings/SetnaSmall.jpg') }}" alt="" style="height: 67px; width: 72px;">
             </span>
             <span class="logo-lg">
-                <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('assets/images/settings/Setna.jpg') }}" alt="" style="height: 67px; width: 150px;">
+                <img src="{{ config('settings.logo_dark') ? config('settings.logo_dark') : asset('storage/settings/Setna.jpg') }}" alt="" style="height: 67px; width: 150px;">
             </span>
         </a>
 
         <a href="{{url('/')}}" class="logo logo-light">
             <span class="logo-sm">
-                <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/SetnaSmall.jpg') }}" alt="" style="height: 67px; width: 72px;">
+                <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('storage/settings/SetnaSmall.jpg') }}" alt="" style="height: 67px; width: 72px;">
             </span>
             <span class="logo-lg">
-                <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('assets/images/settings/Setna.jpg') }}" alt="" style="height: 67px; width: 150px;">
+                <img src="{{ config('settings.logo_light') ? config('settings.logo_light') : asset('storage/settings/Setna.jpg') }}" alt="" style="height: 67px; width: 150px;">
             </span>
         </a>
     </div>
