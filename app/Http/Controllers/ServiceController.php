@@ -6,7 +6,8 @@ use App\Models\Service;
 use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Services\EventNotificationService;
-use DataTables;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class ServiceController extends Controller
 {
@@ -56,10 +57,15 @@ class ServiceController extends Controller
 
     public function store(Request $request)
     {
+        // Unformat the charges before validation
+        if ($request->has('charges')) {
+            $request->merge(['charges' => $this->unformat_number($request->charges)]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'department_id' => 'required|exists:departments,id',
-            'charges' => 'required|numeric|min:0',
+            'charges' => 'required|numeric|min:0|max:9999999999',
         ]);
 
         Service::create($validated);
@@ -72,15 +78,21 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         $departments = Department::all();
+        $service->charges = number_format($service->charges, 0);
         return view('services.edit', compact('service', 'departments'));
     }
 
     public function update(Request $request, Service $service)
     {
+        // Unformat the charges before validation
+        if ($request->has('charges')) {
+            $request->merge(['charges' => $this->unformat_number($request->charges)]);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'department_id' => 'required|exists:departments,id',
-            'charges' => 'required|numeric|min:0',
+            'charges' => 'required|numeric|min:0|max:9999999999',
         ]);
 
         $service->update($validated);
@@ -97,5 +109,9 @@ class ServiceController extends Controller
         EventNotificationService::notifyEventByName('Service Deleted');
 
         return redirect()->route('services.index')->with('success', 'Service deleted successfully');
+    }
+    function unformat_number($formatted)
+    {
+        return str_replace(',', '', $formatted);
     }
 }

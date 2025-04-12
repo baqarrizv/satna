@@ -7,7 +7,8 @@ use App\Models\Department;
 use Illuminate\Http\Request;
 use App\Services\FileUploadService;
 use App\Services\EventNotificationService;
-use DataTables;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
@@ -81,6 +82,11 @@ class DoctorController extends Controller
 
     public function store(Request $request)
     {
+        // Unformat the doctor_charges before validation
+        if ($request->has('doctor_charges')) {
+            $request->merge(['doctor_charges' => $this->unformat_number($request->doctor_charges)]);
+        }
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'dob' => 'nullable|date',
@@ -92,9 +98,9 @@ class DoctorController extends Controller
             'date_of_appointment' => 'required|date',
             'specialist' => 'required|string',
             'department_id' => 'required|exists:departments,id',
-            'doctor_charges' => 'required|numeric',
-            'doctor_portion' => 'nullable|numeric',
-            'clinic_portion' => 'nullable|numeric',
+            'doctor_charges' => 'required|numeric|max:9999999999',
+            'doctor_portion' => 'nullable|numeric|max:9999999999',
+            'clinic_portion' => 'nullable|numeric|max:9999999999',
             'payment_mode' => 'nullable|string',
             'account_title' => 'nullable|string',
             'account_number' => 'nullable|string',
@@ -149,7 +155,11 @@ class DoctorController extends Controller
 
     public function update(Request $request, Doctor $doctor)
     {
-        $doctor->doctor_charges = $this->unformat_number($request->doctor_charges);
+        // Unformat the doctor_charges before validation
+        if ($request->has('doctor_charges')) {
+            $request->merge(['doctor_charges' => $this->unformat_number($request->doctor_charges)]);
+        }
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'dob' => 'nullable|date',
@@ -161,9 +171,9 @@ class DoctorController extends Controller
             'date_of_appointment' => 'required|date',
             'specialist' => 'required|string',
             'department_id' => 'required|exists:departments,id',
-            'doctor_charges' => 'required|numeric',
-            'doctor_portion' => 'nullable|numeric',
-            'clinic_portion' => 'nullable|numeric',
+            'doctor_charges' => 'required|numeric|max:9999999999',
+            'doctor_portion' => 'nullable|numeric|max:9999999999',
+            'clinic_portion' => 'nullable|numeric|max:9999999999',
             'payment_mode' => 'nullable|string',
             'account_title' => 'nullable|string',
             'account_number' => 'nullable|string',
