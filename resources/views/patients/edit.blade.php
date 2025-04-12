@@ -301,9 +301,16 @@ $(document).ready(function(){
     $('#patient_contact, #spouse_contact, #alternative_contact').inputmask('(0399) 999-9999');
 
     // Initialize the filter for the current patient type
-    var selectedType = $('input[name="type"]:checked').val();
-    filterDoctors(selectedType);
-    hideandshow(selectedType);
+    var initialType = $('input[name="type"]:checked').val();
+    if (initialType) {
+        filterDoctors(initialType);
+        hideandshow(initialType);
+    } else {
+        // Default to Regular Patient if somehow no radio button is checked
+        $('input[name="type"][value="Regular Patient"]').prop('checked', true);
+        filterDoctors('Regular Patient');
+        hideandshow('Regular Patient');
+    }
     
     // Handle patient type change
     $('input[name="type"]').change(function() {
@@ -379,6 +386,12 @@ $(document).ready(function(){
             $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'Regular Patient') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();
             $('#fileTypeContainer').hide();
@@ -404,34 +417,9 @@ $(document).ready(function(){
             $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'Laboratory') {
-            // Configuration for Laboratory patient type
-            $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide();
-            $('#fileTypeContainer').hide();
-            $('#gyneOptionContainer').hide();
-            // Update required attributes for doctor fields
-            $('#doctor_id').prop('required', true);
-            $('#doctor_coordinator_id').prop('required', false);
-            // Make patient name and contact required, but not CNIC
-            $('input[name="patient_name"]').prop('required', true);
-            $('input[name="patient_contact"]').prop('required', true);
-            $('#patient_cnic').prop('required', false);
-            $('#cnic-required').hide();
-            $('#purpose').prop('required', false);
-            // Show CNIC field, DOB, and Alternative Contact
-            $('[for="patient_cnic"]').closest('.mb-3').show();
-            // Show DOB field
-            $('.gyne-hide-field').show();
-            // Hide spouse section as it's not needed for Laboratory
-            $('.gyne-hide-section').hide();
-            $('.laboratory-hide-field').hide();
-            // Show Alternative Contact field
-            $('.if-hide-field').show();
-            // Set spouse fields as not required
-            $('input[name="spouse_name"]').prop('required', false);
-            $('input[name="spouse_contact"]').prop('required', false);
-            $('.if-required').hide();
-            filterDoctors(selectedType);
+            // For Laboratory, we just need to validate the patient name and contact
+            // which are already required at the HTML level
+            // No doctor or CNIC validation needed
         } else if (selectedType === 'Gyne') {
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();
@@ -472,8 +460,8 @@ $(document).ready(function(){
             // Reset requirements for CNIC
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            // Hide CNIC fields for I/F
-            $('[for="patient_cnic"]').closest('.mb-3').hide();
+            // Show CNIC fields for I/F (fixing inconsistency with create page)
+            $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
             // Show DOB, Address, and Spouse fields
             $('.gyne-hide-field').show();
@@ -490,18 +478,86 @@ $(document).ready(function(){
     // Form validation
     $('form').on('submit', function(e) {
         var selectedType = $('input[name="type"]:checked').val();
+        var hasError = false;
         
-        // Skip CNIC validation for Gyne and I/F as fields are hidden
-        if (selectedType === 'Gyne' || selectedType === 'I/F') {
-            if (selectedType === 'Gyne') {
-                var purpose = $('#purpose').val();
-                if (!purpose) {
-                    e.preventDefault();
-                    alert('Purpose is required for Gyne patients.');
-                    $('#purpose').focus();
-                    return false;
-                }
+        // Validate required fields based on patient type
+        if (selectedType === 'Free Consultancy') {
+            if (!$('#doctor_coordinator_id').val()) {
+                e.preventDefault();
+                alert('Please select a Coordinator');
+                $('#doctor_coordinator_id').focus();
+                hasError = true;
             }
+        } else if (selectedType === 'Gyne') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+            
+            var purpose = $('#purpose').val();
+            if (!purpose) {
+                e.preventDefault();
+                alert('Purpose is required for Gyne patients.');
+                $('#purpose').focus();
+                hasError = true;
+            }
+            
+            var fileType = $('select[name="filetype"]').val();
+            if (!fileType) {
+                e.preventDefault();
+                alert('Type is required for Gyne patients.');
+                $('select[name="filetype"]').focus();
+                hasError = true;
+            }
+        } else if (selectedType === 'I/F') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+            
+            var spouseName = $('input[name="spouse_name"]').val();
+            if (!spouseName) {
+                e.preventDefault();
+                alert('Spouse Name is required for Infertility patients.');
+                $('input[name="spouse_name"]').focus();
+                hasError = true;
+            }
+            
+            var spouseContact = $('input[name="spouse_contact"]').val();
+            if (!spouseContact) {
+                e.preventDefault();
+                alert('Spouse Contact is required for Infertility patients.');
+                $('input[name="spouse_contact"]').focus();
+                hasError = true;
+            }
+            
+            var fileType = $('select[name="filetype"]').val();
+            if (!fileType) {
+                e.preventDefault();
+                alert('Type is required for Infertility patients.');
+                $('select[name="filetype"]').focus();
+                hasError = true;
+            }
+        } else if (selectedType === 'Regular Patient') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+        }
+        
+        // If we already found errors, don't continue with CNIC validation
+        if (hasError) {
+            return false;
+        }
+        
+        // Skip CNIC validation for Gyne, I/F, and Free Consultancy as CNIC is not required
+        if (selectedType === 'Gyne' || selectedType === 'I/F' || selectedType === 'Free Consultancy') {
             return true;
         } else {
             // For other patient types

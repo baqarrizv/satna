@@ -104,7 +104,7 @@ class PatientController extends Controller
         // Additional validation for Regular/Free Consultancy
         if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
             $request->validate([
-                'spouse_name' => 'required'
+
             ]);
         }
 
