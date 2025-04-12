@@ -11,4 +11,4 @@
 <meta name="mobile-web-app-title" content="{{ config('settings.title') }}">
 
 <!-- App favicon -->
-<link rel="shortcut icon" href="{{ config('settings.fav_icon') }}">
+<link rel="shortcut icon" href="{{ config('settings.fav_icon') ? config('settings.fav_icon') : asset('/assets/images/settings/SetnaSmall.jpg') }}">
