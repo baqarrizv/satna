@@ -181,6 +181,27 @@ class PaymentController extends Controller
     // Store a new payment in the database
     public function applyCharges(Request $request)
     {
+        // Clean numeric values by removing commas
+        if ($request->has('total')) {
+            $request->merge(['total' => str_replace(',', '', $request->total)]);
+        }
+        
+        if ($request->has('discount')) {
+            $request->merge(['discount' => str_replace(',', '', $request->discount)]);
+        }
+        
+        if ($request->has('doctor_charges')) {
+            $request->merge(['doctor_charges' => str_replace(',', '', $request->doctor_charges)]);
+        }
+        
+        if ($request->has('charges')) {
+            $cleanedCharges = [];
+            foreach ($request->charges as $charge) {
+                $cleanedCharges[] = str_replace(',', '', $charge);
+            }
+            $request->merge(['charges' => $cleanedCharges]);
+        }
+        
         $validated = $request->validate([
             'patient_id' => 'required|exists:patients,id',
             'type' => 'required|in:Appointment Charges,Service Charges',
@@ -262,8 +283,10 @@ class PaymentController extends Controller
             // Calculate tax if payment mode is Card
             if ($request->payment_mode === 'Card' && $netAmount >= $taxThreshold) {
                 $paymentData['tax'] = round($netAmount * ($taxPercent / 100));
+                $paymentData['tax_percentage'] = $taxPercent;
             } else {
                 $paymentData['tax'] = 0;
+                $paymentData['tax_percentage'] = 0;
             }
 
             $paymentData['doctor_id'] = $doctor->id;
