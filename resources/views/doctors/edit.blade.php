@@ -196,7 +196,7 @@
                                 <div class="mb-3">
                                     <label for="doctor_charges" class="form-label">Doctor Charges <span class="text-danger">*</span></label>
                                     <input type="text" name="doctor_charges" id="doctor_charges" step="1" required class="form-control @error('doctor_charges') is-invalid @enderror" value="{{ old('doctor_charges', $doctor->doctor_charges) }}" max="9999999" oninput="limitDigits(this, 7)">
-                                    <small class="text-muted">Maximum 7 digits allowed</small>
+                                    <!-- <small class="text-muted">Maximum 7 digits allowed</small> -->
                                     @error('doctor_charges')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
