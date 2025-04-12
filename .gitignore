@@ -1,8 +1,6 @@
 /node_modules
 /public/hot
 /public/storage
-/public/assets/uploads/images/settings/
-/public/assets/uploads/images/users/
 /public/assets/uploads/settings/
 /public/assets/uploads/user/
 /storage/*.key
@@ -15,6 +13,4 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/public/assets/uploads/images/settings/
-/public/assets/uploads/images/users/
 
