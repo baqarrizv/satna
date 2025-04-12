@@ -29,27 +29,27 @@ class DoctorController extends Controller
     {
         if ($request->ajax()) {
             $doctors = Doctor::with('department');
-            
+
             return Datatables::of($doctors)
                 ->addIndexColumn()
-                ->addColumn('status', function($doctor) {
+                ->addColumn('status', function ($doctor) {
                     $canModifyStatus = auth()->user()->can('Modify Doctor Status');
-                    $html = '<input type="checkbox" id="switch-' . $doctor->id . '" switch="bool" ' 
-                        . ($doctor->is_active ? 'checked' : '') 
+                    $html = '<input type="checkbox" id="switch-' . $doctor->id . '" switch="bool" '
+                        . ($doctor->is_active ? 'checked' : '')
                         . ($canModifyStatus ? '' : 'disabled')
                         . ' onchange="toggleDoctorStatus(' . $doctor->id . ', this.checked)">'
                         . '<label for="switch-' . $doctor->id . '" data-on-label="Active" data-off-label="Inactive"></label>';
                     return $html;
                 })
-                ->addColumn('action', function($doctor) {
+                ->addColumn('action', function ($doctor) {
                     $actions = '';
-                    
+
                     if (auth()->user()->can('Edit Doctor')) {
                         $actions .= '<a href="' . route('doctors.edit', $doctor->id) . '" class="btn btn-outline-secondary btn-sm">
                             <i class="uil-pen"></i>
                         </a>';
                     }
-                    
+
                     if (auth()->user()->can('Delete Doctor')) {
                         $actions .= '<form action="' . route('doctors.destroy', $doctor->id) . '" method="POST" style="display:inline-block;">
                             ' . csrf_field() . '
@@ -59,10 +59,10 @@ class DoctorController extends Controller
                             </button>
                         </form>';
                     }
-                    
+
                     return $actions;
                 })
-                ->editColumn('doctor_charges', function($doctor) {
+                ->editColumn('doctor_charges', function ($doctor) {
                     return number_format($doctor->doctor_charges, 0);
                 })
                 ->rawColumns(['status', 'action'])
@@ -208,7 +208,7 @@ class DoctorController extends Controller
     public function destroy(Doctor $doctor)
     {
         $doctor->delete();
-       
+
         EventNotificationService::notifyEventByName('Doctor Deleted');
 
         return redirect()->route('doctors.index')->with('success', 'Doctor deleted successfully');
@@ -221,13 +221,14 @@ class DoctorController extends Controller
         ]);
 
         $doctor->update(['is_active' => $request->is_active]);
-        
+
         EventNotificationService::notifyEventByName('Doctor Status Updated');
 
         return response()->json(['success' => true]);
     }
+
     function unformat_number($formatted)
-{
-    return str_replace(',', '', $formatted);
-}
+    {
+        return str_replace(',', '', $formatted);
+    }
 }
