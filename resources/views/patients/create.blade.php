@@ -429,8 +429,6 @@ $(document).ready(function(){
                 return false;
             }
         }
-        
-        console.log("Form validation successful, submitting form");
         return true;
     });
 
@@ -503,13 +501,6 @@ $(document).ready(function(){
             $('input[name="spouse_contact"]').prop('required', false);
             $('.if-required').hide();
             filterDoctors(selectedType);
-            
-            // Log the visibility state for debugging
-            console.log("Free Consultancy selected:");
-            console.log("Doctor container visible: " + $('#doctorSelectionContainer').is(':visible'));
-            console.log("Coordinator container visible: " + $('#doctorCoordinatorContainer').is(':visible'));
-            console.log("Doctor required: " + $('#doctor_id').prop('required'));
-            console.log("Coordinator required: " + $('#doctor_coordinator_id').prop('required'));
         } else if (selectedType === 'Regular Patient') {
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();

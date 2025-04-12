@@ -346,8 +346,8 @@ $(document).ready(function(){
                 }
             });
         } else if (patientType === 'Laboratory') {
-            // For Laboratory patients, we don't need to filter doctors
-            doctorSelect.find('.doctor-option').show();
+            // For Laboratory patients, show all doctors
+            doctorSelect.find('.doctor-option').hide();
         } else {
             // For Regular Patient, show all doctors EXCEPT Infertility and Gynecology
             doctorSelect.find('.doctor-option').each(function() {
@@ -417,9 +417,35 @@ $(document).ready(function(){
             $('.if-required').hide();
             filterDoctors(selectedType);
         } else if (selectedType === 'Laboratory') {
-            // For Laboratory, we just need to validate the patient name and contact
-            // which are already required at the HTML level
-            // No doctor or CNIC validation needed
+            $('#doctorSelectionContainer').hide();
+            $('#doctorCoordinatorContainer').hide();
+            $('#fileTypeContainer').hide();
+            $('#gyneOptionContainer').hide();
+            // Update required attributes for doctor fields - make not required for Laboratory
+            $('#doctor_id').prop('required', false);
+            $('#doctor_coordinator_id').prop('required', false);
+            
+            // Show only these fields for Laboratory
+            $('input[name="patient_name"]').closest('.col-md-4').show();
+            $('input[name="patient_contact"]').closest('.col-md-4').show();
+            $('input[name="patient_dob"]').closest('.col-md-4').show();
+            $('#alternative_contact').closest('.col-md-4').show();
+            
+            // Hide other personal information fields
+            $('[for="patient_cnic"]').closest('.mb-3').hide();
+            $('[for="patient_address"]').closest('.mb-3').hide();
+            
+            // Show alternative contact field for Laboratory
+            $('.if-hide-field').show();
+            
+            // Hide spouse section
+            $('.gyne-hide-section').hide();
+            
+            // Set spouse fields as not required
+            $('input[name="spouse_name"]').prop('required', false);
+            $('input[name="spouse_contact"]').prop('required', false);
+            $('.if-required').hide();
+            filterDoctors(selectedType);
         } else if (selectedType === 'Gyne') {
             $('#doctorSelectionContainer').show();
             $('#doctorCoordinatorContainer').hide();
@@ -557,7 +583,7 @@ $(document).ready(function(){
         }
         
         // Skip CNIC validation for Gyne, I/F, and Free Consultancy as CNIC is not required
-        if (selectedType === 'Gyne' || selectedType === 'I/F' || selectedType === 'Free Consultancy') {
+        if (selectedType === 'Gyne' || selectedType === 'I/F' || selectedType === 'Free Consultancy' || selectedType === 'Laboratory') {
             return true;
         } else {
             // For other patient types
