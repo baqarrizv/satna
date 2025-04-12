@@ -58,12 +58,12 @@
                                             <label class="form-check-label" for="ultrasound">I/F(Infertility)</label>
                                         </div>
                                         <div class="form-check p-2">
-                                            <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient" {{ $patient->type == 'Regular Patient' ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="regularPatient">Regular Patient</label>
-                                        </div>
-                                        <div class="form-check p-2">
                                             <input type="radio" id="laboratory" name="type" class="form-check-input" value="Laboratory" {{ $patient->type == 'Laboratory' ? 'checked' : '' }}>
                                             <label class="form-check-label" for="laboratory">Laboratory</label>
+                                        </div>
+                                        <div class="form-check p-2">
+                                            <input type="radio" id="regularPatient" name="type" class="form-check-input" value="Regular Patient" {{ $patient->type == 'Regular Patient' ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="regularPatient">Regular Patient</label>
                                         </div>
                                     </div>
                                     @error('type')
@@ -214,18 +214,18 @@
                             <div class="col-md-4">
                                 <div class="mb-3 gyne-hide-field">
                                     <label for="patient_dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="patient_dob" class="form-control" value="{{ $patient->patient_dob ? $patient->patient_dob->format('Y-m-d') : '' }}">
+                                    <input type="date" name="patient_dob" class="form-control"  value="{{ $patient->patient_dob ? \Carbon\Carbon::parse($patient->patient_dob)->format('Y-m-d') : '' }}">
                                 </div>
                             </div>
                           
                             <div class="col-md-8">
-                                <div class="mb-3 gyne-hide-field">
+                                <div class="mb-3 gyne-hide-field laboratory-hide-field">
                                     <label for="patient_address" class="form-label">Address</label>
                                     <textarea name="patient_address" class="form-control" rows="3">{{ $patient->patient_address }}</textarea>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="mb-3">
+                                <div class="mb-3 laboratory-hide-field">
                                     <label for="patient_cnic" class="form-label">CNIC <span id="cnic-required" class="text-danger" style="display: none;">*</span></label>
                                     <input type="text" id="patient_cnic" name="patient_cnic" class="form-control @error('patient_cnic') is-invalid @enderror" value="{{ $patient->patient_cnic }}">
                                     @error('patient_cnic')
@@ -266,7 +266,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="spouse_dob" class="form-label">Spouse Date of Birth</label>
-                                    <input type="date" name="spouse_dob" class="form-control" value="{{ $patient->spouse_dob ? $patient->spouse_dob->format('Y-m-d') : '' }}">
+                                    <input type="date" name="spouse_dob" class="form-control" value="{{ $patient->spouse_dob ? \Carbon\Carbon::parse($patient->spouse_dob)->format('Y-m-d') : '' }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -424,6 +424,7 @@ $(document).ready(function(){
             $('.gyne-hide-field').show();
             // Hide spouse section as it's not needed for Laboratory
             $('.gyne-hide-section').hide();
+            $('.laboratory-hide-field').hide();
             // Show Alternative Contact field
             $('.if-hide-field').show();
             // Set spouse fields as not required
