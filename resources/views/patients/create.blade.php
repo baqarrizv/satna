@@ -452,7 +452,7 @@ $(document).ready(function(){
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
             // Hide CNIC fields for I/F
-            $('[for="patient_cnic"]').closest('.mb-3').hide();
+            $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
             // Show DOB, Address, and Spouse fields
             $('.gyne-hide-field').show();
