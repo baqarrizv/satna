@@ -116,33 +116,35 @@ class PatientController extends Controller
 
         if ($request->type == 'Free Consultancy') {
             // Generate FC Number for Free Consultancy patients (starting from 1001)
-            $lastFcNumber = Patient::whereNotNull('fc_number')
+            $maxFcNumber = Patient::withTrashed()
+                ->whereNotNull('fc_number')
                 ->where('fc_number', '!=', '')
-                ->where(DB::raw('CAST(fc_number AS UNSIGNED)'), '>=', 1001)
-                ->orderBy(DB::raw('CAST(fc_number AS UNSIGNED)'), 'desc')
-                ->first();
-            $fcNumber = $lastFcNumber ? (intval($lastFcNumber->fc_number) + 1) : 1001;
+                ->max(DB::raw('CAST(fc_number AS UNSIGNED)'));
+            
+            // If max exists, increment by 1, otherwise start from 1001
+            $fcNumber = $maxFcNumber ? ($maxFcNumber + 1) : 1001;
         } 
         
         // Generate File Number for non-Free Consultancy patient types
         if ($request->type != 'Free Consultancy') {
-            $lastFileNumber = Patient::whereNotNull('file_number')
+            $maxFileNumber = Patient::withTrashed()
+                ->whereNotNull('file_number')
                 ->where('file_number', '!=', '')
-                ->where(DB::raw('CAST(file_number AS UNSIGNED)'), '>=', 1001)
-                ->orderBy(DB::raw('CAST(file_number AS UNSIGNED)'), 'desc')
-                ->first();
-            $fileNumber = $lastFileNumber ? (intval($lastFileNumber->file_number) + 1) : 1001;
+                ->max(DB::raw('CAST(file_number AS UNSIGNED)'));
+            
+            // If max exists, increment by 1, otherwise start from 1001
+            $fileNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1001;
         }
 
-        // Double-check if the generated numbers are unique
+        // Double-check if the generated numbers are unique (including deleted patients)
         if ($fcNumber) {
-            while (Patient::where('fc_number', $fcNumber)->exists()) {
+            while (Patient::withTrashed()->where('fc_number', $fcNumber)->exists()) {
                 $fcNumber++;
             }
         }
         
         if ($fileNumber) {
-            while (Patient::where('file_number', $fileNumber)->exists()) {
+            while (Patient::withTrashed()->where('file_number', $fileNumber)->exists()) {
                 $fileNumber++;
             }
         }
@@ -203,30 +205,34 @@ class PatientController extends Controller
 
         // If patient type is changing to Free Consultancy and doesn't have an FC number
         if ($request->type == 'Free Consultancy' && (!$fcNumber || $fcNumber == '')) {
-            $lastFcNumber = Patient::whereNotNull('fc_number')
+            // Get the maximum fc_number that exists in the database
+            $maxFcNumber = Patient::withTrashed()
+                ->whereNotNull('fc_number')
                 ->where('fc_number', '!=', '')
-                ->where(DB::raw('CAST(fc_number AS UNSIGNED)'), '>=', 1001)
-                ->orderBy(DB::raw('CAST(fc_number AS UNSIGNED)'), 'desc')
-                ->first();
-            $fcNumber = $lastFcNumber ? (intval($lastFcNumber->fc_number) + 1) : 1001;
+                ->max(DB::raw('CAST(fc_number AS UNSIGNED)'));
             
-            // Ensure uniqueness
-            while (Patient::where('fc_number', $fcNumber)->exists()) {
+            // If max exists, increment by 1, otherwise start from 1001
+            $fcNumber = $maxFcNumber ? ($maxFcNumber + 1) : 1001;
+            
+            // Double-check uniqueness (including deleted patients)
+            while (Patient::withTrashed()->where('fc_number', $fcNumber)->where('id', '!=', $patient->id)->exists()) {
                 $fcNumber++;
             }
         }
 
         // If patient type is changing from Free Consultancy to another type and doesn't have a file number
         if ($request->type != 'Free Consultancy' && (!$fileNumber || $fileNumber == '')) {
-            $lastFileNumber = Patient::whereNotNull('file_number')
+            // Get the maximum file_number that exists in the database
+            $maxFileNumber = Patient::withTrashed()
+                ->whereNotNull('file_number')
                 ->where('file_number', '!=', '')
-                ->where(DB::raw('CAST(file_number AS UNSIGNED)'), '>=', 1001)
-                ->orderBy(DB::raw('CAST(file_number AS UNSIGNED)'), 'desc')
-                ->first();
-            $fileNumber = $lastFileNumber ? (intval($lastFileNumber->file_number) + 1) : 1001;
+                ->max(DB::raw('CAST(file_number AS UNSIGNED)'));
             
-            // Ensure uniqueness
-            while (Patient::where('file_number', $fileNumber)->exists()) {
+            // If max exists, increment by 1, otherwise start from 1001
+            $fileNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1001;
+            
+            // Double-check uniqueness (including deleted patients)
+            while (Patient::withTrashed()->where('file_number', $fileNumber)->where('id', '!=', $patient->id)->exists()) {
                 $fileNumber++;
             }
         }
