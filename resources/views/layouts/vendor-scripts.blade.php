@@ -11,7 +11,7 @@
 <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
 <script src="{{ URL::asset('/assets/js/select2-init.js') }}"></script>
 <!-- Lock screen check -->
-<script src="{{ URL::asset('/assets/js/lock-check.js') }}"></script>
+<!-- <script src="{{ URL::asset('/assets/js/lock-check.js') }}"></script> -->
 <!-- DataTables + Buttons JS -->
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
