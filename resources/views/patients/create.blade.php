@@ -65,7 +65,7 @@
                             <div class="col-md-4" id="doctorCoordinatorContainer">
                                 <div class="mb-3">
                                     <label for="doctor_coordinator_id" class="form-label">Doctor's Coordinator <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('doctor_coordinator_id') is-invalid @enderror" id="doctor_coordinator_id" name="doctor_coordinator_id" required>
+                                    <select class="form-control @error('doctor_coordinator_id') is-invalid @enderror select2" id="doctor_coordinator_id" name="doctor_coordinator_id" required>
                                         <option value="">Select Coordinator</option>
                                         @foreach($coordinators as $coordinator)
                                             <option value="{{ $coordinator->id }}" 
@@ -91,7 +91,7 @@
                             <div class="col-md-4" id="doctorSelectionContainer" style="display: none;">
                                 <div class="mb-3">
                                     <label for="doctor_id" class="form-label">Doctor <span class="text-danger">*</span></label>
-                                    <select name="doctor_id" class="form-control @error('doctor_id') is-invalid @enderror" id="doctor_id">
+                                    <select name="doctor_id" class="form-control @error('doctor_id') is-invalid @enderror select2" id="doctor_id">
                                         <option value="">Select Doctor</option>
                                         @foreach($doctors as $doctor)
                                             <option value="{{ $doctor->id }}" 
