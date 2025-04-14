@@ -353,11 +353,12 @@
 
             console.log('Department changed:', selectedDepartment);
 
-            // Reset service selection
+            // Reset service selection and charges fields
             serviceSelect.val('').trigger('change');
+            serviceRow.find('.service-charges').val('');
 
             if (selectedDepartment) {
-                // Destroy the Select2 instance first
+                // Destroy the Select2 instance first if it exists
                 if (serviceSelect.hasClass('select2-hidden-accessible')) {
                     serviceSelect.select2('destroy');
                 }
@@ -365,7 +366,7 @@
                 // Enable the service select
                 serviceSelect.prop('disabled', false);
 
-                // Reset all options first
+                // Hide all options first
                 serviceSelect.find('option').hide();
                 serviceSelect.find('option:first').text('Select Service').show();
 
@@ -406,29 +407,34 @@
                     dropdownParent: serviceSelect.parent()
                 });
             }
+
+            // Recalculate total after department change and service reset
+            calculateTotal();
         });
 
         // Service selection change handler
         $(document).on('change', '.service-select', function() {
             console.log('Service selection changed');
+            // Remove any error messages
             $('.services').find('.text-danger').remove();
 
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
+            const chargesField = $(this).closest('.service-row').find('.service-charges');
 
             // Update charges - round to whole number and format with commas
             if (charges) {
                 const formattedCharges = numberWithCommas(Math.round(charges));
-                $(this).closest('.service-row').find('.service-charges').val(formattedCharges);
+                chargesField.val(formattedCharges);
                 console.log('Service charges updated:', formattedCharges);
             } else {
                 // Clear the charges if no valid service selected
-                $(this).closest('.service-row').find('.service-charges').val('');
+                chargesField.val('');
             }
 
             // Check for duplicates
             const selectedValue = $(this).val();
-            if (selectedValue !== '') {
+            if (selectedValue && selectedValue !== '') {
                 let duplicateFound = false;
                 $('.service-select').not(this).each(function() {
                     if ($(this).val() === selectedValue) {
@@ -439,8 +445,9 @@
 
                 if (duplicateFound) {
                     const errorMsg = '<div class="text-danger">This service has already been added!</div>';
+                    // Reset this service selection
                     $(this).val('').trigger('change');
-                    $(this).closest('.service-row').find('.service-charges').val('');
+                    chargesField.val('');
                     $(this).closest('.service-row').after(errorMsg);
                     console.log('Duplicate service detected');
                 }
@@ -540,20 +547,34 @@
                 dropdownParent: $('#' + newDepartmentFilterId).parent()
             });
 
+            // Initialize service select as disabled with Select2
+            $('#' + newServiceSelectId).select2({
+                width: '100%',
+                placeholder: 'Select Department First',
+                dropdownParent: $('#' + newServiceSelectId).parent()
+            });
+
             // Enable all remove buttons
             $('.remove-row').prop('disabled', false);
 
             console.log('New row added successfully');
+            
+            // Recalculate total after adding new row
+            calculateTotal();
         });
 
         // Remove row button handler
         $(document).on('click', '.remove-row', function() {
             console.log('Remove row button clicked');
 
+            // Remove any error messages
+            $('.services').find('.text-danger').remove();
+
             if ($('.service-row').length > 1) {
                 // Properly destroy Select2 before removing row
                 const row = $(this).closest('.service-row');
 
+                // Destroy Select2 instances if they exist
                 if (row.find('.department-filter').hasClass('select2-hidden-accessible')) {
                     row.find('.department-filter').select2('destroy');
                 }
