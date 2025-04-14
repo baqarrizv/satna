@@ -4,6 +4,7 @@
 
 @section('css')
 <!-- No additional CSS needed -->
+<link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -249,9 +250,18 @@
 @endsection
 
 @section('script')
+<!-- We're removing the duplicate jQuery loading since it's already in vendor-scripts -->
+{{-- <script src="{{ URL::asset('/assets/libs/jquery/jquery.min.js') }}"></script> --}}
 <script src="{{ URL::asset('/assets/libs/inputmask/inputmask.min.js') }}"></script>
+{{-- <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script> --}}
 <script>
 $(document).ready(function(){
+    // Initialize Select2
+    $('.select2').select2({
+        width: '100%',
+        placeholder: 'Select an option'
+    });
+
     // Set initial visibility for Regular Patient (default)
     $('#doctorSelectionContainer').show();
     $('#doctorCoordinatorContainer').hide();
@@ -290,190 +300,17 @@ $(document).ready(function(){
         hideandshow(selectedType);
     });
     
-    // Form validation
-    $('form').on('submit', function(e) {
-        var selectedType = $('input[name="type"]:checked').val();
-        console.log("Form submission initiated for patient type: " + selectedType);
-        var hasError = false;
-        
-        // Only validate fields marked with * (required) in the UI
-        if (selectedType === 'Free Consultancy') {
-            // For Free Consultancy, check coordinator field
-            console.log("Checking coordinator value: " + $('#doctor_coordinator_id').val());
-            console.log("Coordinator field required: " + $('#doctor_coordinator_id').prop('required'));
-            console.log("Coordinator container visible: " + $('#doctorCoordinatorContainer').is(':visible'));
-            
-            if ($('#doctorCoordinatorContainer').is(':visible') && !$('#doctor_coordinator_id').val()) {
-                e.preventDefault();
-                console.log("Error: Coordinator not selected");
-                alert('Please select a Coordinator');
-                $('#doctor_coordinator_id').focus();
-                hasError = true;
-            }
-            
-            // Make sure doctor field is not required for Free Consultancy
-            $('#doctor_id').prop('required', false);
-        } else if (selectedType === 'Gyne') {
-            if (!$('#doctor_id').val()) {
-                e.preventDefault();
-                console.log("Error: Doctor not selected");
-                alert('Please select a Doctor');
-                $('#doctor_id').focus();
-                hasError = true;
-            }
-            
-            // Only check Purpose if it's visible
-            if ($('#gyneOptionContainer').is(':visible')) {
-                var purpose = $('#purpose').val();
-                if (!purpose) {
-                    e.preventDefault();
-                    console.log("Error: Purpose not selected");
-                    alert('Purpose is required for Gyne patients.');
-                    $('#purpose').focus();
-                    hasError = true;
-                }
-            }
-            
-            // Only check Type if it's visible
-            if ($('#fileTypeContainer').is(':visible')) {
-                var fileType = $('select[name="filetype"]').val();
-                if (!fileType) {
-                    e.preventDefault();
-                    console.log("Error: Type not selected");
-                    alert('Type is required for Gyne patients.');
-                    $('select[name="filetype"]').focus();
-                    hasError = true;
-                }
-            }
-        } else if (selectedType === 'I/F') {
-            if (!$('#doctor_id').val()) {
-                e.preventDefault();
-                console.log("Error: Doctor not selected");
-                alert('Please select a Doctor');
-                $('#doctor_id').focus();
-                hasError = true;
-            }
-            
-            // Only validate spouse info if the fields are visible
-            if ($('.gyne-hide-section').is(':visible')) {
-                var spouseName = $('input[name="spouse_name"]').val();
-                if (!spouseName) {
-                    e.preventDefault();
-                    console.log("Error: Spouse Name missing");
-                    alert('Spouse Name is required for Infertility patients.');
-                    $('input[name="spouse_name"]').focus();
-                    hasError = true;
-                }
-                
-                var spouseContact = $('input[name="spouse_contact"]').val();
-                if (!spouseContact) {
-                    e.preventDefault();
-                    console.log("Error: Spouse Contact missing");
-                    alert('Spouse Contact is required for Infertility patients.');
-                    $('input[name="spouse_contact"]').focus();
-                    hasError = true;
-                }
-            }
-            
-            // Only check Type if it's visible
-            if ($('#fileTypeContainer').is(':visible')) {
-                var fileType = $('select[name="filetype"]').val();
-                if (!fileType) {
-                    e.preventDefault();
-                    console.log("Error: Type not selected");
-                    alert('Type is required for Infertility patients.');
-                    $('select[name="filetype"]').focus();
-                    hasError = true;
-                }
-            }
-        } else if (selectedType === 'Regular Patient') {
-            if (!$('#doctor_id').val()) {
-                e.preventDefault();
-                console.log("Error: Doctor not selected");
-                alert('Please select a Doctor');
-                $('#doctor_id').focus();
-                hasError = true;
-            }
-        } else if (selectedType === 'Laboratory') {
-            // For Laboratory, we just need to validate patient name and contact
-            // which are already required via HTML
-        }
-        
-        // If we already found errors, don't continue with CNIC validation
-        if (hasError) {
-            console.log("Form submission stopped due to validation errors");
-            return false;
-        }
-        
-        // Only validate CNIC format if value is provided (not required for any patient type)
-        var cnic = $('#patient_cnic').val();
-        if (cnic && cnic.trim() !== '') {
-            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
-            if (!cnicRegex.test(cnic)) {
-                e.preventDefault();
-                console.log("Error: Invalid CNIC format");
-                alert('Please enter a valid CNIC number in the format: 00000-0000000-0');
-                $('#patient_cnic').focus();
-                return false;
-            }
-        }
-        
-        var spouseCnic = $('#spouse_cnic').val();
-        if (spouseCnic && spouseCnic.trim() !== '') {
-            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
-            if (!cnicRegex.test(spouseCnic)) {
-                e.preventDefault();
-                console.log("Error: Invalid spouse CNIC format");
-                alert('Please enter a valid spouse CNIC number in the format: 00000-0000000-0');
-                $('#spouse_cnic').focus();
-                return false;
-            }
-        }
-        return true;
-    });
-
-    // Function to filter doctors based on department
-    function filterDoctors(patientType) {
-        var doctorSelect = $('#doctor_id');
-        var coordinatorSelect = $('#doctor_coordinator_id');
-        
-        // Hide all options first
-        doctorSelect.find('option').hide();
-        coordinatorSelect.find('option').hide();
-        
-        // Always show the "Select Doctor" option and selected options
-        doctorSelect.find('option:first, option:selected').show();
-        coordinatorSelect.find('option:first, option:selected').show();
-
-        if (patientType === 'Gyne') {
-            // Show only Gynecology department doctors
-            doctorSelect.find('.doctor-option.gynecology-doctors').show();
-        } else if (patientType === 'I/F') {
-            // Show only Infertility department doctors
-            doctorSelect.find('.doctor-option.infertility-doctors').show();
-        } else if (patientType === 'Free Consultancy') {
-            // For Free Consultancy, show only coordinators that are not from Gynecology or Infertility departments
-            coordinatorSelect.find('.coordinator-option').each(function() {
-                const dept = $(this).data('department')?.toLowerCase() || '';
-                if (dept !== 'gynecology' && dept !== 'infertility') {
-                    $(this).show();
-                }
-            });
-        } else if (patientType === 'Laboratory') {
-            // For Laboratory patients, we don't need to filter doctors
-            doctorSelect.find('.doctor-option').show();
-        } else {
-            // For Regular Patient, show all doctors EXCEPT Infertility and Gynecology
-            doctorSelect.find('.doctor-option').each(function() {
-                const dept = $(this).data('department')?.toLowerCase() || '';
-                if (dept !== 'gynecology' && dept !== 'infertility') {
-                    $(this).show();
-                }
-            });
-        }
-    }
+    // Remove browser validation and handle it ourselves
+    $('form').attr('novalidate', 'novalidate');
     
+    // Update hideandshow function to explicitly show/hide containers
     function hideandshow(selectedType){
+        // Reset all required fields and visibility first to avoid validation issues when switching types
+        $('#purpose').prop('required', false);
+        $('select[name="filetype"]').prop('required', false);
+        $('#fileTypeContainer').hide();
+        $('#gyneOptionContainer').hide();
+        
         if (selectedType === 'Free Consultancy') {
             // Show coordinator selection and hide doctor selection
             $('#doctorSelectionContainer').hide();
@@ -540,7 +377,7 @@ $(document).ready(function(){
             // No CNIC required for Gyne
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
-            $('#purpose').prop('required', true);
+            $('#purpose').prop('required', true);           
             $('select[name="filetype"]').prop('required', true);
             // Hide CNIC fields for Gyne
             $('[for="patient_cnic"]').closest('.mb-3').hide();
@@ -569,7 +406,10 @@ $(document).ready(function(){
             $('#patient_cnic').prop('required', false);
             $('#cnic-required').hide();
             $('#purpose').prop('required', false);
-            $('select[name="filetype"]').prop('required', true);
+            // Add timeout to ensure the DOM is updated before setting required
+            setTimeout(function() {
+                $('select[name="filetype"]').prop('required', true);
+            }, 100);
             // Show CNIC fields for I/F
             $('[for="patient_cnic"]').closest('.mb-3').show();
             $('[for="spouse_cnic"]').closest('.mb-3').show();
@@ -614,6 +454,243 @@ $(document).ready(function(){
             $('.if-required').hide();
             filterDoctors(selectedType);
         }
+    }
+    
+    // Update the validation for the form submit
+    $('form').on('submit', function(e) {
+        var selectedType = $('input[name="type"]:checked').val();
+        var hasError = false;
+        
+        // Start with basic validation for all patient types
+        
+        // Patient name and contact are required for all types
+        if (!$('input[name="patient_name"]').val()) {
+            e.preventDefault();
+            alert('Patient Name is required.');
+            $('input[name="patient_name"]').focus();
+            return false;
+        }
+        
+        if (!$('input[name="patient_contact"]').val()) {
+            e.preventDefault();
+            alert('Contact Number is required.');
+            $('input[name="patient_contact"]').focus();
+            return false;
+        }
+        
+        // Type-specific validation
+        if (selectedType === 'Free Consultancy') {
+            if (!$('#doctor_coordinator_id').val()) {
+                e.preventDefault();
+                alert('Please select a Coordinator');
+                $('#doctor_coordinator_id').focus();
+                hasError = true;
+            }
+        } else if (selectedType === 'Gyne') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+            
+            var purpose = $('#purpose').val();
+            if (!purpose && $('#purpose').is(':visible') && $('#gyneOptionContainer').is(':visible')) {
+                e.preventDefault();
+                alert('Purpose is required for Gyne patients.');
+                $('#purpose').focus();
+                hasError = true;
+            }
+            
+            var fileType = $('select[name="filetype"]').val();
+            if (!fileType && $('#fileTypeContainer').is(':visible')) {
+                e.preventDefault();
+                alert('Type is required for Gyne patients.');
+                $('select[name="filetype"]').focus();
+                hasError = true;
+            }
+        } else if (selectedType === 'I/F') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+            
+            var spouseName = $('input[name="spouse_name"]').val();
+            if (!spouseName && $('.gyne-hide-section').is(':visible')) {
+                e.preventDefault();
+                alert('Spouse Name is required for Infertility patients.');
+                $('input[name="spouse_name"]').focus();
+                hasError = true;
+            }
+            
+            var spouseContact = $('input[name="spouse_contact"]').val();
+            if (!spouseContact && $('.gyne-hide-section').is(':visible')) {
+                e.preventDefault();
+                alert('Spouse Contact is required for Infertility patients.');
+                $('input[name="spouse_contact"]').focus();
+                hasError = true;
+            }
+            
+            var fileType = $('select[name="filetype"]').val();
+           
+        } else if (selectedType === 'Regular Patient') {
+            if (!$('#doctor_id').val()) {
+                e.preventDefault();
+                alert('Please select a Doctor');
+                $('#doctor_id').focus();
+                hasError = true;
+            }
+        }
+        
+        if (hasError) {
+            return false;
+        }
+        
+        // CNIC validation
+        var cnic = $('#patient_cnic').val();
+        if (cnic && cnic.trim() !== '') {
+            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+            if (!cnicRegex.test(cnic)) {
+                e.preventDefault();
+                alert('Please enter a valid CNIC number in the format: 00000-0000000-0');
+                $('#patient_cnic').focus();
+                return false;
+            }
+        }
+        
+        var spouseCnic = $('#spouse_cnic').val();
+        if (spouseCnic && spouseCnic.trim() !== '') {
+            var cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+            if (!cnicRegex.test(spouseCnic)) {
+                e.preventDefault();
+                alert('Please enter a valid spouse CNIC number in the format: 00000-0000000-0');
+                $('#spouse_cnic').focus();
+                return false;
+            }
+        }
+        return true;
+    });
+
+    // Function to filter doctors based on department
+    function filterDoctors(patientType) {
+        var doctorSelect = $('#doctor_id');
+        var coordinatorSelect = $('#doctor_coordinator_id');
+        
+        // Destroy Select2 before manipulating options
+        if (doctorSelect.hasClass('select2-hidden-accessible')) {
+            doctorSelect.select2('destroy');
+        }
+        
+        if (coordinatorSelect.hasClass('select2-hidden-accessible')) {
+            coordinatorSelect.select2('destroy');
+        }
+        
+        // Reset selections
+        doctorSelect.val('');
+        
+        // Hide all options first
+        doctorSelect.find('option').hide();
+        coordinatorSelect.find('option').hide();
+        
+        // Always show the "Select Doctor/Coordinator" option
+        doctorSelect.find('option:first').show();
+        coordinatorSelect.find('option:first').show();
+
+        var visibleDoctorOptions = 0;
+        var visibleCoordinatorOptions = 0;
+
+        if (patientType === 'Gyne') {
+            // Show only Gynecology department doctors
+            var gyneOptions = doctorSelect.find('.doctor-option.gynecology-doctors');
+            gyneOptions.show();
+            visibleDoctorOptions = gyneOptions.length;
+        } else if (patientType === 'I/F') {
+            // Show only Infertility department doctors
+            var ifOptions = doctorSelect.find('.doctor-option.infertility-doctors');
+            ifOptions.show();
+            visibleDoctorOptions = ifOptions.length;
+        } else if (patientType === 'Free Consultancy') {
+            // For Free Consultancy, show only coordinators that are not from Gynecology or Infertility departments
+            coordinatorSelect.find('.coordinator-option').each(function() {
+                const dept = $(this).data('department')?.toLowerCase() || '';
+                if (dept !== 'gynecology' && dept !== 'infertility') {
+                    $(this).show();
+                    visibleCoordinatorOptions++;
+                }
+            });
+        } else if (patientType === 'Laboratory') {
+            // For Laboratory patients, we hide the doctor selection
+            visibleDoctorOptions = 0;
+        } else {
+            // For Regular Patient, show all doctors EXCEPT Infertility and Gynecology
+            doctorSelect.find('.doctor-option').each(function() {
+                const dept = $(this).data('department')?.toLowerCase() || '';
+                if (dept !== 'gynecology' && dept !== 'infertility') {
+                    $(this).show();
+                    visibleDoctorOptions++;
+                }
+            });
+        }
+        
+        // Handle no doctors available message
+        if (visibleDoctorOptions === 0 && patientType !== 'Free Consultancy' && patientType !== 'Laboratory') {
+            // Remove any existing no doctors message
+            doctorSelect.find('.no-doctors-message').remove();
+            
+            // Add a disabled option for "No doctors available" message
+            doctorSelect.find('option:first').after('<option class="no-doctors-message" disabled>No doctors available for this patient type</option>');
+            
+            // Make sure this option is visible
+            doctorSelect.find('.no-doctors-message').show();
+        } else {
+            // Remove any existing no doctors message
+            doctorSelect.find('.no-doctors-message').remove();
+        }
+        
+        // Handle no coordinators available message
+        if (visibleCoordinatorOptions === 0 && patientType === 'Free Consultancy') {
+            // Remove any existing no coordinators message
+            coordinatorSelect.find('.no-coordinators-message').remove();
+            
+            // Add a disabled option for "No coordinators available" message
+            coordinatorSelect.find('option:first').after('<option class="no-coordinators-message" disabled>No coordinators available for this patient type</option>');
+            
+            // Make sure this option is visible
+            coordinatorSelect.find('.no-coordinators-message').show();
+        } else {
+            // Remove any existing no coordinators message
+            coordinatorSelect.find('.no-coordinators-message').remove();
+        }
+        
+        // Remove any existing alert messages
+        $('#no-doctors-message, #no-coordinators-message').remove();
+        
+        // Reinitialize Select2 with filtered options
+        doctorSelect.select2({
+            width: '100%',
+            placeholder: 'Select Doctor',
+            templateResult: function(data) {
+                // Skip hidden options in dropdown
+                if ($(data.element).css('display') === 'none') {
+                    return null;
+                }
+                return data.text;
+            }
+        });
+        
+        coordinatorSelect.select2({
+            width: '100%',
+            placeholder: 'Select Coordinator',
+            templateResult: function(data) {
+                // Skip hidden options in dropdown
+                if ($(data.element).css('display') === 'none') {
+                    return null;
+                }
+                return data.text;
+            }
+        });
     }
 });
 </script>
