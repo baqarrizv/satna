@@ -32,7 +32,14 @@ class LockScreenController extends Controller
             // If the password is correct, unlock the screen
             session(['is_locked' => false]);
 
-            return redirect()->route('home');  // or the previous page
+            // Redirect to the intended URL if it exists, otherwise go to home
+            $intendedUrl = session('lock_intended_url');
+            if ($intendedUrl) {
+                session()->forget('lock_intended_url');
+                return redirect($intendedUrl);
+            }
+            
+            return redirect()->route('home');
         } else {
             return back()->withErrors(['password' => 'Incorrect password.']);
         }
@@ -42,10 +49,13 @@ class LockScreenController extends Controller
     public function checkSession(Request $request)
     {
         // Check if user is authenticated and if session is locked
-        $isExpired = !Auth::check() || !session('is_locked');
+        // Return 'expired: true' if NOT locked (session is valid/expired)
+        // Return 'expired: false' if locked (need to redirect to lock screen)
+        $isAuthenticated = Auth::check();
+        $isLocked = session('is_locked', false);
         
         return response()->json([
-            'expired' => $isExpired
+            'expired' => !$isAuthenticated || !$isLocked
         ]);
     }
 }

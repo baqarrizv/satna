@@ -34,7 +34,7 @@
                                         <h5 class="font-size-15 mt-3">{{ Auth::user()->name }}</h5>
                                     </div>
                                     <!-- Unlock form -->
-                                    <form action="{{ route('unlock') }}" method="POST">
+                                    <form action="{{ route('unlock-screen') }}" method="POST">
                                         @csrf
                                         <div class="mb-3">
                                             <label class="form-label" for="userpassword">Password</label>

@@ -33,27 +33,24 @@ use App\Services\FileUploadService;
 
 Auth::routes(); // Auth routes for login, registration, password reset, etc.
 
-Route::group(['middleware' => ['auth', 'enforce2fa']], function () {       
+// First define the lock and unlock routes which should be accessible even when locked
+Route::get('/lock-screen', [LockScreenController::class, 'showLockScreen'])->name('lock-screen');
+Route::post('/unlock', [LockScreenController::class, 'unlock'])->name('unlock-screen');
+Route::get('/check-session', [LockScreenController::class, 'checkSession'])->name('check.session');
+
+// Add the lock route outside the auth middleware group
+Route::get('/lock', function () {
+    session(['is_locked' => true]); // Set session as locked
+    return redirect()->route('lock-screen'); // Redirect to lock screen
+})->name('lock')->middleware('auth');
+
+// Apply middleware to all protected routes
+Route::group(['middleware' => ['auth', 'enforce2fa', 'CheckIfLocked']], function () {       
     // Route for the home page, handled by HomeController's index method 
     Route::get('/', [HomeController::class, 'index'])->name('home');
     
     // Route for viewing notifications, handled by NotificationController's index method
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-
-    // Route to lock the user session and redirect to lock screen
-    Route::get('/lock', function () {
-        session(['is_locked' => true]); // Set session as locked
-        return redirect()->route('lock-screen'); // Redirect to lock screen
-    })->name('lock');
-
-    // Route to display the lock screen, handled by LockScreenController
-    Route::get('/lock-screen', [LockScreenController::class, 'showLockScreen'])->name('lock-screen');
-
-    // Route to unlock the session after user authentication
-    Route::post('/unlock', [LockScreenController::class, 'unlock'])->name('unlock');
-
-    // Route to check if session is expired
-    Route::get('/check-session', [LockScreenController::class, 'checkSession'])->name('check.session');
 
     // Route for editing settings, with permission check for 'Modify Settings'
     Route::get('/settings/edit', [SettingController::class, 'edit'])
