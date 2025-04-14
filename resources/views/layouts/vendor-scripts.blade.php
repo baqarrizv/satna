@@ -46,7 +46,7 @@
 
     function timerIncrement() {
         idleTime++;
-        if (idleTime > 10) { // 10 minutes, you can adjust this to your need
+        if (idleTime > 60) { // 60 minutes (1 hour)
             window.location.href = '{{ route('lock') }}';
         }
     }
