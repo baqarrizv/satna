@@ -101,7 +101,7 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <label class="form-label"><strong>Charges</strong></label>
-                                                <input type="number" name="charges[]" readonly class="form-control service-charges" value="">
+                                                <input type="text" name="charges[]" readonly class="form-control service-charges" value="">
                                             </div>
                                             <div class="col-md-2 d-flex align-items-end">
                                                 <button type="button" class="btn btn-danger remove-row">-</button>
@@ -297,13 +297,13 @@
         // Function to calculate tax and total with tax
         function calculateTaxAndTotal() {
             var subtotal = parseFloat($('#total').val().replace(/,/g, '')) || 0;
-            // console.log("Calculating tax. Subtotal:", subtotal, "Threshold:", taxThreshold);
+            console.log("Calculating tax. Subtotal:", subtotal, "Threshold:", taxThreshold);
 
             // Only apply tax if subtotal is at or above threshold
             var taxAmount = 0;
             if (subtotal >= taxThreshold) {
                 taxAmount = (subtotal * taxPercentage) / 100;
-                taxAmount = Math.round(taxAmount * 100 / 100); // Round to 2 decimal places
+                taxAmount = Math.round(taxAmount); // Round to whole number
                 $('.tax-field').show();
                 $('#total_label').html('<strong>Subtotal</strong>');
                 console.log("Applied tax:", taxPercentage + "%. Amount:", taxAmount);
@@ -315,11 +315,11 @@
 
             // Calculate total with tax
             var totalWithTax = parseFloat(subtotal) + parseFloat(taxAmount);
-            console.log("Total with tax:", numberWithCommas(totalWithTax));
+            console.log("Total with tax:", totalWithTax);
 
-            // Update the displayed values
+            // Update the displayed values with comma formatting
             $('#tax_amount').val(numberWithCommas(taxAmount));
-            $('#total_with_tax').val(numberWithCommas(totalWithTax));
+            $('#total_with_tax').val(numberWithCommas(Math.round(totalWithTax)));
         }
 
         // Recalculate tax when subtotal changes
@@ -416,9 +416,15 @@
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
 
-            // Update charges - round to whole number
-            $(this).closest('.service-row').find('.service-charges').val(Math.round(charges));
-            console.log('Service charges updated:', Math.round(charges));
+            // Update charges - round to whole number and format with commas
+            if (charges) {
+                const formattedCharges = numberWithCommas(Math.round(charges));
+                $(this).closest('.service-row').find('.service-charges').val(formattedCharges);
+                console.log('Service charges updated:', formattedCharges);
+            } else {
+                // Clear the charges if no valid service selected
+                $(this).closest('.service-row').find('.service-charges').val('');
+            }
 
             // Check for duplicates
             const selectedValue = $(this).val();
@@ -448,7 +454,7 @@
         $(document).on('change', '#doctor_id', function() {
             const selectedOption = $(this).find('option:selected');
             const charges = selectedOption.data('charges');
-            $('#doctor_charges').val(Number(charges).toLocaleString());
+            $('#doctor_charges').val(numberWithCommas(Math.round(charges)));
             calculateTotal();
         });
 
@@ -458,7 +464,8 @@
             const $type = "{{ $type }}";
             if ($type === 'Service Charges') {
                 $('.service-charges').each(function() {
-                    const charge = parseFloat($(this).val()) || 0;
+                    // Remove commas before parsing
+                    const charge = parseFloat($(this).val().replace(/,/g, '')) || 0;
                     total += charge;
                 });
             } else if ($type === 'Appointment Charges') {
@@ -515,7 +522,7 @@
                     </div>
                     <div class="col-md-3">
                         <label class="form-label"><strong>Charges</strong></label>
-                        <input type="number" name="charges[]" readonly class="form-control service-charges" value="">
+                        <input type="text" name="charges[]" readonly class="form-control service-charges" value="">
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
                         <button type="button" class="btn btn-danger remove-row">-</button>
@@ -607,6 +614,10 @@
         });
 
         function numberWithCommas(number) {
+            // Ensure the number is valid, otherwise return empty string
+            if (number === undefined || number === null || isNaN(number)) {
+                return '';
+            }
             var parts = number.toString().split(".");
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
             return parts.join(".");
