@@ -101,12 +101,12 @@ class PatientController extends Controller
             ]);
         }
 
-        // Additional validation for Regular/Free Consultancy
-        if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
-            $request->validate([
-                'spouse_name' => $request->type == 'Regular Patient' ? 'required' : 'nullable'
-            ]);
-        }
+        // // Additional validation for Regular/Free Consultancy
+        // if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
+        //     $request->validate([
+        //         'spouse_name' => $request->type == 'Regular Patient' ? 'required' : 'nullable'
+        //     ]);
+        // }
 
         // Laboratory patient type doesn't need additional validation
 

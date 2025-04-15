@@ -316,9 +316,10 @@ $(document).ready(function(){
         filterDoctors('Regular Patient');
     }
     
-    // Handle patient type change
-    $('input[name="type"]').change(function() {
+    // Attach click handlers to all patient type radio buttons
+    $('input[name="type"]').on('click', function() {
         var selectedType = $(this).val();
+        console.log("Patient type selected: " + selectedType);
         hideandshow(selectedType);
     });
     
@@ -466,166 +467,198 @@ $(document).ready(function(){
         });
     }
     
-    function hideandshow(selectedType){
-        // Reset all required fields and visibility first to avoid validation issues when switching types
-        $('#purpose').prop('required', false);
-        $('select[name="filetype"]').prop('required', false);
-        $('#fileTypeContainer').hide();
-        $('#gyneOptionContainer').hide();
+    function hideandshow(selectedType) {
+        // Reset all fields
+        resetAllFields();
         
-        if (selectedType === 'Free Consultancy') {
-            $('#doctorSelectionContainer').hide();
-            $('#doctorCoordinatorContainer').show();
-            // Update required attributes for doctor fields
-            $('#doctor_id').prop('required', false);
-            $('#doctor_coordinator_id').prop('required', true);
-            // Reset requirements for CNIC
-            $('#patient_cnic').prop('required', false);
-            $('#cnic-required').hide();
-            // Show CNIC fields
-            $('[for="patient_cnic"]').closest('.mb-3').show();
-            $('[for="spouse_cnic"]').closest('.mb-3').show();
-            // Show DOB, Address, and Spouse fields
-            $('.gyne-hide-field').show();
-            $('.gyne-hide-section').show();
-            // Show Type field
-            $('.if-hide-field').show();
-            // Set spouse fields as optional
-            $('input[name="spouse_name"]').prop('required', false);
-            $('input[name="spouse_contact"]').prop('required', false);
-            $('.if-required').hide();
-        } else if (selectedType === 'Regular Patient') {
-            $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide();
-            // Update required attributes for doctor fields
-            $('#doctor_id').prop('required', true);
-            $('#doctor_coordinator_id').prop('required', false);
-            // Reset requirements for CNIC
-            $('#patient_cnic').prop('required', false);
-            $('#cnic-required').hide();
-            // Show CNIC fields
-            $('[for="patient_cnic"]').closest('.mb-3').show();
-            $('[for="spouse_cnic"]').closest('.mb-3').show();
-            // Show DOB, Address, and Spouse fields
-            $('.gyne-hide-field').show();
-            $('.gyne-hide-section').show();
-            // Show Type field
-            $('.if-hide-field').show();
-            // Set spouse fields as optional
-            $('input[name="spouse_name"]').prop('required', false);
-            $('input[name="spouse_contact"]').prop('required', false);
-            $('.if-required').hide();
-        } else if (selectedType === 'Laboratory') {
-            $('#doctorSelectionContainer').hide();
-            $('#doctorCoordinatorContainer').hide();
-            // Update required attributes for doctor fields - make not required for Laboratory
-            $('#doctor_id').prop('required', false);
-            $('#doctor_coordinator_id').prop('required', false);
-            
-            // Show only these fields for Laboratory
-            $('input[name="patient_name"]').closest('.col-md-4').show();
-            $('input[name="patient_contact"]').closest('.col-md-4').show();
-            $('input[name="patient_dob"]').closest('.col-md-4').show();
-            $('#alternative_contact').closest('.col-md-4').show();
-            
-            // Hide other personal information fields
-            $('[for="patient_cnic"]').closest('.mb-3').hide();
-            $('[for="patient_address"]').closest('.mb-3').hide();
-            
-            // Show alternative contact field for Laboratory
-            $('.if-hide-field').show();
-            
-            // Hide spouse section
-            $('.gyne-hide-section').hide();
-            
-            // Set spouse fields as not required
-            $('input[name="spouse_name"]').prop('required', false);
-            $('input[name="spouse_contact"]').prop('required', false);
-            $('.if-required').hide();
-        } else if (selectedType === 'Gyne') {
-            $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide();
-            $('#fileTypeContainer').show();
-            $('#gyneOptionContainer').show();
-            
-            // For Gyne patients, show Type field but not Alternative Contact
-            $('.if-hide-field').show();
-            
-            // Update required attributes for doctor fields
-            $('#doctor_id').prop('required', true);
-            $('#doctor_coordinator_id').prop('required', false);
-            
-            // No CNIC required for Gyne
-            $('#patient_cnic').prop('required', false);
-            $('#cnic-required').hide();
-            
-            // Make purpose visible and required for Gyne
-            $('#purpose').show();
-            $('#purpose').prop('required', true);
-            
-            // Make filetype required for Gyne - set it early to ensure DOM has time to update
-            // Ensure the field is visible first
-            setTimeout(function() {
-                $('select[name="filetype"]').prop('required', true);
-            }, 100);
-            
-            // Hide CNIC fields for Gyne
-            $('[for="patient_cnic"]').closest('.mb-3').hide();
-            $('[for="spouse_cnic"]').closest('.mb-3').hide();
-            
-            // Hide DOB, Address, and Spouse fields for Gyne
-            $('.gyne-hide-field').hide();
-            $('.gyne-hide-section').hide();
-            
-            // Set all spouse fields as not required
-            $('input[name="spouse_name"]').prop('required', false);
-            $('input[name="spouse_contact"]').prop('required', false);
-            $('.if-required').hide();
-        } else if (selectedType === 'I/F') {
-            $('#doctorSelectionContainer').show();
-            $('#doctorCoordinatorContainer').hide();
-            $('#fileTypeContainer').show();
-            $('#gyneOptionContainer').hide();
-            
-            // Hide Type field and Alternative Contact for I/F
-            $('.if-hide-field').hide();
-            
-            // Both patient and spouse information required for I/F
-            $('input[name="patient_name"]').prop('required', true);
-            $('input[name="spouse_name"]').prop('required', true);
-            $('input[name="patient_contact"]').prop('required', true);
-            $('input[name="spouse_contact"]').prop('required', true);
-            
-            // Reset requirements for CNIC
-            $('#patient_cnic').prop('required', false);
-            $('#cnic-required').hide();
-            
-            // Make purpose not required for I/F
-            $('#purpose').prop('required', false);
-            
-            // Make filetype required for I/F - add a delay to ensure DOM is updated
-            setTimeout(function() {
-                $('select[name="filetype"]').prop('required', true);
-            }, 100);
-            
-            // Show CNIC fields for I/F
-            $('[for="patient_cnic"]').closest('.mb-3').show();
-            $('[for="spouse_cnic"]').closest('.mb-3').show();
-            
-            // Show DOB, Address, and Spouse fields
-            $('.gyne-hide-field').show();
-            $('.gyne-hide-section').show();
-            
-            // Set spouse fields as required for I/F
-            $('.if-required').show();
-            
-            // Update required attributes for doctor fields
-            $('#doctor_id').prop('required', true);
-            $('#doctor_coordinator_id').prop('required', false);
-        }
+        // Define configuration for each patient type
+        const patientTypeConfig = {
+            'Free Consultancy': {
+                doctor: { show: false, required: false },
+                coordinator: { show: true, required: true },
+                fileType: { show: false, required: false },
+                purpose: { show: false, required: false },
+                gyneOption: { show: false },
+                patientFields: {
+                    cnic: { show: true, required: false },
+                    dob: { show: true },
+                    address: { show: true }
+                },
+                spouseSection: { 
+                    show: true, 
+                    required: false 
+                },
+                ifFields: { show: true },
+                laboratoryFields: { show: true }
+            },
+            'Regular Patient': {
+                doctor: { show: true, required: true },
+                coordinator: { show: false, required: false },
+                fileType: { show: false, required: false },
+                purpose: { show: false, required: false },
+                gyneOption: { show: false },
+                patientFields: {
+                    cnic: { show: true, required: false },
+                    dob: { show: true },
+                    address: { show: true }
+                },
+                spouseSection: { 
+                    show: true, 
+                    required: false 
+                },
+                ifFields: { show: true },
+                laboratoryFields: { show: true }
+            },
+            'Laboratory': {
+                doctor: { show: false, required: false },
+                coordinator: { show: false, required: false },
+                fileType: { show: false, required: false },
+                purpose: { show: false, required: false },
+                gyneOption: { show: false },
+                patientFields: {
+                    cnic: { show: false, required: false },
+                    dob: { show: true },
+                    address: { show: false }
+                },
+                spouseSection: { 
+                    show: false, 
+                    required: false 
+                },
+                ifFields: { show: true },
+                laboratoryFields: { show: false }
+            },
+            'Gyne': {
+                doctor: { show: true, required: true },
+                coordinator: { show: false, required: false },
+                fileType: { show: true, required: true },
+                purpose: { show: true, required: true },
+                gyneOption: { show: true },
+                patientFields: {
+                    cnic: { show: false, required: false },
+                    dob: { show: false },
+                    address: { show: false }
+                },
+                spouseSection: { 
+                    show: false, 
+                    required: false 
+                },
+                ifFields: { show: true },
+                laboratoryFields: { show: true }
+            },
+            'I/F': {
+                doctor: { show: true, required: true },
+                coordinator: { show: false, required: false },
+                fileType: { show: true, required: true },
+                purpose: { show: false, required: false },
+                gyneOption: { show: false },
+                patientFields: {
+                    cnic: { show: true, required: false },
+                    dob: { show: true },
+                    address: { show: true }
+                },
+                spouseSection: { 
+                    show: true, 
+                    required: true 
+                },
+                ifFields: { show: false },
+                laboratoryFields: { show: true }
+            }
+        };
+        
+        // Get configuration for selected type
+        const config = patientTypeConfig[selectedType];
+        
+        // Apply configuration
+        applyDoctorConfig(config.doctor);
+        applyCoordinatorConfig(config.coordinator);
+        applyFileTypeConfig(config.fileType, config.purpose, config.gyneOption);
+        applyPatientFieldsConfig(config.patientFields);
+        applySpouseSectionConfig(config.spouseSection);
+        applySpecialFieldsConfig(config.ifFields, config.laboratoryFields);
+        
+        // Ensure essential fields are always required
+        ensureEssentialFields();
         
         // Call filterDoctors after updating UI
         filterDoctors(selectedType);
+    }
+    
+    // Reset all fields to default state
+    function resetAllFields() {
+        // Reset required fields
+        $('#purpose').prop('required', false);
+        $('select[name="filetype"]').prop('required', false);
+        
+        // Hide containers
+        $('#fileTypeContainer').hide();
+        $('#gyneOptionContainer').hide();
+    }
+
+    // Configure doctor fields
+    function applyDoctorConfig(config) {
+        $('#doctorSelectionContainer').toggle(config.show);
+        $('#doctor_id').prop('required', config.required);
+    }
+
+    // Configure coordinator fields
+    function applyCoordinatorConfig(config) {
+        $('#doctorCoordinatorContainer').toggle(config.show);
+        $('#doctor_coordinator_id').prop('required', config.required);
+    }
+
+    // Configure file type and purpose fields
+    function applyFileTypeConfig(fileTypeConfig, purposeConfig, gyneOptionConfig) {
+        $('#fileTypeContainer').toggle(fileTypeConfig.show);
+        
+        // Use setTimeout to ensure DOM is updated before setting required attribute
+        if (fileTypeConfig.required) {
+            setTimeout(function() {
+                $('select[name="filetype"]').prop('required', fileTypeConfig.required);
+            }, 100);
+        } else {
+            $('select[name="filetype"]').prop('required', false);
+        }
+        
+        if (purposeConfig.show) {
+            $('#gyneOptionContainer').show();
+            $('#purpose').prop('required', purposeConfig.required);
+        } else {
+            $('#gyneOptionContainer').hide();
+            $('#purpose').prop('required', false);
+        }
+    }
+
+    // Configure patient personal fields
+    function applyPatientFieldsConfig(config) {
+        // Configure CNIC field
+        const cnicField = $('[for="patient_cnic"]').closest('.mb-3');
+        cnicField.toggle(config.cnic.show);
+        $('#patient_cnic').prop('required', config.cnic.required);
+        $('#cnic-required').toggle(config.cnic.required);
+        
+        // Configure DOB and Address fields
+        $('.gyne-hide-field').toggle(config.dob.show);
+        $('.laboratory-hide-field').toggle(config.address.show);
+    }
+
+    // Configure spouse section
+    function applySpouseSectionConfig(config) {
+        $('.gyne-hide-section').toggle(config.show);
+        $('input[name="spouse_name"]').prop('required', config.required);
+        $('input[name="spouse_contact"]').prop('required', config.required);
+        $('.if-required').toggle(config.required);
+    }
+
+    // Configure special fields for I/F and Laboratory
+    function applySpecialFieldsConfig(ifConfig, labConfig) {
+        $('.if-hide-field').toggle(ifConfig.show);
+    }
+    
+    // Ensure essential fields are always required
+    function ensureEssentialFields() {
+        // Patient name and contact are always required
+        $('input[name="patient_name"]').prop('required', true);
+        $('input[name="patient_contact"]').prop('required', true);
     }
     
     // Remove browser validation and handle it ourselves
@@ -713,9 +746,6 @@ $(document).ready(function(){
                 e.preventDefault();
                 alert('Type is required for Infertility patients.');
                 $('select[name="filetype"]').focus();
-                $('html, body').animate({
-                    scrollTop: $('#fileTypeContainer').offset().top - 100
-                }, 200);
                 hasError = true;
             }
         } else if (selectedType === 'Regular Patient') {
