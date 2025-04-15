@@ -235,7 +235,6 @@ File: Main Js File
     // Apply the theme based on stored value
     function applyTheme(theme) {
         var body = document.getElementsByTagName("body")[0];
-        theme = "dark";
         if (theme === "dark") {
             document.body.setAttribute("data-bs-theme", "dark");
             document.body.setAttribute("data-topbar", "dark");

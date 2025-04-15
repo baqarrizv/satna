@@ -1,3 +1,20 @@
+<!-- Early theme initialization to prevent flashing -->
+<script>
+(function() {
+    // Apply theme as early as possible to prevent flashing
+    var theme = localStorage.getItem('theme');
+    if (theme === 'dark') {
+        document.documentElement.setAttribute('data-bs-theme', 'dark');
+        document.documentElement.setAttribute('data-topbar', 'dark');
+        document.documentElement.setAttribute('data-sidebar', 'dark');
+    } else {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+        document.documentElement.setAttribute('data-topbar', 'light');
+        document.documentElement.setAttribute('data-sidebar', 'light');
+    }
+})();
+</script>
+
 @yield('css')
 <!-- Bootstrap Css -->
 <link href="{{ URL::asset('/assets/css/bootstrap.css')}}" id="bootstrap-style" rel="stylesheet" type="text/css" />
