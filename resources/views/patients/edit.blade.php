@@ -129,8 +129,8 @@
                                 <div class="mb-3">
                                     <label for="filecreated" class="form-label">File Created</label>
                                     <select name="filecreated" id="filecreated" class="form-control">
-                                        <option value="no" {{ $patient->filecreated == 'no' || !$patient->filecreated ? 'selected' : '' }}>No</option>
-                                        <option value="yes" {{ $patient->filecreated == 'yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="No" {{ $patient->filecreated == 'No' || !$patient->filecreated ? 'selected' : '' }}>No</option>
+                                        <option value="Yes" {{ $patient->filecreated == 'Yes' ? 'selected' : '' }}>Yes</option>
                                     </select>
                                 </div>
                             </div>
@@ -315,6 +315,19 @@ $(document).ready(function(){
     $('#patient_cnic').inputmask('99999-9999999-9');
     $('#spouse_cnic').inputmask('99999-9999999-9');
     $('#patient_contact, #spouse_contact, #alternative_contact').inputmask('(0399) 999-9999');
+
+    // Helper function to count digits in a string
+    function countDigits(str) {
+        return str.replace(/\D/g, '').length;
+    }
+
+    // Helper function to validate phone numbers
+    function validatePhoneNumber(phoneNumber) {
+        // Remove all non-digits
+        const digitsOnly = phoneNumber.replace(/\D/g, '');
+        // Check if exactly 11 digits
+        return digitsOnly.length === 11;
+    }
 
     // Initialize the filter for the current patient type
     var initialType = $('input[name="type"]:checked').val();
@@ -706,6 +719,33 @@ $(document).ready(function(){
             e.preventDefault();
             alert('Contact Number is required.');
             $('input[name="patient_contact"]').focus();
+            return false;
+        }
+
+        // Validate contact number format
+        const contactNumber = $('input[name="patient_contact"]').val();
+        if (!validatePhoneNumber(contactNumber)) {
+            e.preventDefault();
+            alert('Contact Number must contain exactly 11 digits. Please enter a valid mobile number.');
+            $('input[name="patient_contact"]').focus();
+            return false;
+        }
+        
+        // Validate spouse contact if provided
+        const spouseContactNumber = $('input[name="spouse_contact"]').val();
+        if (spouseContactNumber && !validatePhoneNumber(spouseContactNumber)) {
+            e.preventDefault();
+            alert('Spouse Contact Number must contain exactly 11 digits. Please enter a valid mobile number.');
+            $('input[name="spouse_contact"]').focus();
+            return false;
+        }
+        
+        // Validate alternative contact if provided
+        const alternativeContactNumber = $('input[name="alternative_contact"]').val();
+        if (alternativeContactNumber && !validatePhoneNumber(alternativeContactNumber)) {
+            e.preventDefault();
+            alert('Alternative Contact Number must contain exactly 11 digits. Please enter a valid mobile number.');
+            $('input[name="alternative_contact"]').focus();
             return false;
         }
         

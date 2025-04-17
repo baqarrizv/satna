@@ -15,7 +15,7 @@ return new class extends Migration
         // First add the filecreated column
         Schema::table('patients', function (Blueprint $table) {
             // Add filecreated column (nullable, default 'no')
-            $table->enum('filecreated', ['yes', 'no'])->nullable()->default('no');
+            $table->enum('filecreated', ['Yes', 'No'])->nullable()->default('No');
         });
         
         // We'll keep file_number as a string since we're changing the format to include year and padding
