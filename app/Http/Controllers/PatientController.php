@@ -34,15 +34,6 @@ class PatientController extends Controller
             
             return Datatables::of($patients)
                 ->addIndexColumn()
-                ->addColumn('fc_file', function($patient) {
-                    // If fc_number exists, show it, otherwise show N/A
-                    $fcDisplay = $patient->fc_number ? $patient->fc_number : 'N/A';
-                    // If file_number exists, show it, otherwise show N/A
-                    $fileDisplay = $patient->file_number ? $patient->file_number : 'N/A';
-                    
-                    // Always display both values separated by a dash
-                    return $fcDisplay . ' - ' . $fileDisplay;
-                })
                 ->addColumn('action', function($patient) {
                     $actions = '';
                     

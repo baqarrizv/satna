@@ -14,7 +14,13 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $services = Service::with('department');
+            $services = Service::with('department')
+                ->select('services.*');
+            
+            // Apply department filter
+            if ($request->has('department_id') && !empty($request->department_id)) {
+                $services->where('department_id', $request->department_id);
+            }
             
             return Datatables::of($services)
                 ->addIndexColumn()

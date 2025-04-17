@@ -87,7 +87,8 @@
                             <tr>
                                 <th>#</th>
                                 <th>ID</th>
-                                <th>FC-File</th>
+                                <th>FC</th>
+                                <th>File</th>
                                 <th>Name</th>
                                 <th>Contact Number</th>
                                 <th>Type</th>
@@ -148,8 +149,13 @@
                     name: 'id'
                 },
                 {
-                    data: 'fc_file',
-                    name: 'fc_file',
+                    data: 'fc_number',
+                    name: 'fc_number',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'file_number',
+                    name: 'file_number',
                     defaultContent: 'N/A'
                 },
                 {

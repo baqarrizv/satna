@@ -5,6 +5,8 @@
 @section('css')
     <!-- DataTables -->
     <link href="{{ URL::asset('/assets/libs/datatables/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <!-- Select2 CSS -->
+    <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('content')
@@ -24,6 +26,29 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Filter Services</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="departmentFilter" class="form-label">Department</label>
+                                <select id="departmentFilter" class="form-control select2">
+                                    <option value="">All Departments</option>
+                                    @foreach(\App\Models\Department::all() as $department)
+                                    <option value="{{ $department->id }}">{{ $department->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -32,8 +57,8 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Name</th>
                                 <th>Department</th>
+                                <th>Name</th>
                                 <th>Charges</th>
                                 <th>Actions</th>
                             </tr>
@@ -49,23 +74,38 @@
 @section('script')
     <!-- Required datatable js -->
     <script src="{{ URL::asset('/assets/libs/datatables/datatables.min.js') }}"></script>
+    <!-- Select2 -->
+    <script src="{{ URL::asset('/assets/libs/select2/select2.min.js') }}"></script>
 
     <script type="text/javascript">
         $(function () {
+            // Initialize select2
+            $('.select2').select2();
+            
             var table = $('#services-table').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('services.index') }}",
+                ajax: {
+                    url: "{{ route('services.index') }}",
+                    data: function(d) {
+                        d.department_id = $('#departmentFilter').val();
+                    }
+                },
                 columns: [
                     {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false},
-                    {data: 'name', name: 'name'},
-                    {data: 'department.name', name: 'department.name'},
+                    {data: 'department.name', name: 'department.name', defaultContent: 'N/A'},
+                    {data: 'name', name: 'name', defaultContent: 'N/A'},
                     {data: 'charges', name: 'charges'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
                 ],
                 responsive: true,
                 pageLength: 25,
                 order: [[1, 'asc']]
+            });
+            
+            // Apply filter when department selection changes
+            $('#departmentFilter').change(function() {
+                table.draw();
             });
         });
     </script>
