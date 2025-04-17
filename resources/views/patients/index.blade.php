@@ -94,6 +94,7 @@
                                 <th>Type</th>
                                 <th>Doctor Coordinator</th>
                                 <th>Doctor</th>
+                                <th>File Created</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -177,6 +178,11 @@
                 {
                     data: 'doctor.name',
                     name: 'doctor.name',
+                    defaultContent: 'N/A'
+                },
+                {
+                    data: 'filecreated',
+                    name: 'filecreated',
                     defaultContent: 'N/A'
                 },
                 {

@@ -110,7 +110,7 @@ class PatientController extends Controller
         // Generate File Number for non-Free Consultancy patient types
         if ($request->type != 'Free Consultancy') {
             // Get current year's last two digits (e.g., 23 for 2023)
-            $currentYear = date('y') + 1;
+            $currentYear = date('y');
             
             // Find the maximum file number for the current year
             $yearPrefix = "TFC-$currentYear/";
