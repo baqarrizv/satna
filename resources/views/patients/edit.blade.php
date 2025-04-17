@@ -124,6 +124,16 @@
                                     @enderror
                                 </div>
                             </div>
+                             <!-- File Created Field - Only for Regular Patient -->
+                             <div class="col-md-4" id="fileCreatedContainer" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="filecreated" class="form-label">File Created</label>
+                                    <select name="filecreated" id="filecreated" class="form-control">
+                                        <option value="no" {{ $patient->filecreated == 'no' || !$patient->filecreated ? 'selected' : '' }}>No</option>
+                                        <option value="yes" {{ $patient->filecreated == 'yes' ? 'selected' : '' }}>Yes</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Patient Numbers Information -->
@@ -247,6 +257,8 @@
                                     <input type="text" id="alternative_contact" name="alternative_contact" class="form-control" value="{{ $patient->alternative_contact }}">
                                 </div>
                             </div>
+                            
+                           
                         </div>
 
                         <!-- Spouse Information -->
@@ -489,7 +501,8 @@ $(document).ready(function(){
                     required: false 
                 },
                 ifFields: { show: true },
-                laboratoryFields: { show: true }
+                laboratoryFields: { show: true },
+                fileCreated: { show: false }
             },
             'Regular Patient': {
                 doctor: { show: true, required: true },
@@ -507,7 +520,8 @@ $(document).ready(function(){
                     required: false 
                 },
                 ifFields: { show: true },
-                laboratoryFields: { show: true }
+                laboratoryFields: { show: true },
+                fileCreated: { show: true }
             },
             'Laboratory': {
                 doctor: { show: false, required: false },
@@ -525,7 +539,8 @@ $(document).ready(function(){
                     required: false 
                 },
                 ifFields: { show: true },
-                laboratoryFields: { show: false }
+                laboratoryFields: { show: false },
+                fileCreated: { show: false }
             },
             'Gyne': {
                 doctor: { show: true, required: true },
@@ -543,7 +558,8 @@ $(document).ready(function(){
                     required: false 
                 },
                 ifFields: { show: true },
-                laboratoryFields: { show: true }
+                laboratoryFields: { show: true },
+                fileCreated: { show: false }
             },
             'I/F': {
                 doctor: { show: true, required: true },
@@ -561,7 +577,8 @@ $(document).ready(function(){
                     required: true 
                 },
                 ifFields: { show: false },
-                laboratoryFields: { show: true }
+                laboratoryFields: { show: true },
+                fileCreated: { show: false }
             }
         };
         
@@ -575,6 +592,7 @@ $(document).ready(function(){
         applyPatientFieldsConfig(config.patientFields);
         applySpouseSectionConfig(config.spouseSection);
         applySpecialFieldsConfig(config.ifFields, config.laboratoryFields);
+        applyFileCreatedConfig(config.fileCreated);
         
         // Ensure essential fields are always required
         ensureEssentialFields();
@@ -652,6 +670,11 @@ $(document).ready(function(){
     // Configure special fields for I/F and Laboratory
     function applySpecialFieldsConfig(ifConfig, labConfig) {
         $('.if-hide-field').toggle(ifConfig.show);
+    }
+    
+    // Configure File Created field
+    function applyFileCreatedConfig(config) {
+        $('#fileCreatedContainer').toggle(config.show);
     }
     
     // Ensure essential fields are always required

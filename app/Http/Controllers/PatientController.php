@@ -84,22 +84,13 @@ class PatientController extends Controller
             'type' => 'required'
         ]);
 
-        // Additional validation for Gyne/Ultrasound
-        if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
+        // Additional validation for Gyne
+        if (in_array($request->type, ['Gyne'])) {
             $request->validate([
                 'filetype' => 'required',
                 'purpose' => 'required'
             ]);
         }
-
-        // // Additional validation for Regular/Free Consultancy
-        // if (in_array($request->type, ['Regular Patient', 'Free Consultancy'])) {
-        //     $request->validate([
-        //         'spouse_name' => $request->type == 'Regular Patient' ? 'required' : 'nullable'
-        //     ]);
-        // }
-
-        // Laboratory patient type doesn't need additional validation
 
         // Generate FC Number and File Number based on type
         $fcNumber = null;
@@ -118,13 +109,27 @@ class PatientController extends Controller
         
         // Generate File Number for non-Free Consultancy patient types
         if ($request->type != 'Free Consultancy') {
+            // Get current year's last two digits (e.g., 23 for 2023)
+            $currentYear = date('y') + 1;
+            
+            // Find the maximum file number for the current year
+            $yearPrefix = "TFC-$currentYear/";
             $maxFileNumber = Patient::withTrashed()
                 ->whereNotNull('file_number')
-                ->where('file_number', '!=', '')
-                ->max(DB::raw('CAST(file_number AS UNSIGNED)'));
+                ->where('file_number', 'like', "$yearPrefix%")
+                ->get()
+                ->map(function($patient) use ($yearPrefix) {
+                    // Extract only the numeric part after the prefix
+                    $numericPart = str_replace($yearPrefix, '', $patient->file_number);
+                    return (int)$numericPart;
+                })
+                ->max();
             
-            // If max exists, increment by 1, otherwise start from 1001
-            $fileNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1001;
+            // If max exists, increment by 1, otherwise start from 1
+            $nextNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1;
+            
+            // Format as TFC-YY/00001
+            $fileNumber = $yearPrefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
         }
 
         // Double-check if the generated numbers are unique (including deleted patients)
@@ -135,8 +140,12 @@ class PatientController extends Controller
         }
         
         if ($fileNumber) {
+            $yearPrefix = substr($fileNumber, 0, 7); // Get TFC-YY/
+            $numericPart = (int)substr($fileNumber, 7); // Get the numeric part
+            
             while (Patient::withTrashed()->where('file_number', $fileNumber)->exists()) {
-                $fileNumber++;
+                $numericPart++;
+                $fileNumber = $yearPrefix . str_pad($numericPart, 5, '0', STR_PAD_LEFT);
             }
         }
 
@@ -211,18 +220,34 @@ class PatientController extends Controller
 
         // If patient type is changing from Free Consultancy to another type and doesn't have a file number
         if ($request->type != 'Free Consultancy' && (!$fileNumber || $fileNumber == '')) {
-            // Get the maximum file_number that exists in the database
+            // Get current year's last two digits (e.g., 23 for 2023)
+            $currentYear = date('y');
+            
+            // Find the maximum file number for the current year
+            $yearPrefix = "TFC-$currentYear/";
             $maxFileNumber = Patient::withTrashed()
                 ->whereNotNull('file_number')
-                ->where('file_number', '!=', '')
-                ->max(DB::raw('CAST(file_number AS UNSIGNED)'));
+                ->where('file_number', 'like', "$yearPrefix%")
+                ->get()
+                ->map(function($patient) use ($yearPrefix) {
+                    // Extract only the numeric part after the prefix
+                    $numericPart = str_replace($yearPrefix, '', $patient->file_number);
+                    return (int)$numericPart;
+                })
+                ->max();
             
-            // If max exists, increment by 1, otherwise start from 1001
-            $fileNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1001;
+            // If max exists, increment by 1, otherwise start from 1
+            $nextNumber = $maxFileNumber ? ($maxFileNumber + 1) : 1;
+            
+            // Format as TFC-YY/00001
+            $fileNumber = $yearPrefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
             
             // Double-check uniqueness (including deleted patients)
+            $numericPart = (int)substr($fileNumber, 7); // Get the numeric part
+            
             while (Patient::withTrashed()->where('file_number', $fileNumber)->where('id', '!=', $patient->id)->exists()) {
-                $fileNumber++;
+                $numericPart++;
+                $fileNumber = $yearPrefix . str_pad($numericPart, 5, '0', STR_PAD_LEFT);
             }
         }
 
