@@ -252,13 +252,11 @@
         </table>
         <br>
         <!-- Payment Details -->
-        <div class="payment-section" style="position: relative; width: 100%; overflow: visible; padding: 30px 0;">
-            <!-- PAID stamp as background of the payment table -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
-                <img src="{{ public_path('assets/images/settings/paid.png') }}" alt="PAID" style="margin-left: 300px; margin-top: 50px; width: 100px; height: 60px;">    
-                <span style="margin-left: -80px;margin-top: 200px; font-size: 8px; font-weight: bold; ">{{ $payment->created_at->format('d-M-Y') }}</span>
+        <div class="payment-section" style="position: relative; width: 100%; overflow: visible; ">
+            <div style="position: absolute; z-index: 3;">
+                <img src="{{ public_path('assets/images/settings/paid.png') }}" alt="PAID" style="margin-left: 300px; margin-top: 50px; width: 120px; height: 70px;">    
+                <span style="position: absolute; margin-left: -103px;margin-top: 50px; font-size: 11px; font-weight: bold; ">{{ $payment->created_at->format('d-M-Y') }}</span>
             </div>
-            
             <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem; position: relative; z-index: 1;">
                 <tbody>
                 @if ($payment->doctor_charges > 0)
