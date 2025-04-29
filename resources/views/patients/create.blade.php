@@ -358,7 +358,7 @@ $(document).ready(function(){
                 },
                 ifFields: { show: true },
                 laboratoryFields: { show: true },
-                fileCreated: { show: true }
+                fileCreated: { show: false }
             },
             'Laboratory': {
                 doctor: { show: false, required: false },
@@ -415,7 +415,7 @@ $(document).ready(function(){
                 },
                 ifFields: { show: false },
                 laboratoryFields: { show: true },
-                fileCreated: { show: false }
+                fileCreated: { show: true }
             }
         };
         

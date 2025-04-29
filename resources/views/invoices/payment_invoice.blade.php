@@ -254,8 +254,8 @@
         <!-- Payment Details -->
         <div class="payment-section" style="position: relative; width: 100%; overflow: visible; ">
             <div style="position: absolute; z-index: 3;">
-                <img src="{{ public_path('assets/images/settings/paid.png') }}" alt="PAID" style="margin-left: 300px; margin-top: 50px; width: 120px; height: 70px;">    
-                <span style="position: absolute; margin-left: -103px;margin-top: 50px; font-size: 11px; font-weight: bold; ">{{ $payment->created_at->format('d-M-Y') }}</span>
+                <img src="{{ public_path('assets/images/settings/paid.png') }}" alt="PAID" style="margin-left: 300px; margin-top: 10%; width: 120px; height: 70px;">    
+                <span style="position: absolute; margin-left: -103px;margin-top: 45px; font-size: 11px; font-weight: bold; ">{{ $payment->created_at->format('d-M-Y') }}</span>
             </div>
             <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem; position: relative; z-index: 1;">
                 <tbody>
