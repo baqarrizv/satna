@@ -99,10 +99,18 @@ class PaymentController extends Controller
 
             if ($patientId) {
                 $patient = Patient::find($patientId);
+            } else if (session('patientId')) {
+                $patient = Patient::find(session('patientId'));
             }
+            
+            // Get active doctors for the dropdown
+            $doctors = Doctor::where('is_active', true)->get();
+
+            // Check if we need to show doctor selection
+            $showDoctorSelection = session('showDoctorSelection', false);
 
             // Handle GET request: Show the form
-            return view('payments.addCharges', compact('patient'));
+            return view('payments.addCharges', compact('patient', 'doctors', 'showDoctorSelection'));
         }
 
         if ($request->isMethod('post')) {
@@ -110,6 +118,7 @@ class PaymentController extends Controller
             $validatedData = $request->validate([
                 'type' => 'required|string',
                 'patient' => 'required|string',
+                'doctor_id' => 'nullable|exists:doctors,id',
             ]);
 
             $input = $validatedData['patient'];
@@ -128,15 +137,28 @@ class PaymentController extends Controller
 
             // Check if patient exists
             if (!$patient) {
-                return redirect()->route('payments.addCharges', compact('patient'))
-                    ->withErrors(['patient' => 'Patient not found. Please check the ID or contact number.']);
+                $doctors = Doctor::where('is_active', true)->get();
+                // Instead of error, show the form with doctor selection
+                session()->flash('error', 'Patient ID not found. Please assign a doctor to this patient.');
+                return view('payments.addCharges', [
+                    'showDoctorSelection' => true, 
+                    'patientInput' => $input,
+                    'doctors' => $doctors,
+                    'type' => $validatedData['type']
+                ]);
+            }
+            
+            // If doctor_id is provided and patient has no doctor, assign the doctor
+            if (!empty($validatedData['doctor_id']) && isset($patient) && !$patient->doctor_id) {
+                $patient->doctor_id = $validatedData['doctor_id'];
+                $patient->save();
             }
 
             $type = $validatedData['type'];
 
             if ($type === 'Appointment Charges' && empty($patient->doctor->doctor_charges)) {
                 return redirect()->route('payments.addCharges')
-                    ->with(['patientId' => $patient->id])
+                    ->with(['patientId' => $patient->id, 'showDoctorSelection' => true])
                     ->withErrors(['patient' => 'Assign a doctor to this patient before adding Appointment Charges']);
             }
 
