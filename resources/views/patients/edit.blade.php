@@ -803,14 +803,6 @@ $(document).ready(function(){
                 $('input[name="spouse_contact"]').focus();
                 hasError = true;
             }
-            
-            var fileType = $('select[name="filetype"]').val();
-            if (!fileType && $('#fileTypeContainer').is(':visible')) {
-                e.preventDefault();
-                alert('Type is required for Infertility patients.');
-                $('select[name="filetype"]').focus();
-                hasError = true;
-            }
         } else if (selectedType === 'Regular Patient') {
             if (!$('#doctor_id').val()) {
                 e.preventDefault();

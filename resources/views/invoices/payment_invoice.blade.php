@@ -147,6 +147,31 @@
             display: block;
             margin: 0 auto;
         }
+        
+        .payment-section {
+            position: relative;
+            width: 100%;
+            height: fit-content;
+            max-height: fit-content;
+        }
+
+        .paid-stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.7;
+            color: #0046ad;
+            font-size: 50px;
+            font-weight: bold;
+            border: 4px solid #0046ad;
+            padding: 5px 15px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
 
         @media print {
             body {
@@ -163,8 +188,6 @@
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
-
-
         }
     </style>
 </head>
@@ -175,7 +198,7 @@
         <table style="width: 100%; border-bottom: 2px solid #e5e7eb;">
             <tr>
                 <td style="text-align: center; padding: 10px 0; width: 15%;">
-                    <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'storage/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
+                    <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'assets/images/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
                 </td>
                 <td style="padding: 10px 0; text-align: center; width: 85%;">
                     <h1 style="color: #2563eb; margin-left: -90px; font-size: 1.5rem; margin-top: 0.5rem;">Payment Slip</h1>
@@ -229,8 +252,15 @@
         </table>
         <br>
         <!-- Payment Details -->
-        <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem;">
-            <tbody>
+        <div class="payment-section" style="position: relative; width: 100%; overflow: visible; padding: 30px 0;">
+            <!-- PAID stamp as background of the payment table -->
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
+                <img src="{{ public_path('assets/images/settings/paid.png') }}" alt="PAID" style="margin-left: 300px; margin-top: 50px; width: 100px; height: 60px;">    
+                <span style="margin-left: -80px;margin-top: 200px; font-size: 8px; font-weight: bold; ">{{ $payment->created_at->format('d-M-Y') }}</span>
+            </div>
+            
+            <table style="width: 100%; border-collapse: collapse; padding: 0 3rem 0 3rem; position: relative; z-index: 1;">
+                <tbody>
                 @if ($payment->doctor_charges > 0)
                 <tr>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">Doctor Charges</td>
@@ -244,8 +274,8 @@
                 </tr>
                 @endforeach
                 @endif
-            </tbody>
-            <tfoot>
+                </tbody>
+                <tfoot>
                 <tr>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; font-weight: 600;">Sub Total</td>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">{{ number_format($payment->sub_total, 0) }}</td>
@@ -264,19 +294,18 @@
                     <td style="font-size: 12px; padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($payment->tax, 0) }}</td>
                 </tr>
                 @endif
-
+                
                 <tr>
                     <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700;">Total Amount</td>
                     <td style="padding: 0.1rem; background-color: #f8fafc; font-weight: 700; text-align: right;">
                         {{ number_format($payment->total + ($payment->tax ?? 0), 0) }}
                     </td>
                 </tr>
-            </tfoot>
-        </table>
+                </tfoot>
+            </table>
+        </div>        
         <br>
-        <!-- Divider line -->
-        <hr style="border: 0; border-top: 1px solid black; margin: 0.1rem;">
-
+        <hr style="border: 1px solid black;">
         <!-- Print info -->
         <table style="width: 100%; font-size: 0.7rem; color: #6b7280;">
             <tr style="justify-content: space-between;">
