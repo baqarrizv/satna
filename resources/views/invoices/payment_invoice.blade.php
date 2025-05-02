@@ -201,7 +201,7 @@
                     <img src="{{ public_path(config('settings.logo_light') ? str_replace(asset(''), '', config('settings.logo_light')) : 'assets/images/settings/Setna.jpg') }}" alt="{{ config('settings.title') }}" class="logo-img">
                 </td>
                 <td style="padding: 10px 0; text-align: center; width: 85%;">
-                    <h1 style="color: #2563eb; margin-left: -90px; font-size: 1.5rem; margin-top: 0.5rem;">Payment Slip</h1>
+                    <h1 style="color: #2563eb; margin-left: -90px; font-size: 1.5rem; margin-top: -1.0rem;">Payment Slip</h1>
                 </td>
             </tr>
         </table>

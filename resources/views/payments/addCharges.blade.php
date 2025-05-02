@@ -57,7 +57,7 @@
                             @if((isset($patient) && !$patient->doctor_id) || $showDoctorSelection)
                             <div class="col-12 mt-3" id="doctor-selection-container">
                                 <label for="doctor_id" class="form-label">Select Doctor</label>
-                                <select class="form-control @error('doctor_id') is-invalid @enderror" id="doctor_id" name="doctor_id" required>
+                                <select class="form-control doctor_id @error('doctor_id') is-invalid @enderror" id="doctor_id" name="doctor_id" required>
                                     <option value="">Select Doctor</option>
                                     @foreach($doctors as $doctor)
                                         <option value="{{ $doctor->id }}" {{ old('doctor_id') == $doctor->id ? 'selected' : '' }}>
@@ -105,7 +105,7 @@ $(document).ready(function() {
     let isMasked = false;
 
     // Initialize Select2 for doctor dropdown
-    $('#doctor_id').select2({
+    $('.doctor_id').select2({
         placeholder: 'Select a doctor',
         width: '100%'
     });
@@ -121,8 +121,10 @@ $(document).ready(function() {
             
             if($('#type').val() == 'Service Charges'){
                 $('#doctor-selection-container').hide();
+                $('.doctor_id').prop('required', false);
             } else {
                 $('#doctor-selection-container').show();
+                $('.doctor_id').prop('required', true);
             }
         }
     }

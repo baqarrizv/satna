@@ -71,7 +71,7 @@
                                 <div class="services">
                                     <div class="service-row">
                                         <div class="row mb-3">
-                                            <div class="col-md-3">
+                                            <div class="col-md-4">
                                                 <label class="form-label"><strong>Department *</strong></label>
                                                 <select id="department-filter-0" class="form-control department-filter select2" required>
                                                     <option value="">Select Department</option>
@@ -103,7 +103,7 @@
                                                 <label class="form-label"><strong>Charges</strong></label>
                                                 <input type="text" name="charges[]" readonly class="form-control service-charges" value="">
                                             </div>
-                                            <div class="col-md-2 d-flex align-items-end">
+                                            <div class="col-md-1 d-flex align-items-end">
                                                 <button type="button" class="btn btn-danger remove-row">-</button>
                                             </div>
                                         </div>
@@ -506,7 +506,7 @@
             const newRowHtml = `
             <div class="service-row">
                 <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label class="form-label"><strong>Department *</strong></label>
                         <select id="${newDepartmentFilterId}" class="form-control department-filter" required>
                             <option value="">Select Department</option>
@@ -531,7 +531,7 @@
                         <label class="form-label"><strong>Charges</strong></label>
                         <input type="text" name="charges[]" readonly class="form-control service-charges" value="">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
+                    <div class="col-md-1 d-flex align-items-end">
                         <button type="button" class="btn btn-danger remove-row">-</button>
                     </div>
                 </div>
