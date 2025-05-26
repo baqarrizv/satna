@@ -99,6 +99,17 @@
                                                     @endforeach
                                                 </select>
                                             </div>
+                                            <div class="col-md-3 doctor-section d-none">
+                                                <label class="form-label"><strong>Doctor</strong></label>
+                                                <select id="doctor-select-0" name="service_doctor_id[]" class="form-control doctor-select select2">
+                                                    <option value="">Select Doctor</option>
+                                                    @foreach($ultrasound_doctors as $doctor)
+                                                    <option value="{{ $doctor->id }}" data-charges="{{ $doctor->doctor_charges }}">
+                                                        {{ $doctor->name }} ({{ $doctor->department->name }})
+                                                    </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                             <div class="col-md-3">
                                                 <label class="form-label"><strong>Charges</strong></label>
                                                 <input type="text" name="charges[]" readonly class="form-control service-charges" value="">
@@ -350,7 +361,29 @@
             const selectedDepartment = $(this).val();
             const serviceRow = $(this).closest('.service-row');
             const serviceSelect = serviceRow.find('.service-select');
+            const doctorSection = serviceRow.find('.doctor-section');
 
+            const departmentDiv = serviceRow.find('.department-filter').closest('.col-md-4, .col-md-3');
+            const serviceDiv = serviceRow.find('.service-select').closest('.col-md-4, .col-md-3');
+            const chargesDiv = serviceRow.find('.service-charges').closest('.col-md-3, .col-md-2');
+
+
+            
+            if (selectedDepartment === 'ULTRASOUND') {
+                doctorSection.removeClass('d-none');
+
+                // Change widths
+                departmentDiv.removeClass('col-md-4').addClass('col-md-3');
+                serviceDiv.removeClass('col-md-4').addClass('col-md-3');
+                chargesDiv.removeClass('col-md-3').addClass('col-md-2');
+            } else {
+                doctorSection.addClass('d-none');
+
+                // Restore original widths
+                departmentDiv.removeClass('col-md-3').addClass('col-md-4');
+                serviceDiv.removeClass('col-md-3').addClass('col-md-4');
+                chargesDiv.removeClass('col-md-2').addClass('col-md-3');
+            }
             console.log('Department changed:', selectedDepartment);
 
             // Reset service selection and charges fields
@@ -501,6 +534,7 @@
             const rowCount = $('.service-row').length;
             const newDepartmentFilterId = 'department-filter-' + rowCount;
             const newServiceSelectId = 'service-select-' + rowCount;
+            const newDoctorSelectId = 'doctor-select-' + rowCount;
 
             // HTML for the new row
             const newRowHtml = `
@@ -525,6 +559,17 @@
                                     data-department="${$(this).data('department')}" 
                                     style="display: none;">${$(this).text()}</option>`;
                             }).get().join('')}
+                        </select>
+                    </div>
+                    <div class="col-md-3 doctor-section d-none">
+                        <label class="form-label"><strong>Doctor</strong></label>
+                        <select id="${newDoctorSelectId}" name="service_doctor_id[]" class="form-control doctor-select select2">
+                            <option value="">Select Doctor</option>
+                            @foreach($ultrasound_doctors as $doctor)
+                            <option value="{{ $doctor->id }}" data-charges="{{ $doctor->doctor_charges }}">
+                                {{ $doctor->name }} ({{ $doctor->department->name }})
+                            </option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -552,6 +597,13 @@
                 width: '100%',
                 placeholder: 'Select Department First',
                 dropdownParent: $('#' + newServiceSelectId).parent()
+            });
+
+            // Initialize doctor select with Select2
+            $('#' + newDoctorSelectId).select2({
+                width: '100%',
+                placeholder: 'Select Doctor',
+                dropdownParent: $('#' + newDoctorSelectId).parent()
             });
 
             // Enable all remove buttons

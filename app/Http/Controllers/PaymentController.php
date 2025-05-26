@@ -105,7 +105,7 @@ class PaymentController extends Controller
             
             // Get active doctors for the dropdown
             $doctors = Doctor::where('is_active', true)->get();
-
+            $ultrasound_doctors = Doctor::where('is_active', true)->where('department_id', 3)->get();
             // Check if we need to show doctor selection
             $showDoctorSelection = session('showDoctorSelection', false);
 
@@ -138,12 +138,14 @@ class PaymentController extends Controller
             // Check if patient exists
             if (!$patient) {
                 $doctors = Doctor::where('is_active', true)->get();
+                $ultrasound_doctors = Doctor::where('is_active', true)->where('department_id', 3)->get();
                 // Instead of error, show the form with doctor selection
                 session()->flash('error', 'Patient ID not found. Please assign a doctor to this patient.');
                 return view('payments.addCharges', [
                     'showDoctorSelection' => true, 
                     'patientInput' => $input,
                     'doctors' => $doctors,
+                    'ultrasound_doctors' => $ultrasound_doctors,
                     'type' => $validatedData['type']
                 ]);
             }
@@ -192,11 +194,10 @@ class PaymentController extends Controller
                 if ($b === 'Uncategorized') return -1;
                 return $a <=> $b;
             });
-
             // Get all doctors for the doctor selection dropdown
             $doctors = Doctor::all();
-
-            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors', 'settings'));
+            $ultrasound_doctors = Doctor::where('is_active', true)->where('department_id', 3)->get();
+            return view('payments.viewChargeDetails', compact('patient', 'type', 'groupedServices', 'doctors', 'ultrasound_doctors', 'settings'));
         }
     }
 
@@ -258,16 +259,21 @@ class PaymentController extends Controller
             'remarks' => $request->remarks,
             'patient_type' => $patient->type,
         ];
-
         if ($request->type === 'Service Charges' && !empty($request->services)) {
             $sub_total = 0;
-
             foreach ($request->services as $i => $service_id) {
                 $service = Service::findOrFail($service_id);
+                $doctor = null;
+                if (isset($request->service_doctor_id[$i]) && $request->service_doctor_id[$i]) {
+                    $doctor = Doctor::find($request->service_doctor_id[$i]);
+                }
+               
                 $paymentServiceData[$i] = [
                     'service_name' => $service->name,
                     'department_name' => $service->department->name,
                     'charges' => $service->charges,
+                    'service_doctor_id' => isset($request->service_doctor_id[$i]) ? $request->service_doctor_id[$i] : null,
+                    'service_doctor_name' => $doctor ? $doctor->name : '',
                 ];
                 $sub_total += $service->charges;
             }

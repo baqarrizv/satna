@@ -267,7 +267,12 @@
                 @else
                 @foreach ($payment->services as $service)
                 <tr>
-                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">{{ $service->service_name }}</td>
+                    <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb;">
+                        {{ $service->service_name }}
+                        @if($service->service_doctor_name)
+                        <br><small style="color: #6b7280;">Doctor: {{ $service->service_doctor_name }}</small>
+                        @endif
+                    </td>
                     <td style="padding: 0.1rem; border-bottom: 1px solid #e5e7eb; text-align: right;">{{ number_format($service->charges, 0) }}</td>
                 </tr>
                 @endforeach
