@@ -1,7 +1,9 @@
 @extends('layouts.master')
 
 @section('title') Edit Doctor @endsection
-
+<link rel="stylesheet" href="{{ URL::asset('/assets/libs/flatpickr/flatpickr.min.css') }}">
+<!-- JS -->
+<script src="{{ URL::asset('/assets/libs/flatpickr/flatpickr.min.js') }}"></script>
 @section('content')
 <div class="container-fluid">
     <div class="row">
@@ -43,7 +45,7 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="dob" class="form-label">Date of Birth</label>
-                                    <input type="date" id="dob" name="dob" class="form-control @error('dob') is-invalid @enderror" value="{{ old('dob', $doctor->dob) }}" autocomplete="bday">
+                                    <input type="text" id="dob" name="dob" class="form-control @error('dob') is-invalid @enderror" value="{{ old('dob', $doctor->dob) }}" autocomplete="bday">
                                     @error('dob')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -157,7 +159,7 @@
                             <div class="col-md-3">
                                 <div class="mb-3">
                                     <label for="date_of_appointment" class="form-label">Date of Appointment <span class="text-danger">*</span></label>
-                                    <input type="date" id="date_of_appointment" name="date_of_appointment" required class="form-control @error('date_of_appointment') is-invalid @enderror" value="{{ old('date_of_appointment', $doctor->date_of_appointment) }}">
+                                    <input type="text" id="date_of_appointment" name="date_of_appointment" required class="form-control @error('date_of_appointment') is-invalid @enderror" value="{{ old('date_of_appointment', $doctor->date_of_appointment) }}">
                                     @error('date_of_appointment')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -442,6 +444,15 @@
 
         // Initial calculation on page load
         calculateAmounts();
+    });
+    flatpickr("#dob", {
+        dateFormat: "d/m/Y",  // This gives you dd/mm/yyyy
+        defaultDate: "{{ $doctor->dob }}"
+    });
+    
+    flatpickr("#date_of_appointment", {
+        dateFormat: "d/m/Y",  // This gives you dd/mm/yyyy
+        defaultDate: "{{ $doctor->date_of_appointment }}"
     });
 </script>
 @endsection

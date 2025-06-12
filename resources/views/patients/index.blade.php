@@ -91,6 +91,7 @@
                                 <th>File</th>
                                 <th>Name</th>
                                 <th>Contact Number</th>
+                                <th>CNIC</th>
                                 <th>Type</th>
                                 <th>Doctor Coordinator</th>
                                 <th>Doctor</th>
@@ -166,6 +167,10 @@
                 {
                     data: 'patient_contact',
                     name: 'patient_contact'
+                },
+                {
+                    data: 'patient_cnic',
+                    name: 'patient_cnic'
                 },
                 {
                     data: 'type',

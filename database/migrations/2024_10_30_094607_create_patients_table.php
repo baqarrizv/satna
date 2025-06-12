@@ -11,14 +11,14 @@ return new class extends Migration
         Schema::create('patients', function (Blueprint $table) {
             $table->id(); // This will serve as the unique identifier for patients
             $table->string('patient_name');
-            $table->date('patient_dob');
+            $table->string('patient_dob', 10)->nullable();
             $table->string('patient_cnic')->unique(); // Unique CNIC with masking
             $table->string('patient_contact')->nullable(); // Contact with masking
             $table->string('patient_occupation')->nullable();
             $table->text('patient_address')->nullable();
 
             $table->string('spouse_name')->nullable();
-            $table->date('spouse_dob')->nullable();
+            $table->string('spouse_dob', 10)->nullable();
             $table->string('spouse_cnic')->nullable();
             $table->string('spouse_contact')->nullable();
             $table->string('spouse_occupation')->nullable();

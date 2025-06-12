@@ -33,6 +33,41 @@ class PatientController extends Controller
             }
             
             return Datatables::of($patients)
+                    ->filter(function ($query) use ($request) {
+                        $search = $request->input('search.value');
+
+                        if ($search) {
+                            $cleanedSearch = str_replace(' ', '', $search); // Space removed
+                            $rawSearch = $search; // As user typed
+
+                            $query->where(function ($q) use ($cleanedSearch, $rawSearch) {
+                                $q->where(function ($contactQ) use ($cleanedSearch, $rawSearch) {
+                                    // Only for patient_contact: search with and without space
+                                    $contactQ->whereRaw("
+                                                    REPLACE(
+                                                        REPLACE(
+                                                            REPLACE(
+                                                                REPLACE(patient_contact, '-', ''),
+                                                            ' ', ''),
+                                                        '(', ''),
+                                                    ')', '') LIKE ?", ["%$cleanedSearch%"])
+                                                ->orWhere('patient_contact', 'LIKE', "%$rawSearch%");
+                                    });
+
+                                // Now normal search for other visible columns
+                                if (!empty($rawSearch)) {
+                                    $q->orWhere('patient_name', 'like', "%{$rawSearch}%")
+                                    ->orWhere('id', 'like', "%{$rawSearch}%")
+                                    ->orWhere('fc_number', 'like', "%{$rawSearch}%")
+                                    ->orWhere('file_number', 'like', "%{$rawSearch}%")
+                                    ->orWhereRaw("REPLACE(patient_cnic, '-', '') LIKE ?", ["%$cleanedSearch%"])
+                                    ->orWhere('patient_cnic', 'like', "%{$rawSearch}%")
+                                    ->orWhere('type', 'like', "%{$rawSearch}%")
+                                    ->orWhere('filecreated', 'like', "%{$rawSearch}%");
+                                }
+                            });
+                        }
+                    })
                 ->addIndexColumn()
                 ->addColumn('action', function($patient) {
                     $actions = '';
@@ -82,6 +117,12 @@ class PatientController extends Controller
             'patient_name' => 'required',
             'patient_contact' => 'required',
             'type' => 'required'
+        ]);
+
+        $request->merge([
+            'patient_contact' => $request->patient_contact ? $request->patient_contact_country_code . ' ' . str_replace(' ', '', $request->patient_contact) : null,
+            'spouse_contact' => $request->spouse_contact ? $request->spouse_contact_country_code . ' ' . str_replace(' ', '', $request->spouse_contact) : null,
+            'alternative_contact' => $request->alternative_contact ? $request->alternative_contact_country_code . ' ' . str_replace(' ', '', $request->alternative_contact) : null,
         ]);
 
         // Additional validation for Gyne
@@ -182,6 +223,12 @@ class PatientController extends Controller
             'type' => 'required'
         ]);
 
+        $request->merge([
+            'patient_contact' => $request->patient_contact ? $request->patient_contact_country_code . ' ' . str_replace(' ', '', $request->patient_contact) : null,
+            'spouse_contact' => $request->spouse_contact ? $request->spouse_contact_country_code . ' ' . str_replace(' ', '', $request->spouse_contact) : null,
+            'alternative_contact' => $request->alternative_contact ? $request->alternative_contact_country_code . ' ' . str_replace(' ', '', $request->alternative_contact) : null,
+        ]);
+        
         // Additional validation for Gyne/Ultrasound
         if (in_array($request->type, ['Gyne', 'Ultrasound'])) {
             $request->validate([

@@ -5,6 +5,38 @@
 @section('css')
 <!-- No additional CSS needed -->
 <link href="{{ URL::asset('/assets/libs/select2/select2.min.css') }}" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{{ URL::asset('/assets/libs/intl-tel-input/css/intlTelInput.min.css') }}" />
+<script src="{{ URL::asset('/assets/libs/intl-tel-input/js/intlTelInput.min.js') }}"></script>
+<script src="{{ URL::asset('/assets/libs/intl-tel-input/js/utils.js') }}"></script>
+
+<link rel="stylesheet" href="{{ URL::asset('/assets/libs/flatpickr/flatpickr.min.css') }}">
+<!-- JS -->
+<script src="{{ URL::asset('/assets/libs/flatpickr/flatpickr.min.js') }}"></script>
+
+<style>
+    .iti {
+        width: 100%;
+    }
+    .iti__flag-container {
+        display: flex;
+        align-items: center;
+    }
+    .form-control.iti__tel-input {
+        height: 38px;
+        border-radius: 0.25rem;
+        border: 1px solid #ced4da;
+        padding-left: 90px;
+    }
+    .iti__selected-flag {
+        background-color: transparent !important;
+        border-right: 1px solid #ced4da;
+        padding: 0 8px;
+    }
+    .iti__country-list {
+        z-index: 1050;
+    }
+</style>
+
 @endsection
 
 @section('content')
@@ -33,7 +65,10 @@
                             <!-- Patient Type Selection -->
                             <div class="col-md-12">
                                 <div class="mb-4">
-                                    <label class="form-label fw-bold">Patient Type</label>
+                                <input type="hidden" id="patient_contact_country_code" name="patient_contact_country_code" class="form-control" value="92">
+                                <input type="hidden" id="spouse_contact_country_code" name="spouse_contact_country_code" class="form-control" value="92">
+                                <input type="hidden" id="alternative_contact_country_code" name="alternative_contact_country_code" class="form-control" value="92">
+                                <label class="form-label fw-bold">Patient Type</label>
                                     <div class="d-flex flex-wrap gap-2">
                                         <div class="form-check p-2">
                                             <input type="radio" id="freeConsultancy" name="type" class="form-check-input" value="Free Consultancy">
@@ -185,7 +220,8 @@
                             <div class="col-md-4">
                                 <div class="mb-3 gyne-hide-field">
                                     <label for="patient_dob" class="form-label">Date of Birth</label>
-                                    <input type="date" name="patient_dob" class="form-control" value="{{ old('patient_dob') }}">
+                                    <input type="text" id="patient_dob" name="patient_dob" class="form-control" value="{{ old('patient_dob') }}">
+                                    
                                 </div>
                             </div>
                           
@@ -236,7 +272,7 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label for="spouse_dob" class="form-label">Spouse Date of Birth</label>
-                                    <input type="date" name="spouse_dob" class="form-control">
+                                    <input type="text" id="spouse_dob" name="spouse_dob" class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -285,7 +321,6 @@ $(document).ready(function(){
     // Initialize input masks
     $('#patient_cnic').inputmask('99999-9999999-9');
     $('#spouse_cnic').inputmask('99999-9999999-9');
-    $('#patient_contact, #spouse_contact, #alternative_contact').inputmask('(0399) 999-9999');
 
     // Helper function to count digits in a string
     function countDigits(str) {
@@ -541,32 +576,7 @@ $(document).ready(function(){
             return false;
         }
 
-        // Validate contact number format
-        const contactNumber = $('input[name="patient_contact"]').val();
-        if (!validatePhoneNumber(contactNumber)) {
-            e.preventDefault();
-            alert('Contact Number must contain exactly 11 digits. Please enter a valid mobile number.');
-            $('input[name="patient_contact"]').focus();
-            return false;
-        }
-        
-        // Validate spouse contact if provided
-        const spouseContactNumber = $('input[name="spouse_contact"]').val();
-        if (spouseContactNumber && !validatePhoneNumber(spouseContactNumber)) {
-            e.preventDefault();
-            alert('Spouse Contact Number must contain exactly 11 digits. Please enter a valid mobile number.');
-            $('input[name="spouse_contact"]').focus();
-            return false;
-        }
-        
-        // Validate alternative contact if provided
-        const alternativeContactNumber = $('input[name="alternative_contact"]').val();
-        if (alternativeContactNumber && !validatePhoneNumber(alternativeContactNumber)) {
-            e.preventDefault();
-            alert('Alternative Contact Number must contain exactly 11 digits. Please enter a valid Pakistani mobile number.');
-            $('input[name="alternative_contact"]').focus();
-            return false;
-        }
+
         
         // Type-specific validation
         if (selectedType === 'Free Consultancy') {
@@ -780,6 +790,57 @@ $(document).ready(function(){
             }
         });
     }
+    // Set country code
+    const phoneFields = [
+      { inputId: '#patient_contact', codeId: '#patient_contact_country_code' },
+      { inputId: '#spouse_contact', codeId: '#spouse_contact_country_code' },
+      { inputId: '#alternative_contact', codeId: '#alternative_contact_country_code' },
+    ];
+
+    const itiInstances = {};
+
+    // Initialize intl-tel-input and apply mask
+    phoneFields.forEach((field, index) => {
+      const inputEl = document.querySelector(field.inputId);
+      const iti = window.intlTelInput(inputEl, {
+        separateDialCode: true,
+        preferredCountries: ["pk", "af", "us", "gb", "in", "sa"],
+        utilsScript: index === 0
+          ? "{{ URL::asset('/assets/libs/intl-tel-input/js/utils.js') }}"
+          : undefined
+      });
+
+      itiInstances[field.inputId] = iti;
+
+      function applyMask() {
+        setTimeout(() => {
+          const placeholder = inputEl.getAttribute("placeholder");
+          const mask = placeholder.replace(/\d/g, "9");
+
+          $(inputEl).inputmask(mask, {
+            placeholder: '_',
+            showMaskOnHover: false,
+            showMaskOnFocus: true,
+            clearIncomplete: true
+          });
+
+          $(field.codeId).val(iti.getSelectedCountryData().dialCode);
+        }, 100);
+      }
+
+      applyMask();
+
+      inputEl.addEventListener("countrychange", applyMask);
+    });
+    flatpickr("#patient_dob", {
+        dateFormat: "d/m/Y",  // This gives you dd/mm/yyyy
+        defaultDate: "{{ old('patient_dob') }}"
+    });
+    
+    flatpickr("#spouse_dob", {
+        dateFormat: "d/m/Y",  // This gives you dd/mm/yyyy
+        defaultDate: "{{ old('spouse_dob') }}"
+    });
 });
 </script>
 @endsection

@@ -11,14 +11,14 @@ class CreateDoctorsTable extends Migration
         Schema::create('doctors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->date('dob');
+            $table->string('dob', 10)->nullable();
             $table->enum('sex', ['Male', 'Female']);
             $table->string('religion')->nullable();
             $table->string('doctor_id')->unique(); // Manually provided unique ID
             $table->string('cnic')->unique();
             $table->string('contact_number');
             $table->text('address');
-            $table->date('date_of_appointment');
+            $table->string('date_of_appointment', 10)->nullable();
             $table->enum('marital_status', ['Single', 'Married', 'Divorced']);
             $table->string('specialist');            
             $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
